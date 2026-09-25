@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090d14">
+<title>Arpit Market Scanner</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090d14;color:#eef3fa;font-family:Arial,sans-serif}
+.app{max-width:520px;margin:auto;padding-bottom:80px}
+header{padding:20px 16px 10px;display:flex;justify-content:space-between}
+h1{font-size:21px;margin:0}
+.sub{color:#8995a8;font-size:12px;margin-top:4px}
+.live{background:#13291e;color:#61dc96;padding:7px 10px;border-radius:20px;font-size:11px}
+.card{margin:10px 14px;padding:15px;background:#111923;border:1px solid #202c3c;border-radius:16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+select,button{background:#182230;color:#eef3fa;border:1px solid #2a394d;border-radius:10px;padding:10px}
+button.active{background:#35455c}
+.price{font-size:30px;font-weight:bold;margin-top:14px}
+.muted{color:#8794a8;font-size:12px}
+.chart{height:210px;margin-top:12px;background:#0b1119;border-radius:12px;display:flex;align-items:flex-end;gap:4px;padding:10px}
+.bar{width:7px;background:#5fd995;border-radius:3px 3px 0 0}
+.red{background:#e87878}
+.level{margin:20px 0;border-top:1px solid #e9c85b;position:relative}
+.level span{position:relative;top:-18px;font-size:11px;color:#e9c85b}
+.support{border-color:#55b8e8}
+.support span{color:#55b8e8}
+.signal{background:#17212e;padding:12px;border-radius:11px;margin-top:8px}
+.green{color:#62dc97}.yellow{color:#e9c85b}
+nav{position:fixed;bottom:0;left:0;right:0;background:#0d141e;border-top:1px solid #202c3c;display:flex;justify-content:space-around;padding:10px}
+nav button{background:none;border:0;font-size:11px}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+<div>
+<h1>Arpit Market Scanner</h1>
+<div class="sub">Automatic Price Action Scanner</div>
+</div>
+<div class="live">● DEMO</div>
+</header>
+
+<div class="card">
+
+<div class="row">
+<select id="symbol">
+<option>NIFTY</option>
+<option>BANKNIFTY</option>
+<option>MCX CRUDE OIL</option>
+</select>
+
+<div>
+<button class="active" onclick="changeTF(5,this)">5m</button>
+<button onclick="changeTF(15,this)">15m</button>
+</div>
+</div>
+
+<div class="price" id="price">25,480.20</div>
+<div class="muted">Live connection: pending</div>
+
+<div class="chart" id="chart"></div>
+
+</div>
+
+<div class="card">
+
+<div class="row">
+<b>Automatic Levels</b>
+<span class="muted">Price Action Engine</span>
+</div>
+
+<div class="level">
+<span>25,500 Resistance</span>
+</div>
+
+<div class="level support">
+<span>25,420 Support</span>
+</div>
+
+<div class="row">
+<span>Level Strength</span>
+<b class="yellow">STRONG</b>
+</div>
+
+</div>
+
+<div class="card">
+
+<b>Scanner Status</b>
+
+<div class="signal">
+<div class="muted">Market Structure</div>
+<b class="green">BULLISH</b>
+</div>
+
+<div class="signal">
+<div class="muted">Breakout</div>
+<b class="yellow">WAITING FOR CLOSE</b>
+</div>
+
+<div class="signal">
+<div class="muted">Retest</div>
+<b class="yellow">NOT TRIGGERED</b>
+</div>
+
+<div class="signal">
+<div class="muted">False Breakout</div>
+<span class="muted">No confirmation</span>
+</div>
+
+</div>
+
+<div class="card">
+
+<b>Confirmation Engine</b>
+
+<p class="muted">
+Level → Breakout candle close → Retest → Rejection/Hold → Confirmation.
+Wick-only break is not treated as a confirmed breakout.
+</p>
+
+</div>
+
+</div>
+
+<nav>
+<button>⌂<br>Home</button>
+<button>◉<br>Scanner</button>
+<button>▥<br>Levels</button>
+<button>↗<br>History</button>
+</nav>
+
+<script>
+
+let timeframe=5;
+
+function changeTF(tf,btn){
+
+timeframe=tf;
+
+document.querySelectorAll(".active")
+.forEach(x=>x.classList.remove("active"));
+
+btn.classList.add("active");
+
+drawChart();
+
+}
+
+function drawChart(){
+
+let chart=document.getElementById("chart");
+
+chart.innerHTML="";
+
+for(let i=0;i<42;i++){
+
+let bar=document.createElement("div");
+
+bar.className="bar";
+
+if(i%7===0)
+bar.classList.add("red");
+
+let height=
+(Math.sin(i*1.7+timeframe)*0.5+0.5)*130+25;
+
+bar.style.height=height+"px";
+
+chart.appendChild(bar);
+
+}
+
+}
+
+drawChart();
+
+setInterval(function(){
+
+let price=25480.20+(Math.random()-0.5)*8;
+
+document.getElementById("price").innerText=
+price.toLocaleString("en-IN",{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+});
+
+},1800);
+
+</script>
+
+</body>
+</html>
