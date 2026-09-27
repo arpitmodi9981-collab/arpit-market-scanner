@@ -61,6 +61,60 @@ button.active{background:#35455c}
 .note{font-size:11px;color:#758196;line-height:1.5}
 </style>
 </head>
+  <section id="historySection" style="margin:20px 0;padding:16px;border:1px solid #333;border-radius:12px;">
+  <h2>5Y Historical Data</h2>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+    <button onclick="loadHistory('NIFTY')">NIFTY</button>
+    <button onclick="loadHistory('BANKNIFTY')">BANKNIFTY</button>
+    <button onclick="loadHistory('MCX CRUDE OIL')">CRUDE OIL</button>
+  </div>
+
+  <div id="historyStatus">
+    Historical data loading...
+  </div>
+
+  <div id="historyInfo" style="margin-top:10px;"></div>
+</section>
+
+<script>
+async function loadHistory(symbol) {
+  const status = document.getElementById("historyStatus");
+  const info = document.getElementById("historyInfo");
+
+  status.textContent = "Checking historical data...";
+  info.textContent = "";
+
+  try {
+    const response = await fetch(
+      API + "/history/" + encodeURIComponent(symbol)
+    );
+
+    if (!response.ok) {
+      throw new Error("History request failed");
+    }
+
+    const data = await response.json();
+
+    status.textContent =
+      data.history && data.history.length
+        ? "Historical data available"
+        : "Historical data source not connected yet";
+
+    info.innerHTML = `
+      <div>Instrument: <b>${data.symbol}</b></div>
+      <div>Timeframes: <b>${data.timeframes.join(", ")}</b></div>
+      <div>Period: <b>${data.years || 5} years</b></div>
+      <div>Records: <b>${data.history ? data.history.length : 0}</b></div>
+    `;
+
+  } catch (error) {
+    status.textContent = "Unable to load historical data.";
+  }
+}
+
+loadHistory("NIFTY");
+</script>
 
 <body>
 <div class="app">
