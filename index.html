@@ -8,384 +8,77 @@
 
 <style>
 *{box-sizing:border-box}
-body{
-  margin:0;background:#090d14;color:#eef3fa;
-  font-family:Arial,sans-serif
-}
+body{margin:0;background:#090d14;color:#eef3fa;font-family:Arial,sans-serif}
 .app{max-width:620px;margin:auto;padding-bottom:90px}
 header{padding:18px 16px 10px}
 h1{font-size:22px;margin:0}
 .sub{color:#8995a8;font-size:12px;margin-top:5px}
 .controls{display:flex;gap:8px;padding:10px 14px}
-select,button{
-  background:#182230;color:#eef3fa;border:1px solid #2b394b;
-  border-radius:10px;padding:11px;font-size:14px
-}
+select,button{background:#182230;color:#eef3fa;border:1px solid #2b394b;border-radius:10px;padding:11px;font-size:14px}
 button.active{background:#35455c}
-.card{
-  margin:10px 14px;padding:15px;background:#111925;
-  border:1px solid #253247;border-radius:14px
-}
+.card{margin:10px 14px;padding:15px;background:#111925;border:1px solid #253247;border-radius:14px}
 .row{display:flex;justify-content:space-between;gap:10px;align-items:center}
 .label{color:#8995a8;font-size:12px}
 .price{font-size:28px;font-weight:bold;margin-top:5px}
-.badge{
-  display:inline-block;padding:5px 8px;border-radius:8px;
-  font-size:11px;background:#302a18;color:#f3c96a
-}
+.badge{display:inline-block;padding:5px 8px;border-radius:8px;font-size:11px;background:#302a18;color:#f3c96a}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.level{
-  padding:12px;border-radius:10px;background:#151f2d
-}
+.level{padding:12px;border-radius:10px;background:#151f2d}
 .level strong{display:block;font-size:18px;margin-top:5px}
 .status{font-size:15px;font-weight:bold;margin-top:5px}
-.green{color:#61dc96}.red{color:#ff7070}.yellow{color:#f3c96a}
+.green{color:#61dc96}
+.red{color:#ff7070}
+.yellow{color:#f3c96a}
 .small{font-size:12px;color:#8995a8;line-height:1.5}
-.chart{
-  height:190px;display:flex;align-items:flex-end;gap:5px;
-  padding:12px;background:#0b111a;border-radius:10px;
-  overflow:hidden
-}
+.chart{height:190px;display:flex;align-items:flex-end;gap:5px;padding:12px;background:#0b111a;border-radius:10px;overflow:hidden}
 .bar{width:8px;border-radius:3px 3px 0 0;min-height:12px}
-.up{background:#61dc96}.down{background:#ff7070}
-.zone{
-  margin-top:10px;padding:10px;border-left:3px solid #f3c96a;
-  background:#171b20;border-radius:5px
-}
-.nav{
-  position:fixed;bottom:0;left:0;right:0;background:#0d131d;
-  border-top:1px solid #243044;display:flex;justify-content:center;
-  gap:25px;padding:12px
-}
+.up{background:#61dc96}
+.down{background:#ff7070}
+.zone{margin-top:10px;padding:10px;border-left:3px solid #f3c96a;background:#171b20;border-radius:5px}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#0d131d;border-top:1px solid #243044;display:flex;justify-content:center;gap:25px;padding:12px}
 .nav span{font-size:12px;color:#8995a8}
 .note{font-size:11px;color:#758196;line-height:1.5}
+.historyButtons{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.historyButtons button{flex:1;min-width:90px}
+.historyInfo{margin-top:12px;padding:10px;background:#151f2d;border-radius:10px;line-height:1.8}
 </style>
 </head>
-  <section id="historySection" style="margin:20px 0;padding:16px;border:1px solid #333;border-radius:12px;">
-  <h2>5Y Historical Data</h2>
-
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-    <button onclick="loadHistory('NIFTY')">NIFTY</button>
-    <button onclick="loadHistory('BANKNIFTY')">BANKNIFTY</button>
-    <button onclick="loadHistory('MCX CRUDE OIL')">CRUDE OIL</button>
-  </div>
-
-  <div id="historyStatus">
-    Historical data loading...
-  </div>
-
-  <div id="historyInfo" style="margin-top:10px;"></div>
-</section>
-
-<script>
-async function loadHistory(symbol) {
-  const status = document.getElementById("historyStatus");
-  const info = document.getElementById("historyInfo");
-
-  status.textContent = "Checking historical data...";
-  info.textContent = "";
-
-  try {
-    const response = await fetch(
-      API + "/history/" + encodeURIComponent(symbol)
-    );
-
-    if (!response.ok) {
-      throw new Error("History request failed");
-    }
-
-    const data = await response.json();
-
-    status.textContent =
-      data.history && data.history.length
-        ? "Historical data available"
-        : "Historical data source not connected yet";
-
-    info.innerHTML = `
-      <div>Instrument: <b>${data.symbol}</b></div>
-      <div>Timeframes: <b>${data.timeframes.join(", ")}</b></div>
-      <div>Period: <b>${data.years || 5} years</b></div>
-      <div>Records: <b>${data.history ? data.history.length : 0}</b></div>
-    `;
-
-  } catch (error) {
-    status.textContent = "Unable to load historical data.";
-  }
-}
-
-loadHistory("NIFTY");
-</script>
 
 <body>
+
 <div class="app">
 
 <header>
-  <h1>Arpit Market Scanner</h1>
-  <div class="sub">Price-action analysis • Demo engine</div>
+<h1>Arpit Market Scanner</h1>
+<div class="sub">Price-action analysis • Backend engine</div>
 </header>
 
 <div class="controls">
-  <select id="instrument">
-    <option>NIFTY</option>
-    <option>BANKNIFTY</option>
-    <option>MCX CRUDE OIL</option>
-  </select>
-  <button id="m5" class="active">5m</button>
-  <button id="m15">15m</button>
+<select id="instrument">
+<option>NIFTY</option>
+<option>BANKNIFTY</option>
+<option>MCX CRUDE OIL</option>
+</select>
+
+<button id="m5" class="active">5m</button>
+<button id="m15">15m</button>
 </div>
 
 <div class="card">
-  <div class="row">
-    <div>
-      <div class="label">Current price</div>
-      <div class="price" id="price">25,480.20</div>
-    </div>
-    <span class="badge">DEMO DATA</span>
-  </div>
+<div class="row">
+<div>
+<div class="label">Current price</div>
+<div class="price" id="price">Loading...</div>
+</div>
+<span class="badge">BACKEND DATA</span>
+</div>
 </div>
 
 <div class="card">
-  <div class="row">
-    <div>
-      <div class="label">Market structure</div>
-      <div class="status" id="structure">Analysing...</div>
-    </div>
-    <div>
-      <div class="label">Timeframe</div>
-      <div class="status" id="tf">5 minute</div>
-    </div>
-  </div>
+<div class="row">
+<div>
+<div class="label">Market structure</div>
+<div class="status" id="structure">Loading...</div>
 </div>
 
-<div class="card">
-  <div class="label">Automatic price-action chart</div>
-  <div class="chart" id="chart"></div>
-</div>
-
-<div class="card">
-  <div class="label">Automatic levels</div>
-
-  <div class="grid">
-    <div class="level">
-      <div class="label">Resistance zone</div>
-      <strong id="resistance">25,500</strong>
-      <div class="small">Repeated swing / rejection area</div>
-    </div>
-
-    <div class="level">
-      <div class="label">Support zone</div>
-      <strong id="support">25,420</strong>
-      <div class="small">Repeated swing / rejection area</div>
-    </div>
-  </div>
-
-  <div class="zone">
-    <div class="label">Level strength</div>
-    <div class="status yellow" id="strength">Calculating...</div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="label">Setup analysis</div>
-
-  <div class="grid">
-    <div class="level">
-      <div class="label">Breakout</div>
-      <div class="status" id="breakout">Waiting</div>
-    </div>
-
-    <div class="level">
-      <div class="label">Retest</div>
-      <div class="status" id="retest">Waiting</div>
-    </div>
-
-    <div class="level">
-      <div class="label">False breakout</div>
-      <div class="status" id="falseBreak">No confirmation</div>
-    </div>
-
-    <div class="level">
-      <div class="label">Breakdown</div>
-      <div class="status" id="breakdown">Waiting</div>
-    </div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="label">Confirmation engine</div>
-  <p class="small">
-    The scanner checks swing highs/lows, repeated rejection,
-    previous-range style levels, candle closes outside a zone,
-    return to the zone and rejection after the return.
-  </p>
-
-  <div class="zone">
-    <div class="label">Current classification</div>
-    <div class="status" id="classification">No confirmed setup</div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="label">Important</div>
-  <p class="note">
-    This version is an educational demo engine. It does not receive
-    live exchange prices and does not place trades. A future live
-    provider connection must supply authorised market data before
-    the analysis can operate on real-time candles.
-  </p>
-</div>
-
-</div>
-
-<div class="nav">
-  <span>Home</span>
-  <span>Scanner</span>
-  <span>Levels</span>
-  <span>History</span>
-</div>
-
-<script>
-const API = "https://arpit-market-scanner-backend.onrender.com";
-
-const state = {
-  instrument: "NIFTY",
-  timeframe: "5m"
-};
-
-function drawChart(candles){
-  const chart = document.getElementById("chart");
-  chart.innerHTML = "";
-
-  if(!candles || !candles.length) return;
-
-  const highs = candles.map(c => c.high);
-  const lows = candles.map(c => c.low);
-  const max = Math.max(...highs);
-  const min = Math.min(...lows);
-  const range = Math.max(max - min, 1);
-
-  candles.forEach(c => {
-    const bar = document.createElement("div");
-
-    const height =
-      ((c.close - min) / range) * 150 + 20;
-
-    bar.className =
-      "bar " + (c.close >= c.open ? "up" : "down");
-
-    bar.style.height =
-      Math.max(12, height) + "px";
-
-    chart.appendChild(bar);
-  });
-}
-
-async function update(){
-
-  try {
-
-    const response = await fetch(
-      API + "/scanner/" +
-      encodeURIComponent(state.instrument)
-    );
-
-    if(!response.ok){
-      throw new Error("Backend error");
-    }
-
-    const data = await response.json();
-
-    document.getElementById("price").textContent =
-      Number(data.price).toLocaleString("en-IN");
-
-    document.getElementById("resistance").textContent =
-      Number(data.levels.resistance).toLocaleString("en-IN");
-
-    document.getElementById("support").textContent =
-      Number(data.levels.support).toLocaleString("en-IN");
-
-    document.getElementById("structure").textContent =
-      data.priceAction.structure;
-
-    document.getElementById("strength").textContent =
-      data.levels.strength;
-
-    document.getElementById("breakout").textContent =
-      data.priceAction.breakout;
-
-    document.getElementById("retest").textContent =
-      data.priceAction.retest;
-
-    document.getElementById("falseBreak").textContent =
-      data.priceAction.falseBreakout;
-
-    document.getElementById("breakdown").textContent =
-      "Waiting";
-
-    document.getElementById("classification").textContent =
-      data.priceAction.breakout !== "Waiting for close"
-        ? data.priceAction.breakout
-        : data.priceAction.falseBreakout !== "No confirmation"
-          ? data.priceAction.falseBreakout
-          : "No confirmed setup";
-
-    drawChart(
-      data.candles[state.timeframe]
-    );
-
-  } catch(error) {
-
-    document.getElementById("price").textContent =
-      "Connection error";
-
-    document.getElementById("classification").textContent =
-      "Backend connection failed";
-  }
-}
-
-document.getElementById("instrument")
-.addEventListener("change", e => {
-
-  state.instrument = e.target.value;
-
-  update();
-});
-
-document.getElementById("m5")
-.addEventListener("click", () => {
-
-  state.timeframe = "5m";
-
-  document.getElementById("m5")
-    .classList.add("active");
-
-  document.getElementById("m15")
-    .classList.remove("active");
-
-  document.getElementById("tf")
-    .textContent = "5 minute";
-
-  update();
-});
-
-document.getElementById("m15")
-.addEventListener("click", () => {
-
-  state.timeframe = "15m";
-
-  document.getElementById("m15")
-    .classList.add("active");
-
-  document.getElementById("m5")
-    .classList.remove("active");
-
-  document.getElementById("tf")
-    .textContent = "15 minute";
-
-  update();
-});
-
-update();
-</script>
-</body>
-</html>
+<div>
+<div class="label">
