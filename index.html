@@ -8,192 +8,232 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090d14;color:#eef3fa;font-family:Arial,sans-serif}
-.app{max-width:520px;margin:auto;padding-bottom:80px}
-header{padding:20px 16px 10px;display:flex;justify-content:space-between}
-h1{font-size:21px;margin:0}
-.sub{color:#8995a8;font-size:12px;margin-top:4px}
-.live{background:#13291e;color:#61dc96;padding:7px 10px;border-radius:20px;font-size:11px}
-.card{margin:10px 14px;padding:15px;background:#111923;border:1px solid #202c3c;border-radius:16px}
-.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-select,button{background:#182230;color:#eef3fa;border:1px solid #2a394d;border-radius:10px;padding:10px}
+body{
+  margin:0;background:#090d14;color:#eef3fa;
+  font-family:Arial,sans-serif
+}
+.app{max-width:620px;margin:auto;padding-bottom:90px}
+header{padding:18px 16px 10px}
+h1{font-size:22px;margin:0}
+.sub{color:#8995a8;font-size:12px;margin-top:5px}
+.controls{display:flex;gap:8px;padding:10px 14px}
+select,button{
+  background:#182230;color:#eef3fa;border:1px solid #2b394b;
+  border-radius:10px;padding:11px;font-size:14px
+}
 button.active{background:#35455c}
-.price{font-size:30px;font-weight:bold;margin-top:14px}
-.muted{color:#8794a8;font-size:12px}
-.chart{height:210px;margin-top:12px;background:#0b1119;border-radius:12px;display:flex;align-items:flex-end;gap:4px;padding:10px}
-.bar{width:7px;background:#5fd995;border-radius:3px 3px 0 0}
-.red{background:#e87878}
-.level{margin:20px 0;border-top:1px solid #e9c85b;position:relative}
-.level span{position:relative;top:-18px;font-size:11px;color:#e9c85b}
-.support{border-color:#55b8e8}
-.support span{color:#55b8e8}
-.signal{background:#17212e;padding:12px;border-radius:11px;margin-top:8px}
-.green{color:#62dc97}.yellow{color:#e9c85b}
-nav{position:fixed;bottom:0;left:0;right:0;background:#0d141e;border-top:1px solid #202c3c;display:flex;justify-content:space-around;padding:10px}
-nav button{background:none;border:0;font-size:11px}
+.card{
+  margin:10px 14px;padding:15px;background:#111925;
+  border:1px solid #253247;border-radius:14px
+}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.label{color:#8995a8;font-size:12px}
+.price{font-size:28px;font-weight:bold;margin-top:5px}
+.badge{
+  display:inline-block;padding:5px 8px;border-radius:8px;
+  font-size:11px;background:#302a18;color:#f3c96a
+}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.level{
+  padding:12px;border-radius:10px;background:#151f2d
+}
+.level strong{display:block;font-size:18px;margin-top:5px}
+.status{font-size:15px;font-weight:bold;margin-top:5px}
+.green{color:#61dc96}.red{color:#ff7070}.yellow{color:#f3c96a}
+.small{font-size:12px;color:#8995a8;line-height:1.5}
+.chart{
+  height:190px;display:flex;align-items:flex-end;gap:5px;
+  padding:12px;background:#0b111a;border-radius:10px;
+  overflow:hidden
+}
+.bar{width:8px;border-radius:3px 3px 0 0;min-height:12px}
+.up{background:#61dc96}.down{background:#ff7070}
+.zone{
+  margin-top:10px;padding:10px;border-left:3px solid #f3c96a;
+  background:#171b20;border-radius:5px
+}
+.nav{
+  position:fixed;bottom:0;left:0;right:0;background:#0d131d;
+  border-top:1px solid #243044;display:flex;justify-content:center;
+  gap:25px;padding:12px
+}
+.nav span{font-size:12px;color:#8995a8}
+.note{font-size:11px;color:#758196;line-height:1.5}
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
 <header>
-<div>
-<h1>Arpit Market Scanner</h1>
-<div class="sub">Automatic Price Action Scanner</div>
-</div>
-<div class="live">● DEMO</div>
+  <h1>Arpit Market Scanner</h1>
+  <div class="sub">Price-action analysis • Demo engine</div>
 </header>
 
-<div class="card">
-
-<div class="row">
-<select id="symbol">
-<option>NIFTY</option>
-<option>BANKNIFTY</option>
-<option>MCX CRUDE OIL</option>
-</select>
-
-<div>
-<button class="active" onclick="changeTF(5,this)">5m</button>
-<button onclick="changeTF(15,this)">15m</button>
-</div>
-</div>
-
-<div class="price" id="price">25,480.20</div>
-<div class="muted">Live connection: pending</div>
-
-<div class="chart" id="chart"></div>
-
+<div class="controls">
+  <select id="instrument">
+    <option>NIFTY</option>
+    <option>BANKNIFTY</option>
+    <option>MCX CRUDE OIL</option>
+  </select>
+  <button id="m5" class="active">5m</button>
+  <button id="m15">15m</button>
 </div>
 
 <div class="card">
-
-<div class="row">
-<b>Automatic Levels</b>
-<span class="muted">Price Action Engine</span>
-</div>
-
-<div class="level">
-<span>25,500 Resistance</span>
-</div>
-
-<div class="level support">
-<span>25,420 Support</span>
-</div>
-
-<div class="row">
-<span>Level Strength</span>
-<b class="yellow">STRONG</b>
-</div>
-
+  <div class="row">
+    <div>
+      <div class="label">Current price</div>
+      <div class="price" id="price">25,480.20</div>
+    </div>
+    <span class="badge">DEMO DATA</span>
+  </div>
 </div>
 
 <div class="card">
-
-<b>Scanner Status</b>
-
-<div class="signal">
-<div class="muted">Market Structure</div>
-<b class="green">BULLISH</b>
-</div>
-
-<div class="signal">
-<div class="muted">Breakout</div>
-<b class="yellow">WAITING FOR CLOSE</b>
-</div>
-
-<div class="signal">
-<div class="muted">Retest</div>
-<b class="yellow">NOT TRIGGERED</b>
-</div>
-
-<div class="signal">
-<div class="muted">False Breakout</div>
-<span class="muted">No confirmation</span>
-</div>
-
+  <div class="row">
+    <div>
+      <div class="label">Market structure</div>
+      <div class="status" id="structure">Analysing...</div>
+    </div>
+    <div>
+      <div class="label">Timeframe</div>
+      <div class="status" id="tf">5 minute</div>
+    </div>
+  </div>
 </div>
 
 <div class="card">
+  <div class="label">Automatic price-action chart</div>
+  <div class="chart" id="chart"></div>
+</div>
 
-<b>Confirmation Engine</b>
+<div class="card">
+  <div class="label">Automatic levels</div>
 
-<p class="muted">
-Level → Breakout candle close → Retest → Rejection/Hold → Confirmation.
-Wick-only break is not treated as a confirmed breakout.
-</p>
+  <div class="grid">
+    <div class="level">
+      <div class="label">Resistance zone</div>
+      <strong id="resistance">25,500</strong>
+      <div class="small">Repeated swing / rejection area</div>
+    </div>
 
+    <div class="level">
+      <div class="label">Support zone</div>
+      <strong id="support">25,420</strong>
+      <div class="small">Repeated swing / rejection area</div>
+    </div>
+  </div>
+
+  <div class="zone">
+    <div class="label">Level strength</div>
+    <div class="status yellow" id="strength">Calculating...</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="label">Setup analysis</div>
+
+  <div class="grid">
+    <div class="level">
+      <div class="label">Breakout</div>
+      <div class="status" id="breakout">Waiting</div>
+    </div>
+
+    <div class="level">
+      <div class="label">Retest</div>
+      <div class="status" id="retest">Waiting</div>
+    </div>
+
+    <div class="level">
+      <div class="label">False breakout</div>
+      <div class="status" id="falseBreak">No confirmation</div>
+    </div>
+
+    <div class="level">
+      <div class="label">Breakdown</div>
+      <div class="status" id="breakdown">Waiting</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="label">Confirmation engine</div>
+  <p class="small">
+    The scanner checks swing highs/lows, repeated rejection,
+    previous-range style levels, candle closes outside a zone,
+    return to the zone and rejection after the return.
+  </p>
+
+  <div class="zone">
+    <div class="label">Current classification</div>
+    <div class="status" id="classification">No confirmed setup</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="label">Important</div>
+  <p class="note">
+    This version is an educational demo engine. It does not receive
+    live exchange prices and does not place trades. A future live
+    provider connection must supply authorised market data before
+    the analysis can operate on real-time candles.
+  </p>
 </div>
 
 </div>
 
-<nav>
-<button>⌂<br>Home</button>
-<button>◉<br>Scanner</button>
-<button>▥<br>Levels</button>
-<button>↗<br>History</button>
-</nav>
+<div class="nav">
+  <span>Home</span>
+  <span>Scanner</span>
+  <span>Levels</span>
+  <span>History</span>
+</div>
 
 <script>
+const state={
+  instrument:"NIFTY",
+  timeframe:5,
+  price:25480.2
+};
 
-let timeframe=5;
+function makeCandles(){
+  const candles=[];
+  let p=state.price-45;
 
-function changeTF(tf,btn){
+  for(let i=0;i<42;i++){
+    const wave=Math.sin(i*0.65)*10;
+    const drift=i*1.1;
+    const open=p;
+    const close=p+(Math.sin(i*1.37)*5)+wave*0.12+drift*0.02;
+    const high=Math.max(open,close)+5+Math.abs(Math.sin(i))*4;
+    const low=Math.min(open,close)-5-Math.abs(Math.cos(i))*4;
 
-timeframe=tf;
-
-document.querySelectorAll(".active")
-.forEach(x=>x.classList.remove("active"));
-
-btn.classList.add("active");
-
-drawChart();
-
+    candles.push({open,high,low,close});
+    p=close;
+  }
+  return candles;
 }
 
-function drawChart(){
-
-let chart=document.getElementById("chart");
-
-chart.innerHTML="";
-
-for(let i=0;i<42;i++){
-
-let bar=document.createElement("div");
-
-bar.className="bar";
-
-if(i%7===0)
-bar.classList.add("red");
-
-let height=
-(Math.sin(i*1.7+timeframe)*0.5+0.5)*130+25;
-
-bar.style.height=height+"px";
-
-chart.appendChild(bar);
-
+function average(arr){
+  if(!arr.length)return 0;
+  return arr.reduce((a,b)=>a+b,0)/arr.length;
 }
 
-}
+function analyse(candles){
+  const highs=candles.map(c=>c.high);
+  const lows=candles.map(c=>c.low);
 
-drawChart();
+  const recentHigh=Math.max(...highs.slice(-20));
+  const recentLow=Math.min(...lows.slice(-20));
 
-setInterval(function(){
+  const last=candles[candles.length-1];
+  const previous=candles[candles.length-2];
 
-let price=25480.20+(Math.random()-0.5)*8;
+  const resistance=Math.round(recentHigh/10)*10;
+  const support=Math.round(recentLow/10)*10;
 
-document.getElementById("price").innerText=
-price.toLocaleString("en-IN",{
-minimumFractionDigits:2,
-maximumFractionDigits:2
-});
+  const body=Math.abs(last.close-last.open);
+  const range=last.high-last.low;
 
-},1800);
-
-</script>
-
-</body>
-</html>
+  const bullish
