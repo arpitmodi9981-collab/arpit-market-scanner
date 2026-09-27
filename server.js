@@ -4,6 +4,7 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 app.use(express.json());
+
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
@@ -25,6 +26,7 @@ const market = {
     dayHigh: 25495,
     dayLow: 25435
   },
+
   BANKNIFTY: {
     price: 52320,
     previousHigh: 52400,
@@ -33,6 +35,7 @@ const market = {
     dayHigh: 52380,
     dayLow: 52200
   },
+
   "MCX CRUDE OIL": {
     price: 9845,
     previousHigh: 9880,
@@ -45,16 +48,42 @@ const market = {
 
 function demoCandles(price) {
   return [
-    { open: price - 35, high: price - 10, low: price - 50, close: price - 20 },
-    { open: price - 20, high: price + 5, low: price - 25, close: price - 5 },
-    { open: price - 5, high: price + 25, low: price - 10, close: price + 15 },
-    { open: price + 15, high: price + 20, low: price - 5, close: price + 8 },
-    { open: price + 8, high: price + 30, low: price + 2, close: price + 22 }
+    {
+      open: price - 35,
+      high: price - 10,
+      low: price - 50,
+      close: price - 20
+    },
+    {
+      open: price - 20,
+      high: price + 5,
+      low: price - 25,
+      close: price - 5
+    },
+    {
+      open: price - 5,
+      high: price + 25,
+      low: price - 10,
+      close: price + 15
+    },
+    {
+      open: price + 15,
+      high: price + 20,
+      low: price - 5,
+      close: price + 8
+    },
+    {
+      open: price + 8,
+      high: price + 30,
+      low: price + 2,
+      close: price + 22
+    }
   ];
 }
 
 function scanner(symbol) {
   const m = market[symbol];
+
   const candles5m = demoCandles(m.price);
   const candles15m = demoCandles(m.price);
 
@@ -62,7 +91,12 @@ function scanner(symbol) {
     symbol,
     price: m.price,
     mode: "demo",
-    timeframes: ["Daily", "15m", "5m"],
+
+    timeframes: [
+      "Daily",
+      "15m",
+      "5m"
+    ],
 
     dailyLevels: {
       previousDayHigh: m.previousHigh,
@@ -82,6 +116,7 @@ function scanner(symbol) {
       breakout: "Waiting for close",
       retest: "Not triggered",
       falseBreakout: "No confirmation",
+
       structure:
         candles15m.at(-1).close >= candles15m.at(-1).open
           ? "Bullish"
@@ -105,7 +140,8 @@ app.get("/", (req, res) => {
 });
 
 app.get("/history/:symbol", (req, res) => {
-  const symbol = decodeURIComponent(req.params.symbol).toUpperCase();
+  const symbol =
+    decodeURIComponent(req.params.symbol).toUpperCase();
 
   if (!market[symbol]) {
     return res.status(404).json({
@@ -116,27 +152,26 @@ app.get("/history/:symbol", (req, res) => {
   res.json({
     symbol,
     status: "ready",
-    timeframes: ["1D", "15m", "5m"],
+    timeframes: [
+      "1D",
+      "15m",
+      "5m"
+    ],
     years: 5,
     history: [],
     message: "5-year history interface ready"
   });
 });
+
+app.get("/health", (req, res) => {
   res.json({
-    symbol,
-    status: "ready",
-    timeframes: ["1D", "15m", "5m"],
-    history: [],
-    message: "Historical data source not connected yet"
+    status: "ok"
   });
 });
 
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
-});
-
 app.get("/scanner/:symbol", (req, res) => {
-  const symbol = decodeURIComponent(req.params.symbol).toUpperCase();
+  const symbol =
+    decodeURIComponent(req.params.symbol).toUpperCase();
 
   if (!market[symbol]) {
     return res.status(404).json({
@@ -148,5 +183,7 @@ app.get("/scanner/:symbol", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(
+    `Server running on port ${PORT}`
+  );
 });
