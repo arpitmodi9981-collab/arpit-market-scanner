@@ -237,3 +237,226 @@ function analyse(candles){
   const range=last.high-last.low;
 
   const bullish
+  =last.close>last.open;
+  const bearish=last.close<last.open;
+
+  const breakout=
+    last.close>resistance &&
+    body>range*0.45;
+
+  const breakdown=
+    last.close<support &&
+    body>range*0.45;
+
+  const falseBreak=
+    previous.close>resistance &&
+    last.high>resistance &&
+    last.close<resistance;
+
+  const retest=
+    (previous.close>resistance &&
+     last.low<=resistance &&
+     last.close>resistance) ||
+    (previous.close<support &&
+     last.high>=support &&
+     last.close<support);
+
+  const closes=candles.slice(-8).map(c=>c.close);
+  const firstAvg=average(closes.slice(0,4));
+  const lastAvg=average(closes.slice(4));
+
+  let structure="Neutral";
+
+  if(lastAvg>firstAvg+3) structure="Bullish";
+  if(lastAvg<firstAvg-3) structure="Bearish";
+
+  return {
+    resistance,
+    support,
+    breakout,
+    breakdown,
+    falseBreak,
+    retest,
+    structure,
+    bullish,
+    bearish
+  };
+}
+
+function drawChart(candles){
+  const chart=document.getElementById("chart");
+  chart.innerHTML="";
+
+  const highs=candles.map(c=>c.high);
+  const lows=candles.map(c=>c.low);
+  const max=Math.max(...highs);
+  const min=Math.min(...lows);
+
+  candles.slice(-32).forEach(c=>{
+    const bar=document.createElement("div");
+
+    const height=
+      ((c.close-c.low)/(max-min))*150+20;
+
+    bar.className=
+      "bar "+(c.close>=c.open?"up":"down");
+
+    bar.style.height=
+      Math.max(12,height)+"px";
+
+    chart.appendChild(bar);
+  });
+}
+
+function update(){
+
+  const candles=makeCandles();
+  const a=analyse(candles);
+
+  document.getElementById("price").textContent=
+    state.price.toLocaleString("en-IN",{
+      minimumFractionDigits:2
+    });
+
+  document.getElementById("resistance").textContent=
+    a.resistance.toLocaleString("en-IN");
+
+  document.getElementById("support").textContent=
+    a.support.toLocaleString("en-IN");
+
+  document.getElementById("structure").textContent=
+    a.structure;
+
+  document.getElementById("strength").textContent=
+    "Moderate — recent swing activity";
+
+  const breakout=
+    document.getElementById("breakout");
+
+  const breakdown=
+    document.getElementById("breakdown");
+
+  const retest=
+    document.getElementById("retest");
+
+  const falseBreak=
+    document.getElementById("falseBreak");
+
+  const classification=
+    document.getElementById("classification");
+
+  breakout.textContent=
+    a.breakout
+      ?"Confirmed candle breakout"
+      :"Waiting";
+
+  breakout.className=
+    "status "+(a.breakout?"green":"yellow");
+
+  breakdown.textContent=
+    a.breakdown
+      ?"Confirmed candle breakdown"
+      :"Waiting";
+
+  breakdown.className=
+    "status "+(a.breakdown?"red":"yellow");
+
+  retest.textContent=
+    a.retest
+      ?"Retest detected"
+      :"Waiting";
+
+  retest.className=
+    "status "+(a.retest?"green":"yellow");
+
+  falseBreak.textContent=
+    a.falseBreak
+      ?"Possible false breakout"
+      :"No confirmation";
+
+  falseBreak.className=
+    "status "+(a.falseBreak?"red":"yellow");
+
+  if(a.falseBreak){
+    classification.textContent=
+      "False-breakout condition detected";
+  }
+  else if(a.breakout && a.retest){
+    classification.textContent=
+      "Breakout + retest condition";
+  }
+  else if(a.breakdown && a.retest){
+    classification.textContent=
+      "Breakdown + retest condition";
+  }
+  else if(a.breakout){
+    classification.textContent=
+      "Breakout detected — retest required";
+  }
+  else if(a.breakdown){
+    classification.textContent=
+      "Breakdown detected — retest required";
+  }
+  else{
+    classification.textContent=
+      "No confirmed setup";
+  }
+
+  drawChart(candles);
+}
+
+document.getElementById("instrument")
+.addEventListener("change",e=>{
+
+  state.instrument=e.target.value;
+
+  if(state.instrument==="BANKNIFTY")
+    state.price=52000;
+
+  else if(state.instrument==="MCX CRUDE OIL")
+    state.price=6500;
+
+  else
+    state.price=25480.2;
+
+  update();
+});
+
+document.getElementById("m5")
+.addEventListener("click",()=>{
+
+  state.timeframe=5;
+
+  document.getElementById("m5")
+    .classList.add("active");
+
+  document.getElementById("m15")
+    .classList.remove("active");
+
+  document.getElementById("tf")
+    .textContent="5 minute";
+
+  update();
+});
+
+document.getElementById("m15")
+.addEventListener("click",()=>{
+
+  state.timeframe=15;
+
+  document.getElementById("m15")
+    .classList.add("active");
+
+  document.getElementById("m5")
+    .classList.remove("active");
+
+  document.getElementById("tf")
+    .textContent="15 minute";
+
+  update();
+});
+
+update();
+</script>
+</body>
+</html>
