@@ -191,241 +191,117 @@ button.active{background:#35455c}
 </div>
 
 <script>
-const state={
-  instrument:"NIFTY",
-  timeframe:5,
-  price:25480.2
+<script>
+const API = "https://arpit-market-scanner-backend.onrender.com";
+
+const state = {
+  instrument: "NIFTY",
+  timeframe: "5m"
 };
 
-function makeCandles(){
-  const candles=[];
-  let p=state.price-45;
-
-  for(let i=0;i<42;i++){
-    const wave=Math.sin(i*0.65)*10;
-    const drift=i*1.1;
-    const open=p;
-    const close=p+(Math.sin(i*1.37)*5)+wave*0.12+drift*0.02;
-    const high=Math.max(open,close)+5+Math.abs(Math.sin(i))*4;
-    const low=Math.min(open,close)-5-Math.abs(Math.cos(i))*4;
-
-    candles.push({open,high,low,close});
-    p=close;
-  }
-  return candles;
-}
-
-function average(arr){
-  if(!arr.length)return 0;
-  return arr.reduce((a,b)=>a+b,0)/arr.length;
-}
-
-function analyse(candles){
-  const highs=candles.map(c=>c.high);
-  const lows=candles.map(c=>c.low);
-
-  const recentHigh=Math.max(...highs.slice(-20));
-  const recentLow=Math.min(...lows.slice(-20));
-
-  const last=candles[candles.length-1];
-  const previous=candles[candles.length-2];
-
-  const resistance=Math.round(recentHigh/10)*10;
-  const support=Math.round(recentLow/10)*10;
-
-  const body=Math.abs(last.close-last.open);
-  const range=last.high-last.low;
-
-  const bullish
-  =last.close>last.open;
-  const bearish=last.close<last.open;
-
-  const breakout=
-    last.close>resistance &&
-    body>range*0.45;
-
-  const breakdown=
-    last.close<support &&
-    body>range*0.45;
-
-  const falseBreak=
-    previous.close>resistance &&
-    last.high>resistance &&
-    last.close<resistance;
-
-  const retest=
-    (previous.close>resistance &&
-     last.low<=resistance &&
-     last.close>resistance) ||
-    (previous.close<support &&
-     last.high>=support &&
-     last.close<support);
-
-  const closes=candles.slice(-8).map(c=>c.close);
-  const firstAvg=average(closes.slice(0,4));
-  const lastAvg=average(closes.slice(4));
-
-  let structure="Neutral";
-
-  if(lastAvg>firstAvg+3) structure="Bullish";
-  if(lastAvg<firstAvg-3) structure="Bearish";
-
-  return {
-    resistance,
-    support,
-    breakout,
-    breakdown,
-    falseBreak,
-    retest,
-    structure,
-    bullish,
-    bearish
-  };
-}
-
 function drawChart(candles){
-  const chart=document.getElementById("chart");
-  chart.innerHTML="";
+  const chart = document.getElementById("chart");
+  chart.innerHTML = "";
 
-  const highs=candles.map(c=>c.high);
-  const lows=candles.map(c=>c.low);
-  const max=Math.max(...highs);
-  const min=Math.min(...lows);
+  if(!candles || !candles.length) return;
 
-  candles.slice(-32).forEach(c=>{
-    const bar=document.createElement("div");
+  const highs = candles.map(c => c.high);
+  const lows = candles.map(c => c.low);
+  const max = Math.max(...highs);
+  const min = Math.min(...lows);
+  const range = Math.max(max - min, 1);
 
-    const height=
-      ((c.close-c.low)/(max-min))*150+20;
+  candles.forEach(c => {
+    const bar = document.createElement("div");
 
-    bar.className=
-      "bar "+(c.close>=c.open?"up":"down");
+    const height =
+      ((c.close - min) / range) * 150 + 20;
 
-    bar.style.height=
-      Math.max(12,height)+"px";
+    bar.className =
+      "bar " + (c.close >= c.open ? "up" : "down");
+
+    bar.style.height =
+      Math.max(12, height) + "px";
 
     chart.appendChild(bar);
   });
 }
 
-function update(){
+async function update(){
 
-  const candles=makeCandles();
-  const a=analyse(candles);
+  try {
 
-  document.getElementById("price").textContent=
-    state.price.toLocaleString("en-IN",{
-      minimumFractionDigits:2
-    });
+    const response = await fetch(
+      API + "/scanner/" +
+      encodeURIComponent(state.instrument)
+    );
 
-  document.getElementById("resistance").textContent=
-    a.resistance.toLocaleString("en-IN");
+    if(!response.ok){
+      throw new Error("Backend error");
+    }
 
-  document.getElementById("support").textContent=
-    a.support.toLocaleString("en-IN");
+    const data = await response.json();
 
-  document.getElementById("structure").textContent=
-    a.structure;
+    document.getElementById("price").textContent =
+      Number(data.price).toLocaleString("en-IN");
 
-  document.getElementById("strength").textContent=
-    "Moderate — recent swing activity";
+    document.getElementById("resistance").textContent =
+      Number(data.levels.resistance).toLocaleString("en-IN");
 
-  const breakout=
-    document.getElementById("breakout");
+    document.getElementById("support").textContent =
+      Number(data.levels.support).toLocaleString("en-IN");
 
-  const breakdown=
-    document.getElementById("breakdown");
+    document.getElementById("structure").textContent =
+      data.priceAction.structure;
 
-  const retest=
-    document.getElementById("retest");
+    document.getElementById("strength").textContent =
+      data.levels.strength;
 
-  const falseBreak=
-    document.getElementById("falseBreak");
+    document.getElementById("breakout").textContent =
+      data.priceAction.breakout;
 
-  const classification=
-    document.getElementById("classification");
+    document.getElementById("retest").textContent =
+      data.priceAction.retest;
 
-  breakout.textContent=
-    a.breakout
-      ?"Confirmed candle breakout"
-      :"Waiting";
+    document.getElementById("falseBreak").textContent =
+      data.priceAction.falseBreakout;
 
-  breakout.className=
-    "status "+(a.breakout?"green":"yellow");
+    document.getElementById("breakdown").textContent =
+      "Waiting";
 
-  breakdown.textContent=
-    a.breakdown
-      ?"Confirmed candle breakdown"
-      :"Waiting";
+    document.getElementById("classification").textContent =
+      data.priceAction.breakout !== "Waiting for close"
+        ? data.priceAction.breakout
+        : data.priceAction.falseBreakout !== "No confirmation"
+          ? data.priceAction.falseBreakout
+          : "No confirmed setup";
 
-  breakdown.className=
-    "status "+(a.breakdown?"red":"yellow");
+    drawChart(
+      data.candles[state.timeframe]
+    );
 
-  retest.textContent=
-    a.retest
-      ?"Retest detected"
-      :"Waiting";
+  } catch(error) {
 
-  retest.className=
-    "status "+(a.retest?"green":"yellow");
+    document.getElementById("price").textContent =
+      "Connection error";
 
-  falseBreak.textContent=
-    a.falseBreak
-      ?"Possible false breakout"
-      :"No confirmation";
-
-  falseBreak.className=
-    "status "+(a.falseBreak?"red":"yellow");
-
-  if(a.falseBreak){
-    classification.textContent=
-      "False-breakout condition detected";
+    document.getElementById("classification").textContent =
+      "Backend connection failed";
   }
-  else if(a.breakout && a.retest){
-    classification.textContent=
-      "Breakout + retest condition";
-  }
-  else if(a.breakdown && a.retest){
-    classification.textContent=
-      "Breakdown + retest condition";
-  }
-  else if(a.breakout){
-    classification.textContent=
-      "Breakout detected — retest required";
-  }
-  else if(a.breakdown){
-    classification.textContent=
-      "Breakdown detected — retest required";
-  }
-  else{
-    classification.textContent=
-      "No confirmed setup";
-  }
-
-  drawChart(candles);
 }
 
 document.getElementById("instrument")
-.addEventListener("change",e=>{
+.addEventListener("change", e => {
 
-  state.instrument=e.target.value;
-
-  if(state.instrument==="BANKNIFTY")
-    state.price=52000;
-
-  else if(state.instrument==="MCX CRUDE OIL")
-    state.price=6500;
-
-  else
-    state.price=25480.2;
+  state.instrument = e.target.value;
 
   update();
 });
 
 document.getElementById("m5")
-.addEventListener("click",()=>{
+.addEventListener("click", () => {
 
-  state.timeframe=5;
+  state.timeframe = "5m";
 
   document.getElementById("m5")
     .classList.add("active");
@@ -434,15 +310,15 @@ document.getElementById("m5")
     .classList.remove("active");
 
   document.getElementById("tf")
-    .textContent="5 minute";
+    .textContent = "5 minute";
 
   update();
 });
 
 document.getElementById("m15")
-.addEventListener("click",()=>{
+.addEventListener("click", () => {
 
-  state.timeframe=15;
+  state.timeframe = "15m";
 
   document.getElementById("m15")
     .classList.add("active");
@@ -451,12 +327,13 @@ document.getElementById("m15")
     .classList.remove("active");
 
   document.getElementById("tf")
-    .textContent="15 minute";
+    .textContent = "15 minute";
 
   update();
 });
 
 update();
+</script>
 </script>
 </body>
 </html>
