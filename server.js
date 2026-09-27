@@ -103,6 +103,7 @@ app.get("/", (req, res) => {
     message: "Scanner engine ready"
   });
 });
+
 app.get("/history/:symbol", (req, res) => {
   const symbol = decodeURIComponent(req.params.symbol).toUpperCase();
 
@@ -112,6 +113,15 @@ app.get("/history/:symbol", (req, res) => {
     });
   }
 
+  res.json({
+    symbol,
+    status: "ready",
+    timeframes: ["1D", "15m", "5m"],
+    years: 5,
+    history: [],
+    message: "5-year history interface ready"
+  });
+});
   res.json({
     symbol,
     status: "ready",
