@@ -103,6 +103,23 @@ app.get("/", (req, res) => {
     message: "Scanner engine ready"
   });
 });
+app.get("/history/:symbol", (req, res) => {
+  const symbol = decodeURIComponent(req.params.symbol).toUpperCase();
+
+  if (!market[symbol]) {
+    return res.status(404).json({
+      error: "Instrument not supported"
+    });
+  }
+
+  res.json({
+    symbol,
+    status: "ready",
+    timeframes: ["1D", "15m", "5m"],
+    history: [],
+    message: "Historical data source not connected yet"
+  });
+});
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
