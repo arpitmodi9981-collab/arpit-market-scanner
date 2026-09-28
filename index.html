@@ -1,254 +1,128 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Arpit Market Scanner</title>
-
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#090d14;color:#fff;font-family:Arial}
-.app{max-width:620px;margin:auto;padding:16px 14px 30px}
-h1{margin:5px 0;font-size:24px}
-.sub,.label{color:#8995a8;font-size:12px}
-.controls{display:flex;gap:8px;margin:15px 0}
-select,button{background:#182230;color:#fff;border:1px solid #35445a;border-radius:9px;padding:11px}
-select{flex:1}
-button.active{background:#40536d}
+body{margin:0;background:#090d14;color:white;font-family:Arial;padding:15px}
 .card{background:#111925;border:1px solid #29364a;border-radius:14px;padding:15px;margin:12px 0}
-.price{font-size:30px;font-weight:bold;margin-top:6px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.box{background:#182230;border-radius:10px;padding:12px}
-.value{font-size:16px;font-weight:bold;margin-top:5px}
+select,button{background:#182230;color:white;border:1px solid #35445a;border-radius:8px;padding:10px}
+button.active{background:#40536d}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{background:#182230;padding:12px;border-radius:9px}
+.big{font-size:30px;font-weight:bold}
+.gray{color:#8995a8;font-size:12px}
 .green{color:#61dc96}
 .yellow{color:#f3c96a}
-.red{color:#ff7070}
-.chart{height:180px;background:#0b1119;border-radius:10px;margin-top:10px;padding:10px;display:flex;align-items:flex-end;gap:8px}
-.bar{flex:1;border-radius:4px 4px 0 0;max-width:40px}
-.up{background:#61dc96}
-.down{background:#ff7070}
+#chart{height:150px;display:flex;align-items:end;gap:7px;background:#0b1119;padding:10px}
+.bar{flex:1;border-radius:4px 4px 0 0}
+.up{background:#61dc96}.down{background:#ff7070}
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<h2>Arpit Market Scanner</h2>
+<div class="gray">Price-action learning scanner</div>
 
-<h1>Arpit Market Scanner</h1>
-<div class="sub">Price-action learning scanner</div>
-
-<div class="controls">
+<div class="card">
 <select id="symbol">
-<option value="NIFTY">NIFTY</option>
-<option value="BANKNIFTY">BANKNIFTY</option>
-<option value="MCX CRUDE OIL">MCX CRUDE OIL</option>
+<option>NIFTY</option>
+<option>BANKNIFTY</option>
+<option>MCX CRUDE OIL</option>
 </select>
-
 <button id="b5" class="active">5m</button>
 <button id="b15">15m</button>
 </div>
 
 <div class="card">
-<div class="label">Current Price</div>
-<div class="price" id="price">Loading...</div>
+<div class="gray">Current Price</div>
+<div id="price" class="big">Loading...</div>
 </div>
 
 <div class="card">
-<div class="label">Market Structure</div>
-<div class="value yellow" id="structure">Loading...</div>
-
+<div class="gray">Market Structure</div>
+<div id="structure" class="green">Loading...</div>
 <div class="grid">
-<div class="box">
-<div class="label">Resistance</div>
-<div class="value" id="resistance">—</div>
-</div>
-
-<div class="box">
-<div class="label">Support</div>
-<div class="value" id="support">—</div>
-</div>
+<div class="box">Resistance<br><b id="resistance">—</b></div>
+<div class="box">Support<br><b id="support">—</b></div>
 </div>
 </div>
 
 <div class="card">
-<div class="label">Candles</div>
-<div class="chart" id="chart"></div>
+<div class="gray">Candles</div>
+<div id="chart"></div>
 </div>
 
 <div class="card">
-<div class="label">Price Action</div>
-
+<div class="gray">Price Action</div>
 <div class="grid">
-
-<div class="box">
-<div class="label">Breakout</div>
-<div class="value yellow" id="breakout">—</div>
-</div>
-
-<div class="box">
-<div class="label">Retest</div>
-<div class="value yellow" id="retest">—</div>
-</div>
-
-<div class="box">
-<div class="label">False Breakout</div>
-<div class="value yellow" id="falseBreak">—</div>
-</div>
-
-<div class="box">
-<div class="label">Level Strength</div>
-<div class="value yellow" id="strength">—</div>
-</div>
-
+<div class="box">Breakout<br><b id="breakout">—</b></div>
+<div class="box">Retest<br><b id="retest">—</b></div>
+<div class="box">False Breakout<br><b id="false">—</b></div>
+<div class="box">Strength<br><b id="strength">—</b></div>
 </div>
 </div>
 
 <div class="card">
-<div class="label">Connection</div>
-<div class="value yellow" id="connection">Connecting...</div>
-</div>
-
+<div class="gray">Connection</div>
+<b id="connection">Connecting...</b>
 </div>
 
 <script>
-
-const API =
-"https://arpit-market-scanner-backend.onrender.com";
-
-let timeframe = "5m";
-
-const $ = id => document.getElementById(id);
+const API="https://arpit-market-scanner-backend.onrender.com";
+let tf="5m";
 
 async function load(){
-
-$("connection").textContent = "Connecting...";
-$("price").textContent = "Loading...";
-
 try{
+let r=await fetch(API+"/scanner/"+encodeURIComponent(symbol.value)+"?x="+Date.now());
+let d=await r.json();
 
-const response = await fetch(
-API + "/scanner/" +
-encodeURIComponent($("symbol").value),
-{cache:"no-store"}
-);
+price.textContent=d.price.toLocaleString("en-IN");
+structure.textContent=d.priceAction.structure;
+resistance.textContent=d.levels.resistance.toLocaleString("en-IN");
+support.textContent=d.levels.support.toLocaleString("en-IN");
+breakout.textContent=d.priceAction.breakout;
+retest.textContent=d.priceAction.retest;
+false.textContent=d.priceAction.falseBreakout;
+strength.textContent=d.levels.strength;
+connection.textContent="Backend connected • Demo data";
 
-if(!response.ok)
-throw new Error("HTTP " + response.status);
-
-const data = await response.json();
-
-$("price").textContent =
-Number(data.price).toLocaleString("en-IN");
-
-$("structure").textContent =
-data.priceAction.structure;
-
-$("structure").className =
-"value " +
-(data.priceAction.structure === "Bullish"
-? "green"
-: "red");
-
-$("resistance").textContent =
-Number(data.levels.resistance)
-.toLocaleString("en-IN");
-
-$("support").textContent =
-Number(data.levels.support)
-.toLocaleString("en-IN");
-
-$("breakout").textContent =
-data.priceAction.breakout;
-
-$("retest").textContent =
-data.priceAction.retest;
-
-$("falseBreak").textContent =
-data.priceAction.falseBreakout;
-
-$("strength").textContent =
-data.levels.strength;
-
-draw(data.candles[timeframe]);
-
-$("connection").textContent =
-"Backend connected • Demo data";
-
-}catch(error){
-
-$("price").textContent = "—";
-$("connection").textContent =
-"Connection error";
-
-console.log(error);
-
+draw(d.candles[tf]);
+}catch(e){
+connection.textContent="Connection error";
+console.log(e);
+}
 }
 
-}
-
-function draw(candles){
-
-const chart = $("chart");
-chart.innerHTML = "";
-
-if(!candles || !candles.length)
-return;
-
-const max =
-Math.max(...candles.map(x=>x.high));
-
-const min =
-Math.min(...candles.map(x=>x.low));
-
-const range =
-Math.max(max-min,1);
-
-candles.forEach(c=>{
-
-const bar =
-document.createElement("div");
-
-bar.className =
-"bar " +
-(c.close >= c.open ? "up" : "down");
-
-bar.style.height =
-(25 + ((c.high-min)/range)*130) + "px";
-
-chart.appendChild(bar);
-
+function draw(c){
+chart.innerHTML="";
+c.forEach(x=>{
+let b=document.createElement("div");
+b.className="bar "+(x.close>=x.open?"up":"down");
+b.style.height=Math.max(20,(x.high-x.low)*4)+"px";
+chart.appendChild(b);
 });
-
 }
 
-$("symbol").addEventListener(
-"change",load
-);
+symbol.onchange=load;
 
-$("b5").addEventListener(
-"click",()=>{
-
-timeframe="5m";
-$("b5").classList.add("active");
-$("b15").classList.remove("active");
+b5.onclick=()=>{
+tf="5m";
+b5.classList.add("active");
+b15.classList.remove("active");
 load();
+};
 
-}
-);
-
-$("b15").addEventListener(
-"click",()=>{
-
-timeframe="15m";
-$("b15").classList.add("active");
-$("b5").classList.remove("active");
+b15.onclick=()=>{
+tf="15m";
+b15.classList.add("active");
+b5.classList.remove("active");
 load();
-
-}
-);
+};
 
 load();
-
 </script>
 
 </body>
