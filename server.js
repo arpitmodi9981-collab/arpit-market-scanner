@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -81,11 +81,140 @@ function demoCandles(price) {
   ];
 }
 
+function findLevels(candles) {
+  const highs = candles.map(c => c.high);
+  const lows = candles.map(c => c.low);
+
+  const resistance = Math.max(...highs);
+  const support = Math.min(...lows);
+
+  const resistanceTouches = candles.filter(
+    c => c.high >= resistance - 10
+  ).length;
+
+  const supportTouches = candles.filter(
+    c => c.low <= support + 10
+  ).length;
+
+  let strength = "WEAK";
+
+  if (
+    resistanceTouches >= 3 ||
+    supportTouches >= 3
+  ) {
+    strength = "STRONG";
+  } else if (
+    resistanceTouches >= 2 ||
+    supportTouches >= 2
+  ) {
+    strength = "MEDIUM";
+  }
+
+  return {
+    resistance,
+    support,
+    resistanceTouches,
+    supportTouches,
+    strength
+  };
+}
+
+function detectPriceAction(candles, levels) {
+  const last = candles[candles.length - 1];
+  const previous = candles[candles.length - 2];
+
+  let structure = "Neutral";
+
+  if (last.close > last.open) {
+    structure = "Bullish";
+  } else if (last.close < last.open) {
+    structure = "Bearish";
+  }
+
+  let breakout = "Waiting for close";
+  let retest = "Not triggered";
+  let falseBreakout = "No confirmation";
+
+  /*
+    Breakout:
+    Candle must close beyond the level.
+  */
+
+  if (last.close > levels.resistance) {
+    breakout = "Breakout above resistance";
+  }
+
+  if (last.close < levels.support) {
+    breakout = "Breakdown below support";
+  }
+
+  /*
+    Retest:
+    Price comes back close to the breakout level.
+  */
+
+  const resistanceDistance =
+    Math.abs(last.low - levels.resistance);
+
+  const supportDistance =
+    Math.abs(last.high - levels.support);
+
+  if (
+    previous.close > levels.resistance &&
+    resistanceDistance <= 15
+  ) {
+    retest = "Retest of resistance";
+  }
+
+  if (
+    previous.close < levels.support &&
+    supportDistance <= 15
+  ) {
+    retest = "Retest of support";
+  }
+
+  /*
+    False breakout:
+    Price moves outside level but closes back inside.
+  */
+
+  if (
+    last.high > levels.resistance &&
+    last.close < levels.resistance
+  ) {
+    falseBreakout =
+      "False breakout above resistance";
+  }
+
+  if (
+    last.low < levels.support &&
+    last.close > levels.support
+  ) {
+    falseBreakout =
+      "False breakdown below support";
+  }
+
+  return {
+    breakout,
+    retest,
+    falseBreakout,
+    structure
+  };
+}
+
 function scanner(symbol) {
   const m = market[symbol];
 
   const candles5m = demoCandles(m.price);
   const candles15m = demoCandles(m.price);
+
+  const levels = findLevels(candles15m);
+
+  const priceAction =
+    detectPriceAction(
+      candles15m,
+      levels
+    );
 
   return {
     symbol,
@@ -107,21 +236,16 @@ function scanner(symbol) {
     },
 
     levels: {
-      resistance: m.previousHigh,
-      support: m.previousLow,
-      strength: "STRONG"
+      resistance: levels.resistance,
+      support: levels.support,
+      strength: levels.strength,
+      resistanceTouches:
+        levels.resistanceTouches,
+      supportTouches:
+        levels.supportTouches
     },
 
-    priceAction: {
-      breakout: "Waiting for close",
-      retest: "Not triggered",
-      falseBreakout: "No confirmation",
-
-      structure:
-        candles15m.at(-1).close >= candles15m.at(-1).open
-          ? "Bullish"
-          : "Bearish"
-    },
+    priceAction,
 
     candles: {
       "15m": candles15m,
@@ -139,9 +263,16 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/health", (req, res) => {
+  res.json({
+    status: "ok"
+  });
+});
+
 app.get("/history/:symbol", (req, res) => {
   const symbol =
-    decodeURIComponent(req.params.symbol).toUpperCase();
+    decodeURIComponent(req.params.symbol)
+      .toUpperCase();
 
   if (!market[symbol]) {
     return res.status(404).json({
@@ -159,31 +290,11 @@ app.get("/history/:symbol", (req, res) => {
     ],
     years: 5,
     history: [],
-    message: "5-year history interface ready"
-  });
-});
-
-app.get("/health", (req, res) => {
-  res.json({
-    status: "ok"
+    message:
+      "5-year history interface ready"
   });
 });
 
 app.get("/scanner/:symbol", (req, res) => {
   const symbol =
-    decodeURIComponent(req.params.symbol).toUpperCase();
-
-  if (!market[symbol]) {
-    return res.status(404).json({
-      error: "Instrument not supported"
-    });
-  }
-
-  return res.json(scanner(symbol));
-});
-
-app.listen(PORT, () => {
-  console.log(
-    `Server running on port ${PORT}`
-  );
-});
+    decodeURIComponent
