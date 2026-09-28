@@ -3,82 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#090d14">
 <title>Arpit Market Scanner</title>
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090d14;color:#eef3fa;font-family:Arial,sans-serif}
-.app{max-width:620px;margin:auto;padding-bottom:90px}
-header{padding:18px 16px 10px}
-h1{font-size:22px;margin:0}
-.sub{color:#8995a8;font-size:12px;margin-top:5px}
-.controls{display:flex;gap:8px;padding:10px 14px}
-select,button{background:#182230;color:#eef3fa;border:1px solid #2b394b;border-radius:10px;padding:11px;font-size:14px}
-button.active{background:#35455c}
-.card{margin:10px 14px;padding:15px;background:#111925;border:1px solid #253247;border-radius:14px}
-.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
-.label{color:#8995a8;font-size:12px}
-.price{font-size:28px;font-weight:bold;margin-top:5px}
-.badge{display:inline-block;padding:5px 8px;border-radius:8px;font-size:11px;background:#302a18;color:#f3c96a}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.level{padding:12px;border-radius:10px;background:#151f2d}
-.level strong{display:block;font-size:18px;margin-top:5px}
-.status{font-size:15px;font-weight:bold;margin-top:5px}
+
+body{
+  margin:0;
+  background:#090d14;
+  color:#eef3fa;
+  font-family:Arial,sans-serif
+}
+
+.app{
+  max-width:620px;
+  margin:auto;
+  padding-bottom:30px
+}
+
+header{
+  padding:20px 16px 10px
+}
+
+h1{
+  margin:0;
+  font-size:23px
+}
+
+.sub{
+  color:#8995a8;
+  font-size:12px;
+  margin-top:5px
+}
+
+.controls{
+  display:flex;
+  gap:8px;
+  padding:12px 14px
+}
+
+select,button{
+  background:#182230;
+  color:#eef3fa;
+  border:1px solid #2b394b;
+  border-radius:10px;
+  padding:11px;
+  font-size:14px
+}
+
+select{
+  flex:1
+}
+
+button{
+  cursor:pointer
+}
+
+button.active{
+  background:#35455c
+}
+
+.card{
+  margin:10px 14px;
+  padding:15px;
+  background:#111925;
+  border:1px solid #253247;
+  border-radius:14px
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center
+}
+
+.label{
+  color:#8995a8;
+  font-size:12px
+}
+
+.price{
+  font-size:28px;
+  font-weight:bold;
+  margin-top:5px
+}
+
+.badge{
+  padding:5px 8px;
+  border-radius:8px;
+  font-size:11px;
+  background:#302a18;
+  color:#f3c96a
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px
+}
+
+.level{
+  padding:12px;
+  border-radius:10px;
+  background:#151f2d
+}
+
+.level strong{
+  display:block;
+  font-size:18px;
+  margin-top:5px
+}
+
+.status{
+  font-size:15px;
+  font-weight:bold;
+  margin-top:5px
+}
+
 .green{color:#61dc96}
 .red{color:#ff7070}
 .yellow{color:#f3c96a}
-.small{font-size:12px;color:#8995a8;line-height:1.5}
-.chart{height:190px;display:flex;align-items:flex-end;gap:5px;padding:12px;background:#0b111a;border-radius:10px;overflow:hidden}
-.bar{width:8px;border-radius:3px 3px 0 0;min-height:12px}
-.up{background:#61dc96}
-.down{background:#ff7070}
-.zone{margin-top:10px;padding:10px;border-left:3px solid #f3c96a;background:#171b20;border-radius:5px}
-.nav{position:fixed;bottom:0;left:0;right:0;background:#0d131d;border-top:1px solid #243044;display:flex;justify-content:center;gap:25px;padding:12px}
-.nav span{font-size:12px;color:#8995a8}
-.note{font-size:11px;color:#758196;line-height:1.5}
-.historyButtons{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.historyButtons button{flex:1;min-width:90px}
-.historyInfo{margin-top:12px;padding:10px;background:#151f2d;border-radius:10px;line-height:1.8}
-</style>
-</head>
 
-<body>
+.chart{
+  height:190px;
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  padding:12px;
+  background:#0b111a;
+  border-radius:10px;
+  margin-top:10px
+}
 
-<div class="app">
+.bar{
+  flex:1;
+  max-width:35px;
+  min-height:10px;
+  border-radius:4px 4px 0 0
+}
 
-<header>
-<h1>Arpit Market Scanner</h1>
-<div class="sub">Price-action analysis • Backend engine</div>
-</header>
+.up{
+  background:#61dc96
+}
 
-<div class="controls">
-<select id="instrument">
-<option>NIFTY</option>
-<option>BANKNIFTY</option>
-<option>MCX CRUDE OIL</option>
-</select>
+.down{
+  background:#ff7070
+}
 
-<button id="m5" class="active">5m</button>
-<button id="m15">15m</button>
-</div>
-
-<div class="card">
-<div class="row">
-<div>
-<div class="label">Current price</div>
-<div class="price" id="price">Loading...</div>
-</div>
-<span class="badge">BACKEND DATA</span>
-</div>
-</div>
-
-<div class="card">
-<div class="row">
-<div>
-<div class="label">Market structure</div>
-<div class="status" id="structure">Loading...</div>
-</div>
-
-<div>
-<div class="label">
+.zone{
+  margin-top:10px;
+  padding:10px;
+  border-left:3px solid #f3c96a;
+  background:#171b20;
+  border-radius:5
