@@ -1,160 +1,267 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Arpit Market Scanner</title>
-
 <style>
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  background:#090d14;
-  color:#eef3fa;
-  font-family:Arial,sans-serif
-}
-
-.app{
-  max-width:620px;
-  margin:auto;
-  padding-bottom:30px
-}
-
-header{
-  padding:20px 16px 10px
-}
-
-h1{
-  margin:0;
-  font-size:23px
-}
-
-.sub{
-  color:#8995a8;
-  font-size:12px;
-  margin-top:5px
-}
-
-.controls{
-  display:flex;
-  gap:8px;
-  padding:12px 14px
-}
-
-select,button{
-  background:#182230;
-  color:#eef3fa;
-  border:1px solid #2b394b;
-  border-radius:10px;
-  padding:11px;
-  font-size:14px
-}
-
-select{
-  flex:1
-}
-
-button{
-  cursor:pointer
-}
-
-button.active{
-  background:#35455c
-}
-
-.card{
-  margin:10px 14px;
-  padding:15px;
-  background:#111925;
-  border:1px solid #253247;
-  border-radius:14px
-}
-
-.row{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  align-items:center
-}
-
-.label{
-  color:#8995a8;
-  font-size:12px
-}
-
-.price{
-  font-size:28px;
-  font-weight:bold;
-  margin-top:5px
-}
-
-.badge{
-  padding:5px 8px;
-  border-radius:8px;
-  font-size:11px;
-  background:#302a18;
-  color:#f3c96a
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:10px
-}
-
-.level{
-  padding:12px;
-  border-radius:10px;
-  background:#151f2d
-}
-
-.level strong{
-  display:block;
-  font-size:18px;
-  margin-top:5px
-}
-
-.status{
-  font-size:15px;
-  font-weight:bold;
-  margin-top:5px
-}
-
-.green{color:#61dc96}
+body{margin:0;background:#090d14;color:#fff;font-family:Arial}
+.app{max-width:600px;margin:auto;padding:16px}
+h1{margin:5px 0;font-size:24px}
+.card{background:#111925;border:1px solid #29364a;border-radius:14px;padding:15px;margin:12px 0}
+select,button{background:#182230;color:white;border:1px solid #35445a;border-radius:9px;padding:10px;margin-right:5px}
+button.active{background:#40536d}
+.label{color:#8d9aad;font-size:12px}
+.price{font-size:30px;font-weight:bold;margin-top:5px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.box{background:#182230;border-radius:10px;padding:12px}
+.value{font-size:17px;font-weight:bold;margin-top:5px}
+.green{color:#5ee391}
+.yellow{color:#f1c75b}
 .red{color:#ff7070}
-.yellow{color:#f3c96a}
+.chart{height:170px;background:#0b1119;border-radius:10px;margin-top:10px;display:flex;align-items:end;gap:8px;padding:10px}
+.bar{flex:1;max-width:35px;border-radius:4px 4px 0 0}
+.up{background:#5ee391}
+.down{background:#ff7070}
+</style>
+</head>
 
-.chart{
-  height:190px;
-  display:flex;
-  align-items:flex-end;
-  gap:8px;
-  padding:12px;
-  background:#0b111a;
-  border-radius:10px;
-  margin-top:10px
+<body>
+
+<div class="app">
+
+<h1>Arpit Market Scanner</h1>
+<div class="label">Price-action learning scanner</div>
+
+<div class="card">
+
+<select id="symbol">
+<option value="NIFTY">NIFTY</option>
+<option value="BANKNIFTY">BANKNIFTY</option>
+<option value="MCX CRUDE OIL">MCX CRUDE OIL</option>
+</select>
+
+<button id="b5" class="active">5m</button>
+<button id="b15">15m</button>
+
+</div>
+
+<div class="card">
+<div class="label">Current Price</div>
+<div class="price" id="price">Loading...</div>
+</div>
+
+<div class="card">
+
+<div class="label">Market Structure</div>
+<div class="value yellow" id="structure">Loading...</div>
+
+<div class="grid">
+
+<div class="box">
+<div class="label">Resistance</div>
+<div class="value" id="resistance">—</div>
+</div>
+
+<div class="box">
+<div class="label">Support</div>
+<div class="value" id="support">—</div>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="label">Candles</div>
+<div class="chart" id="chart"></div>
+
+</div>
+
+<div class="card">
+
+<div class="label">Price Action</div>
+
+<div class="grid">
+
+<div class="box">
+<div class="label">Breakout</div>
+<div class="value yellow" id="breakout">—</div>
+</div>
+
+<div class="box">
+<div class="label">Retest</div>
+<div class="value yellow" id="retest">—</div>
+</div>
+
+<div class="box">
+<div class="label">False Breakout</div>
+<div class="value yellow" id="false">—</div>
+</div>
+
+<div class="box">
+<div class="label">Level Strength</div>
+<div class="value yellow" id="strength">—</div>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="label">Connection</div>
+<div class="value yellow" id="connection">
+Connecting...
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const API =
+"https://arpit-market-scanner-backend.onrender.com";
+
+let tf = "5m";
+
+const $ = id =>
+document.getElementById(id);
+
+async function load(){
+
+$("connection").textContent =
+"Connecting...";
+
+$("price").textContent =
+"Loading...";
+
+try{
+
+const symbol =
+encodeURIComponent(
+$("symbol").value
+);
+
+const response =
+await fetch(
+API + "/scanner/" + symbol,
+{cache:"no-store"}
+);
+
+if(!response.ok)
+throw new Error(
+"HTTP " + response.status
+);
+
+const data =
+await response.json();
+
+$("price").textContent =
+Number(data.price)
+.toLocaleString("en-IN");
+
+$("structure").textContent =
+data.priceAction.structure;
+
+$("structure").className =
+"value " +
+(data.priceAction.structure === "Bullish"
+? "green"
+: "red");
+
+$("resistance").textContent =
+Number(data.levels.resistance)
+.toLocaleString("en-IN");
+
+$("support").textContent =
+Number(data.levels.support)
+.toLocaleString("en-IN");
+
+$("breakout").textContent =
+data.priceAction.breakout;
+
+$("retest").textContent =
+data.priceAction.retest;
+
+$("false").textContent =
+data.priceAction.falseBreakout;
+
+$("strength").textContent =
+data.levels.strength;
+
+draw(data.candles[tf]);
+
+$("connection").textContent =
+"Backend connected • Demo data";
+
+}catch(error){
+
+$("connection").textContent =
+"Connection error";
+
+$("connection").className =
+"value red";
+
+$("price").textContent =
+"—";
+
+console.log(error);
+
 }
 
-.bar{
-  flex:1;
-  max-width:35px;
-  min-height:10px;
-  border-radius:4px 4px 0 0
 }
 
-.up{
-  background:#61dc96
+function draw(candles){
+
+const chart =
+$("chart");
+
+chart.innerHTML = "";
+
+if(!candles || !candles.length)
+return;
+
+let max =
+Math.max(...candles.map(x=>x.high));
+
+let min =
+Math.min(...candles.map(x=>x.low));
+
+let range =
+Math.max(max-min,1);
+
+candles.forEach(c=>{
+
+const bar =
+document.createElement("div");
+
+bar.className =
+"bar " +
+(c.close >= c.open
+? "up"
+: "down");
+
+bar.style.height =
+(25 +
+((c.high-min)/range)*130)
++ "px";
+
+chart.appendChild(bar);
+
+});
+
 }
 
-.down{
-  background:#ff7070
-}
+$("symbol").addEventListener(
+"change",
+load
+);
 
-.zone{
-  margin-top:10px;
-  padding:10px;
-  border-left:3px solid #f3c96a;
-  background:#171b20;
-  border-radius:5
+$("b5").addEventListener(
+"click",
+()=>{
+
+tf
