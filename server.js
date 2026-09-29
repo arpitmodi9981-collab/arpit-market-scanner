@@ -1,4 +1,8 @@
 const express = require("express");
+const {
+  Client,
+  StreamableHTTPClientTransport
+} = require("@modelcontextprotocol/client");
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -16,6 +20,45 @@ app.use((req, res, next) => {
 
   next();
 });
+
+const NSE_MCP_URL = "https://mcp.nseindia.in/cmmkt/mcp";
+
+let nseClient = null;
+let nseStatus = "not connected";
+let nseTools = [];
+
+async function connectNSE() {
+  try {
+    nseClient = new Client({
+      name: "arpit-market-scanner",
+      version: "1.0.0"
+    });
+
+    const transport = new StreamableHTTPClientTransport(
+      new URL(NSE_MCP_URL)
+    );
+
+    await nseClient.connect(transport);
+
+    const toolsResult = await nseClient.listTools();
+
+    nseTools = toolsResult.tools || [];
+    nseStatus = "connected";
+
+    console.log("NSE MCP connected");
+    console.log(
+      "NSE tools:",
+      nseTools.map(tool => tool.name)
+    );
+  } catch (error) {
+    nseStatus = "connection failed";
+
+    console.error(
+      "NSE MCP connection error:",
+      error.message
+    );
+  }
+}
 
 const market = {
   NIFTY: {
@@ -135,14 +178,12 @@ function detectPriceAction(candles, levels) {
   let retest = "Not triggered";
   let falseBreakout = "No confirmation";
 
-  // Breakout requires candle close beyond the level
   if (last.close > levels.resistance) {
     breakout = "Breakout above resistance";
   } else if (last.close < levels.support) {
     breakout = "Breakdown below support";
   }
 
-  // Retest detection
   const resistanceDistance =
     Math.abs(last.low - levels.resistance);
 
@@ -163,7 +204,6 @@ function detectPriceAction(candles, levels) {
     retest = "Retest of support";
   }
 
-  // False breakout detection
   if (
     last.high > levels.resistance &&
     last.close < levels.resistance
@@ -193,7 +233,6 @@ function scanner(symbol) {
   const candles15m = demoCandles(m.price);
 
   const levels = findLevels(candles15m);
-
   const priceAction =
     detectPriceAction(candles15m, levels);
 
@@ -237,14 +276,37 @@ app.get("/", (req, res) => {
   res.json({
     app: "Arpit Market Scanner Backend",
     status: "online",
-    mode: "demo",
+    mode: nseStatus === "connected"
+      ? "nse-mcp-connected"
+      : "demo",
+    nseMcp: nseStatus,
     message: "Scanner engine ready"
   });
 });
 
 app.get("/health", (req, res) => {
   res.json({
-    status: "ok"
+    status: "ok",
+    nseMcp: nseStatus
+  });
+});
+
+app.get("/nse/status", (req, res) => {
+  res.json({
+    status: nseStatus,
+    endpoint: NSE_MCP_URL,
+    toolCount: nseTools.length
+  });
+});
+
+app.get("/nse/tools", (req, res) => {
+  res.json({
+    status: nseStatus,
+    tools: nseTools.map(tool => ({
+      name: tool.name,
+      description: tool.description || "",
+      inputSchema: tool.inputSchema || null
+    }))
   });
 });
 
@@ -285,6 +347,7 @@ app.get("/scanner/:symbol", (req, res) => {
   return res.json(scanner(symbol));
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+  await connectNSE();
 });
