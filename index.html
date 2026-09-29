@@ -1,128 +1,1550 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Arpit Market Scanner</title>
+
 <style>
-body{margin:0;background:#090d14;color:white;font-family:Arial;padding:15px}
-.card{background:#111925;border:1px solid #29364a;border-radius:14px;padding:15px;margin:12px 0}
-select,button{background:#182230;color:white;border:1px solid #35445a;border-radius:8px;padding:10px}
-button.active{background:#40536d}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.box{background:#182230;padding:12px;border-radius:9px}
-.big{font-size:30px;font-weight:bold}
-.gray{color:#8995a8;font-size:12px}
-.green{color:#61dc96}
-.yellow{color:#f3c96a}
-#chart{height:150px;display:flex;align-items:end;gap:7px;background:#0b1119;padding:10px}
-.bar{flex:1;border-radius:4px 4px 0 0}
-.up{background:#61dc96}.down{background:#ff7070}
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#070b11;
+  color:#f5f7fa;
+  font-family:Arial,Helvetica,sans-serif;
+  padding:14px;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+}
+
+.header{
+  padding:8px 4px 18px;
+}
+
+.title{
+  font-size:25px;
+  font-weight:800;
+}
+
+.subtitle{
+  color:#8995a8;
+  font-size:13px;
+  margin-top:5px;
+}
+
+.card{
+  background:#111925;
+  border:1px solid #29364a;
+  border-radius:16px;
+  padding:15px;
+  margin:12px 0;
+}
+
+.sectionTitle{
+  color:#8995a8;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.7px;
+  margin-bottom:10px;
+}
+
+.controls{
+  display:grid;
+  grid-template-columns:1fr auto auto;
+  gap:9px;
+}
+
+select,
+button{
+  width:100%;
+  background:#182230;
+  color:#fff;
+  border:1px solid #35445a;
+  border-radius:10px;
+  padding:12px;
+  font-size:14px;
+}
+
+button{
+  cursor:pointer;
+}
+
+button.active{
+  background:#40536d;
+}
+
+.price{
+  font-size:38px;
+  font-weight:800;
+}
+
+.muted{
+  color:#8995a8;
+}
+
+.green{
+  color:#61dc96;
+}
+
+.red{
+  color:#ff7070;
+}
+
+.yellow{
+  color:#f3c96a;
+}
+
+.blue{
+  color:#72a7ff;
+}
+
+.status{
+  font-weight:700;
+  margin-top:5px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.grid3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+.box{
+  background:#182230;
+  border-radius:11px;
+  padding:13px;
+  min-width:0;
+}
+
+.boxTitle{
+  color:#8995a8;
+  font-size:11px;
+  margin-bottom:5px;
+}
+
+.boxValue{
+  font-size:17px;
+  font-weight:750;
+  word-break:break-word;
+}
+
+.chartOuter{
+  position:relative;
+  background:#080e16;
+  border:1px solid #202c3d;
+  border-radius:12px;
+  height:330px;
+  overflow:hidden;
+}
+
+.chartGrid{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 24.5%,
+      #1a2534 25%,
+      transparent 25.5%,
+      transparent 49.5%,
+      #1a2534 50%,
+      transparent 50.5%,
+      transparent 74.5%,
+      #1a2534 75%,
+      transparent 75.5%
+    );
+}
+
+#chart{
+  position:absolute;
+  left:15px;
+  right:15px;
+  top:15px;
+  bottom:15px;
+}
+
+.candle{
+  position:absolute;
+  width:28px;
+}
+
+.wick{
+  position:absolute;
+  left:12px;
+  width:2px;
+  background:#b8c2d1;
+}
+
+.body{
+  position:absolute;
+  left:5px;
+  width:18px;
+  border-radius:3px;
+}
+
+.candleUp .body{
+  background:#61dc96;
+}
+
+.candleDown .body{
+  background:#ff7070;
+}
+
+.levelLine{
+  position:absolute;
+  left:8px;
+  right:8px;
+  height:0;
+  border-top:2px dashed;
+  z-index:5;
+}
+
+.resistanceLine{
+  border-color:#ff7070;
+}
+
+.supportLine{
+  border-color:#61dc96;
+}
+
+.levelTag{
+  position:absolute;
+  right:0;
+  top:-20px;
+  font-size:10px;
+  padding:3px 6px;
+  border-radius:5px;
+  background:#111925;
+  font-weight:bold;
+}
+
+.resistanceTag{
+  color:#ff7070;
+}
+
+.supportTag{
+  color:#61dc96;
+}
+
+.chartLegend{
+  display:flex;
+  gap:15px;
+  flex-wrap:wrap;
+  color:#aeb8c7;
+  font-size:11px;
+  margin-top:10px;
+}
+
+.dot{
+  display:inline-block;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  margin-right:5px;
+}
+
+.redDot{
+  background:#ff7070;
+}
+
+.greenDot{
+  background:#61dc96;
+}
+
+.yellowDot{
+  background:#f3c96a;
+}
+
+.actionBig{
+  font-size:18px;
+  font-weight:800;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:7px;
+  background:#202c3d;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.connection{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.refresh{
+  font-size:12px;
+  color:#8995a8;
+}
+
+.warning{
+  color:#f3c96a;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.footer{
+  color:#667387;
+  font-size:11px;
+  text-align:center;
+  padding:18px 5px;
+}
+
+@media(max-width:600px){
+
+  body{
+    padding:10px;
+  }
+
+  .controls{
+    grid-template-columns:1fr 70px 70px;
+  }
+
+  .grid3{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .price{
+    font-size:34px;
+  }
+
+  .chartOuter{
+    height:290px;
+  }
+
+  .candle{
+    width:23px;
+  }
+
+  .wick{
+    left:10px;
+  }
+
+  .body{
+    left:4px;
+    width:15px;
+  }
+}
 </style>
 </head>
 
 <body>
 
-<h2>Arpit Market Scanner</h2>
-<div class="gray">Price-action learning scanner</div>
+<div class="container">
 
-<div class="card">
-<select id="symbol">
-<option>NIFTY</option>
-<option>BANKNIFTY</option>
-<option>MCX CRUDE OIL</option>
-</select>
-<button id="b5" class="active">5m</button>
-<button id="b15">15m</button>
+  <div class="header">
+    <div class="title">Arpit Market Scanner</div>
+    <div class="subtitle">
+      Price-action learning & market-structure scanner
+    </div>
+  </div>
+
+
+  <!-- CONTROLS -->
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      Instrument & Timeframe
+    </div>
+
+    <div class="controls">
+
+      <select id="symbol">
+        <option value="NIFTY">NIFTY</option>
+        <option value="BANKNIFTY">BANKNIFTY</option>
+        <option value="MCX CRUDE OIL">MCX CRUDE OIL</option>
+      </select>
+
+      <button id="b5" class="active">
+        5m
+      </button>
+
+      <button id="b15">
+        15m
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- PRICE -->
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      Current Price
+    </div>
+
+    <div id="price" class="price">
+      Loading...
+    </div>
+
+    <div id="mode" class="muted">
+      Connecting...
+    </div>
+
+  </div>
+
+
+  <!-- STRUCTURE -->
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      Market Structure
+    </div>
+
+    <div id="structure"
+         class="actionBig green">
+      Loading...
+    </div>
+
+    <div style="height:10px"></div>
+
+    <div class="grid">
+
+      <div class="box">
+        <div class="boxTitle">
+          Resistance
+        </div>
+        <div id="resistance"
+             class="boxValue red">
+          —
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="boxTitle">
+          Support
+        </div>
+        <div id="support"
+             class="boxValue green">
+          —
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- CHART -->
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      Price Chart & Auto Levels
+    </div>
+
+    <div class="chartOuter">
+
+      <div class="chartGrid"></div>
+
+      <div id="resLine"
+           class="levelLine resistanceLine">
+        <span class="levelTag resistanceTag">
+          RESISTANCE
+        </span>
+      </div>
+
+      <div id="supLine"
+           class="levelLine supportLine">
+        <span class="levelTag supportTag">
+          SUPPORT
+        </span>
+      </div>
+
+      <div id="chart"></div>
+
+    </div>
+
+    <div class="chartLegend">
+
+      <span>
+        <span class="dot redDot"></span>
+        Resistance
+      </span>
+
+      <span>
+        <span class="dot greenDot"></span>
+        Support
+      </span>
+
+      <span>
+        <span class="dot yellowDot"></span>
+        Breakout / retest area
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <!-- LEVEL DETAILS -->
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      Level Analysis
+    </div>
+
+    <div class="grid3">
+
+      <div class="box">
+        <div class="boxTitle">
+          Resistance touches
+        </div>
+        <div id="resTouches"
+             class="boxValue">
+          —
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="boxTitle">
+          Support touches
+        </div>
+        <div id="supTouches"
+             class="boxValue">
+          —
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="boxTitle">
+          Level strength
+        </div>
+        <div id="strength"
+             class="boxValue yellow">
+          —
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- PRICE ACTION -->
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      Price Action
+    </div>
+
+    <div class="grid">
+
+      <div class="box">
+
+        <div class="boxTitle">
+          Breakout
+        </div>
+
+        <div id="breakout"
+             class="boxValue">
+          —
+        </div>
+
+      </div>
+
+
+      <div class="box">
+
+        <div class="boxTitle">
+          Retest
+        </div>
+
+        <div id="retest"
+             class="boxValue">
+          —
+        </div>
+
+      </div>
+
+
+      <div class="box">
+
+        <div class="boxTitle">
+          False Breakout
+        </div>
+
+        <div id="falseBreakout"
+             class="boxValue">
+          —
+        </div>
+
+      </div>
+
+
+      <div class="box">
+
+        <div class="boxTitle">
+          Setup status
+        </div>
+
+        <div id="setupStatus"
+             class="boxValue">
+          —
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- DAILY LEVELS -->
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      Daily Reference Levels
+    </div>
+
+    <div class="grid">
+
+      <div class="box">
+        <div class="boxTitle">
+          Previous Day High
+        </div>
+        <div id="pdh"
+             class="boxValue">
+          —
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="boxTitle">
+          Previous Day Low
+        </div>
+        <div id="pdl"
+             class="boxValue">
+          —
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="boxTitle">
+          Previous Close
+        </div>
+        <div id="previousClose"
+             class="boxValue">
+          —
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="boxTitle">
+          Current Day High
+        </div>
+        <div id="dayHigh"
+             class="boxValue">
+          —
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="boxTitle">
+          Current Day Low
+        </div>
+        <div id="dayLow"
+             class="boxValue">
+          —
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="boxTitle">
+          Timeframe
+        </div>
+        <div id="timeframe"
+             class="boxValue">
+          5m
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- HISTORICAL DATA -->
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      Historical Data
+    </div>
+
+    <div class="grid">
+
+      <div class="box">
+        <div class="boxTitle">
+          Available period
+        </div>
+        <div class="boxValue">
+          5 Years
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="boxTitle">
+          Status
+        </div>
+        <div id="historyStatus"
+             class="boxValue yellow">
+          Checking...
+        </div>
+      </div>
+
+    </div>
+
+    <div style="height:10px"></div>
+
+    <div class="warning">
+      Historical-data interface is ready. The current backend
+      does not yet contain the actual historical market dataset.
+    </div>
+
+  </div>
+
+
+  <!-- CONNECTION -->
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      Backend
+    </div>
+
+    <div class="connection">
+
+      <div>
+        <div id="connection"
+             class="boxValue">
+          Connecting...
+        </div>
+
+        <div id="lastUpdate"
+             class="refresh">
+          —
+        </div>
+      </div>
+
+      <button id="refreshBtn">
+        Refresh
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="footer">
+    Arpit Market Scanner • Educational / informational use
+  </div>
+
 </div>
 
-<div class="card">
-<div class="gray">Current Price</div>
-<div id="price" class="big">Loading...</div>
-</div>
-
-<div class="card">
-<div class="gray">Market Structure</div>
-<div id="structure" class="green">Loading...</div>
-<div class="grid">
-<div class="box">Resistance<br><b id="resistance">—</b></div>
-<div class="box">Support<br><b id="support">—</b></div>
-</div>
-</div>
-
-<div class="card">
-<div class="gray">Candles</div>
-<div id="chart"></div>
-</div>
-
-<div class="card">
-<div class="gray">Price Action</div>
-<div class="grid">
-<div class="box">Breakout<br><b id="breakout">—</b></div>
-<div class="box">Retest<br><b id="retest">—</b></div>
-<div class="box">False Breakout<br><b id="false">—</b></div>
-<div class="box">Strength<br><b id="strength">—</b></div>
-</div>
-</div>
-
-<div class="card">
-<div class="gray">Connection</div>
-<b id="connection">Connecting...</b>
-</div>
 
 <script>
-const API="https://arpit-market-scanner-backend.onrender.com";
-let tf="5m";
 
-async function load(){
-try{
-let r=await fetch(API+"/scanner/"+encodeURIComponent(symbol.value)+"?x="+Date.now());
-let d=await r.json();
+const API =
+  "https://arpit-market-scanner-backend.onrender.com";
 
-price.textContent=d.price.toLocaleString("en-IN");
-structure.textContent=d.priceAction.structure;
-resistance.textContent=d.levels.resistance.toLocaleString("en-IN");
-support.textContent=d.levels.support.toLocaleString("en-IN");
-breakout.textContent=d.priceAction.breakout;
-retest.textContent=d.priceAction.retest;
-false.textContent=d.priceAction.falseBreakout;
-strength.textContent=d.levels.strength;
-connection.textContent="Backend connected • Demo data";
+let tf = "5m";
 
-draw(d.candles[tf]);
-}catch(e){
-connection.textContent="Connection error";
-console.log(e);
+let currentData = null;
+
+
+/* -----------------------------
+   ELEMENTS
+----------------------------- */
+
+const symbolEl =
+  document.getElementById("symbol");
+
+const priceEl =
+  document.getElementById("price");
+
+const modeEl =
+  document.getElementById("mode");
+
+const structureEl =
+  document.getElementById("structure");
+
+const resistanceEl =
+  document.getElementById("resistance");
+
+const supportEl =
+  document.getElementById("support");
+
+const resTouchesEl =
+  document.getElementById("resTouches");
+
+const supTouchesEl =
+  document.getElementById("supTouches");
+
+const strengthEl =
+  document.getElementById("strength");
+
+const breakoutEl =
+  document.getElementById("breakout");
+
+const retestEl =
+  document.getElementById("retest");
+
+const falseEl =
+  document.getElementById("falseBreakout");
+
+const setupEl =
+  document.getElementById("setupStatus");
+
+const connectionEl =
+  document.getElementById("connection");
+
+const lastUpdateEl =
+  document.getElementById("lastUpdate");
+
+const historyStatusEl =
+  document.getElementById("historyStatus");
+
+const chartEl =
+  document.getElementById("chart");
+
+const resLineEl =
+  document.getElementById("resLine");
+
+const supLineEl =
+  document.getElementById("supLine");
+
+
+/* -----------------------------
+   FORMAT NUMBER
+----------------------------- */
+
+function formatNumber(value){
+
+  if(
+    typeof value !== "number" ||
+    !Number.isFinite(value)
+  ){
+    return "—";
+  }
+
+  return value.toLocaleString("en-IN");
 }
+
+
+/* -----------------------------
+   SETUP STATUS
+----------------------------- */
+
+function getSetupStatus(priceAction){
+
+  if(!priceAction){
+    return "No confirmed setup";
+  }
+
+  const breakout =
+    String(priceAction.breakout || "");
+
+  const retest =
+    String(priceAction.retest || "");
+
+  const falseBreakout =
+    String(priceAction.falseBreakout || "");
+
+  if(
+    falseBreakout &&
+    falseBreakout !== "No confirmation"
+  ){
+    return "False breakout detected";
+  }
+
+  if(
+    retest &&
+    retest !== "Not triggered"
+  ){
+    return "Retest detected";
+  }
+
+  if(
+    breakout &&
+    breakout !== "Waiting for close"
+  ){
+    return "Breakout detected";
+  }
+
+  return "No confirmed setup";
 }
 
-function draw(c){
-chart.innerHTML="";
-c.forEach(x=>{
-let b=document.createElement("div");
-b.className="bar "+(x.close>=x.open?"up":"down");
-b.style.height=Math.max(20,(x.high-x.low)*4)+"px";
-chart.appendChild(b);
-});
+
+/* -----------------------------
+   STRUCTURE COLOR
+----------------------------- */
+
+function setStructureColor(value){
+
+  structureEl.classList.remove(
+    "green",
+    "red",
+    "yellow"
+  );
+
+  if(value === "Bullish"){
+    structureEl.classList.add("green");
+  }
+  else if(value === "Bearish"){
+    structureEl.classList.add("red");
+  }
+  else{
+    structureEl.classList.add("yellow");
+  }
 }
 
-symbol.onchange=load;
 
-b5.onclick=()=>{
-tf="5m";
-b5.classList.add("active");
-b15.classList.remove("active");
-load();
-};
+/* -----------------------------
+   ACTION COLOR
+----------------------------- */
 
-b15.onclick=()=>{
-tf="15m";
-b15.classList.add("active");
-b5.classList.remove("active");
-load();
-};
+function setActionColor(element,value){
 
-load();
+  element.classList.remove(
+    "green",
+    "red",
+    "yellow"
+  );
+
+  const text =
+    String(value || "").toLowerCase();
+
+  if(
+    text.includes("false") ||
+    text.includes("breakdown")
+  ){
+    element.classList.add("red");
+  }
+  else if(
+    text.includes("breakout") ||
+    text.includes("retest")
+  ){
+    element.classList.add("green");
+  }
+  else{
+    element.classList.add("yellow");
+  }
+}
+
+
+/* -----------------------------
+   DRAW CANDLES
+----------------------------- */
+
+function drawCandles(
+  candles,
+  resistance,
+  support
+){
+
+  chartEl.innerHTML = "";
+
+  if(
+    !Array.isArray(candles) ||
+    candles.length === 0
+  ){
+    return;
+  }
+
+  const values = [];
+
+  candles.forEach(c => {
+
+    if(
+      Number.isFinite(c.high) &&
+      Number.isFinite(c.low)
+    ){
+      values.push(c.high);
+      values.push(c.low);
+    }
+
+  });
+
+  if(Number.isFinite(resistance)){
+    values.push(resistance);
+  }
+
+  if(Number.isFinite(support)){
+    values.push(support);
+  }
+
+  if(values.length === 0){
+    return;
+  }
+
+  const max =
+    Math.max(...values);
+
+  const min =
+    Math.min(...values);
+
+  const range =
+    Math.max(1,max-min);
+
+  const chartWidth =
+    chartEl.clientWidth;
+
+  const spacing =
+    chartWidth / candles.length;
+
+  candles.forEach((c,index)=>{
+
+    if(
+      !Number.isFinite(c.open) ||
+      !Number.isFinite(c.high) ||
+      !Number.isFinite(c.low) ||
+      !Number.isFinite(c.close)
+    ){
+      return;
+    }
+
+    const candle =
+      document.createElement("div");
+
+    candle.className =
+      "candle " +
+      (
+        c.close >= c.open
+          ? "candleUp"
+          : "candleDown"
+      );
+
+    const x =
+      index * spacing +
+      spacing / 2 -
+      14;
+
+    candle.style.left =
+      Math.max(
+        0,
+        Math.min(
+          chartWidth - 28,
+          x
+        )
+      ) + "px";
+
+
+    const yHigh =
+      ((max-c.high)/range)*100;
+
+    const yLow =
+      ((max-c.low)/range)*100;
+
+    const yOpen =
+      ((max-c.open)/range)*100;
+
+    const yClose =
+      ((max-c.close)/range)*100;
+
+
+    const top =
+      Math.min(yOpen,yClose);
+
+    const bottom =
+      Math.max(yOpen,yClose);
+
+    const bodyHeight =
+      Math.max(
+        5,
+        bottom-top
+      );
+
+
+    const wick =
+      document.createElement("div");
+
+    wick.className =
+      "wick";
+
+    wick.style.top =
+      yHigh + "%";
+
+    wick.style.height =
+      Math.max(
+        2,
+        yLow-yHigh
+      ) + "%";
+
+
+    const body =
+      document.createElement("div");
+
+    body.className =
+      "body";
+
+    body.style.top =
+      top + "%";
+
+    body.style.height =
+      bodyHeight + "%";
+
+
+    candle.appendChild(wick);
+    candle.appendChild(body);
+
+    chartEl.appendChild(candle);
+
+  });
+
+
+  positionLevel(
+    resLineEl,
+    resistance,
+    max,
+    range
+  );
+
+  positionLevel(
+    supLineEl,
+    support,
+    max,
+    range
+  );
+
+}
+
+
+/* -----------------------------
+   LEVEL POSITION
+----------------------------- */
+
+function positionLevel(
+  element,
+  value,
+  max,
+  range
+){
+
+  if(
+    !Number.isFinite(value)
+  ){
+    element.style.display =
+      "none";
+    return;
+  }
+
+  const percentage =
+    ((max-value)/range)*100;
+
+  element.style.display =
+    "block";
+
+  element.style.top =
+    percentage + "%";
+}
+
+
+/* -----------------------------
+   LOAD SCANNER
+----------------------------- */
+
+async function loadScanner(){
+
+  connectionEl.textContent =
+    "Connecting...";
+
+  try{
+
+    const url =
+      API +
+      "/scanner/" +
+      encodeURIComponent(
+        symbolEl.value
+      ) +
+      "?x=" +
+      Date.now();
+
+    const response =
+      await fetch(url);
+
+    if(!response.ok){
+      throw new Error(
+        "HTTP " + response.status
+      );
+    }
+
+    const data =
+      await response.json();
+
+    currentData =
+      data;
+
+
+    /* PRICE */
+
+    priceEl.textContent =
+      formatNumber(data.price);
+
+    modeEl.textContent =
+      "Backend mode: " +
+      (data.mode || "unknown");
+
+
+    /* STRUCTURE */
+
+    const structure =
+      data.priceAction?.structure ||
+      "Neutral";
+
+    structureEl.textContent =
+      structure;
+
+    setStructureColor(
+      structure
+    );
+
+
+    /* LEVELS */
+
+    const resistance =
+      Number(
+        data.levels?.resistance
+      );
+
+    const support =
+      Number(
+        data.levels?.support
+      );
+
+    resistanceEl.textContent =
+      formatNumber(resistance);
+
+    supportEl.textContent =
+      formatNumber(support);
+
+
+    resTouchesEl.textContent =
+      data.levels?.resistanceTouches ??
+      "—";
+
+    supTouchesEl.textContent =
+      data.levels?.supportTouches ??
+      "—";
+
+    strengthEl.textContent =
+      data.levels?.strength ||
+      "—";
+
+
+    /* PRICE ACTION */
+
+    const breakout =
+      data.priceAction?.breakout ||
+      "Waiting for close";
+
+    const retest =
+      data.priceAction?.retest ||
+      "Not triggered";
+
+    const falseBreakout =
+      data.priceAction?.falseBreakout ||
+      "No confirmation";
+
+
+    breakoutEl.textContent =
+      breakout;
+
+    retestEl.textContent =
+      retest;
+
+    falseEl.textContent =
+      falseBreakout;
+
+
+    setActionColor(
+      breakoutEl,
+      breakout
+    );
+
+    setActionColor(
+      retestEl,
+      retest
+    );
+
+    setActionColor(
+      falseEl,
+      falseBreakout
+    );
+
+
+    setupEl.textContent =
+      getSetupStatus(
+        data.priceAction
+      );
+
+
+    /* DAILY LEVELS */
+
+    const daily =
+      data.dailyLevels || {};
+
+    document.getElementById(
+      "pdh"
+    ).textContent =
+      formatNumber(
+        Number(daily.previousDayHigh)
+      );
+
+    document.getElementById(
+      "pdl"
+    ).textContent =
+      formatNumber(
+        Number(daily.previousDayLow)
+      );
+
+    document.getElementById(
+      "previousClose"
+    ).textContent =
+      formatNumber(
+        Number(daily.previousClose)
+      );
+
+    document.getElementById(
+      "dayHigh"
+    ).textContent =
+      formatNumber(
+        Number(daily.currentDayHigh)
+      );
+
+    document.getElementById(
+      "dayLow"
+    ).textContent =
+      formatNumber(
+        Number(daily.currentDayLow)
+      );
+
+    document.getElementById(
+      "timeframe"
+    ).textContent =
+      tf;
+
+
+    /* CHART */
+
+    const candles =
+      data.candles?.[tf] || [];
+
+    drawCandles(
+      candles,
+      resistance,
+      support
+    );
+
+
+    /* CONNECTION */
+
+    connectionEl.textContent =
+      "Backend connected";
+
+    lastUpdateEl.textContent =
+      "Updated: " +
+      new Date().toLocaleTimeString(
+        "en-IN"
+      );
+
+
+    /* HISTORY */
+
+    checkHistory();
+
+  }
+  catch(error){
+
+    console.error(error);
+
+    connectionEl.textContent =
+      "Connection error";
+
+    modeEl.textContent =
+      "Backend unavailable";
+
+  }
+
+}
+
+
+/* -----------------------------
+   HISTORY CHECK
+----------------------------- */
+
+async function checkHistory(){
+
+  try{
+
+    const response =
+      await fetch(
+        API +
+        "/history/" +
+        encodeURIComponent(
+          symbolEl.value
+        ) +
+        "?x=" +
+        Date.now()
+      );
+
+    if(!response.ok){
+      throw new Error(
+        "History unavailable"
+      );
+    }
+
+    const data =
+      await response.json();
+
+    if(
+      Array.isArray(data.history) &&
+      data.history.length > 0
+    ){
+
+      historyStatusEl.textContent =
+        "Data available";
+
+      historyStatusEl.className =
+        "boxValue green";
+
+    }
+    else{
+
+      historyStatusEl.textContent =
+        "Interface ready";
+
+      historyStatusEl.className =
+        "boxValue yellow";
+
+    }
+
+  }
+  catch(error){
+
+    historyStatusEl.textContent =
+      "Not connected";
+
+    historyStatusEl.className =
+      "boxValue red";
+
+  }
+
+}
+
+
+/* -----------------------------
+   BUTTONS
+----------------------------- */
+
+document
+  .getElementById("b5")
+  .addEventListener(
+    "click",
+    () => {
+
+      tf = "5m";
+
+      document
+        .getElementById("b5")
+        .classList
+        .add("active");
+
+      document
+        .getElementById("b15")
+        .classList
+        .remove("active");
+
+      loadScanner();
+
+    }
+  );
+
+
+document
+  .getElementById("b15")
+  .addEventListener(
+    "click",
+    () => {
+
+      tf = "15m";
+
+      document
+        .getElementById("b15")
+        .classList
+        .add("active");
+
+      document
+        .getElementById("b5")
+        .classList
+        .remove("active");
+
+      loadScanner();
+
+    }
+  );
+
+
+/* SYMBOL CHANGE */
+
+symbolEl.addEventListener(
+  "change",
+  loadScanner
+);
+
+
+/* MANUAL REFRESH */
+
+document
+  .getElementById("refreshBtn")
+  .addEventListener(
+    "click",
+    loadScanner
+  );
+
+
+/* -----------------------------
+   AUTO REFRESH
+----------------------------- */
+
+setInterval(
+  loadScanner,
+  30000
+);
+
+
+/* -----------------------------
+   INITIAL LOAD
+----------------------------- */
+
+loadScanner();
+
 </script>
 
 </body>
