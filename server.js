@@ -1,10 +1,7 @@
 const express = require("express");
-
-const {
-  Client,
-  StreamableHTTPClientTransport,
-  SSEClientTransport
-} = require("@modelcontextprotocol/client");
+const https = require("https");
+const zlib = require("zlib");
+const AdmZip = require("adm-zip");
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -23,623 +20,511 @@ app.use((req, res, next) => {
   next();
 });
 
-
 /* =========================
-   NSE MCP
+   NSE OFFICIAL REPORT
 ========================= */
 
-const NSE_MCP_URL =
-  "https://mcp.nseindia.in/bhavcopy/cm/mcp";
+const NSE_REPORT_PAGE =
+  "https://www.nseindia.com/all-reports";
 
-let nseClient = null;
-let nseTransport = null;
-let nseStatus = "not connected";
-let nseTools = [];
-let nseProtocol = null;
-let nseLastError = null;
+let latestData = [];
+let latestDate = null;
+let dataStatus = "not loaded";
+let lastError = null;
 
+/* =========================
+   DOWNLOAD HELPER
+========================= */
 
-async function connectNSE() {
+function download(url, redirects = 0) {
+  return new Promise((resolve, reject) => {
+    if (redirects > 5) {
+      return reject(new Error("Too many redirects"));
+    }
 
-  console.log("Starting NSE Bhavcopy MCP connection...");
-
-  nseStatus = "connecting";
-  nseLastError = null;
-  nseClient = null;
-  nseTransport = null;
-  nseTools = [];
-  nseProtocol = null;
-
-
-  /* Streamable HTTP */
-
-  try {
-
-    const client = new Client(
+    const req = https.get(
+      url,
       {
-        name: "arpit-market-scanner",
-        version: "1.0.0"
-      },
-      {
-        versionNegotiation: {
-          mode: "auto"
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36",
+          "Accept":
+            "application/zip,text/csv,*/*",
+          "Accept-Language":
+            "en-US,en;q=0.9",
+          "Referer":
+            "https://www.nseindia.com/"
         }
+      },
+      res => {
+        if (
+          res.statusCode >= 300 &&
+          res.statusCode < 400 &&
+          res.headers.location
+        ) {
+          return download(
+            res.headers.location,
+            redirects + 1
+          ).then(resolve).catch(reject);
+        }
+
+        if (res.statusCode !== 200) {
+          return reject(
+            new Error(
+              `NSE returned HTTP ${res.statusCode}`
+            )
+          );
+        }
+
+        const chunks = [];
+
+        res.on("data", chunk => {
+          chunks.push(chunk);
+        });
+
+        res.on("end", () => {
+          resolve(
+            Buffer.concat(chunks)
+          );
+        });
       }
     );
 
-    const transport =
-      new StreamableHTTPClientTransport(
-        new URL(NSE_MCP_URL)
+    req.on("error", reject);
+
+    req.setTimeout(30000, () => {
+      req.destroy(
+        new Error("NSE request timeout")
       );
+    });
+  });
+}
 
-    await client.connect(transport);
+/* =========================
+   CSV PARSER
+========================= */
 
-    nseClient = client;
-    nseTransport = transport;
+function parseCSVLine(line) {
+  const result = [];
+  let current = "";
+  let insideQuotes = false;
 
-    nseProtocol =
-      typeof client.getProtocolEra === "function"
-        ? client.getProtocolEra()
-        : null;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
 
-    const result =
-      await client.listTools();
+    if (ch === '"') {
+      if (
+        insideQuotes &&
+        line[i + 1] === '"'
+      ) {
+        current += '"';
+        i++;
+      } else {
+        insideQuotes = !insideQuotes;
+      }
+    } else if (
+      ch === "," &&
+      !insideQuotes
+    ) {
+      result.push(current);
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
 
-    nseTools =
-      result.tools || [];
+  result.push(current);
 
-    nseStatus = "connected";
+  return result;
+}
 
-    console.log(
-      "NSE Bhavcopy MCP connected"
+function csvToObjects(csv) {
+  const lines =
+    csv
+      .replace(/^\uFEFF/, "")
+      .split(/\r?\n/)
+      .filter(Boolean);
+
+  if (!lines.length) {
+    return [];
+  }
+
+  const headers =
+    parseCSVLine(lines[0]);
+
+  const rows = [];
+
+  for (
+    let i = 1;
+    i < lines.length;
+    i++
+  ) {
+    const values =
+      parseCSVLine(lines[i]);
+
+    const row = {};
+
+    headers.forEach(
+      (header, index) => {
+        row[header] =
+          values[index] ?? "";
+      }
     );
 
-    console.log(
-      "NSE protocol:",
-      nseProtocol
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+/* =========================
+   NUMBER HELPER
+========================= */
+
+function num(value) {
+  const n =
+    Number(
+      String(value ?? "")
+        .replace(/,/g, "")
+        .trim()
     );
 
-    console.log(
-      "NSE tool count:",
-      nseTools.length
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+/* =========================
+   NORMALIZE UDIFF
+========================= */
+
+function normalizeRow(row) {
+  return {
+    date:
+      row.TradDt || null,
+
+    symbol:
+      row.TckrSymb || null,
+
+    series:
+      row.SctySrs || null,
+
+    name:
+      row.FininstrmNm || null,
+
+    open:
+      num(row.OpnPric),
+
+    high:
+      num(row.HghPric),
+
+    low:
+      num(row.LwPric),
+
+    close:
+      num(row.ClsPric),
+
+    last:
+      num(row.LastPric),
+
+    previousClose:
+      num(row.PrvsClsgPric),
+
+    volume:
+      num(row.TtlTradgVol),
+
+    turnover:
+      num(row.TtlTrfVal),
+
+    trades:
+      num(row.TtlNbOfTxsExctd)
+  };
+}
+
+/* =========================
+   FIND CSV INSIDE ZIP
+========================= */
+
+function extractCSV(buffer) {
+  const zip =
+    new AdmZip(buffer);
+
+  const entries =
+    zip.getEntries();
+
+  const csvEntry =
+    entries.find(
+      entry =>
+        !entry.isDirectory &&
+        entry.entryName
+          .toLowerCase()
+          .endsWith(".csv")
     );
 
-    console.log(
-      "NSE tools:",
-      nseTools.map(
-        tool => tool.name
-      )
+  if (!csvEntry) {
+    throw new Error(
+      "CSV not found inside NSE ZIP"
     );
+  }
 
-    return true;
+  return csvEntry
+    .getData()
+    .toString("utf8");
+}
 
-  } catch (streamableError) {
+/* =========================
+   LOAD NSE FILE
+========================= */
 
-    console.error(
-      "Bhavcopy Streamable HTTP failed:",
-      streamableError.message
-    );
+async function loadNSEFile(url) {
+  try {
+    dataStatus = "loading";
+    lastError = null;
 
+    const buffer =
+      await download(url);
 
-    /* SSE fallback */
+    let csv;
 
-    try {
+    const isZip =
+      buffer[0] === 0x50 &&
+      buffer[1] === 0x4b;
 
-      console.log(
-        "Trying Bhavcopy SSE fallback..."
-      );
+    if (isZip) {
+      csv =
+        extractCSV(buffer);
+    } else {
+      csv =
+        buffer.toString("utf8");
+    }
 
-      const client =
-        new Client({
-          name:
-            "arpit-market-scanner",
+    const rows =
+      csvToObjects(csv);
 
-          version:
-            "1.0.0"
-        });
-
-      const transport =
-        new SSEClientTransport(
-          new URL(NSE_MCP_URL)
+    const normalized =
+      rows
+        .map(normalizeRow)
+        .filter(
+          row =>
+            row.symbol &&
+            row.open !== null &&
+            row.high !== null &&
+            row.low !== null &&
+            row.close !== null
         );
 
-      await client.connect(
-        transport
-      );
+    latestData =
+      normalized;
 
-      nseClient = client;
-      nseTransport = transport;
+    latestDate =
+      normalized.length
+        ? normalized[0].date
+        : null;
 
-      nseProtocol =
-        typeof client.getProtocolEra === "function"
-          ? client.getProtocolEra()
-          : "legacy";
+    dataStatus =
+      "loaded";
 
-      const result =
-        await client.listTools();
+    console.log(
+      `NSE data loaded: ${normalized.length} rows`
+    );
 
-      nseTools =
-        result.tools || [];
+    return normalized;
 
-      nseStatus =
-        "connected-sse";
+  } catch (error) {
+    dataStatus =
+      "error";
 
-      console.log(
-        "NSE Bhavcopy MCP connected using SSE"
-      );
+    lastError =
+      error.message;
 
-      console.log(
-        "NSE protocol:",
-        nseProtocol
-      );
+    console.error(
+      "NSE data error:",
+      error.message
+    );
 
-      console.log(
-        "NSE tool count:",
-        nseTools.length
-      );
-
-      return true;
-
-    } catch (sseError) {
-
-      nseStatus =
-        "connection failed";
-
-      nseLastError = {
-
-        streamableHTTP:
-          streamableError.message,
-
-        sse:
-          sseError.message
-
-      };
-
-      console.error(
-        "NSE Bhavcopy MCP connection failed:"
-      );
-
-      console.error(
-        nseLastError
-      );
-
-      return false;
-    }
+    return [];
   }
 }
 
-
 /* =========================
-   DEMO MARKET DATA
+   DEMO FALLBACK
 ========================= */
 
-const market = {
-
-  NIFTY: {
-
-    price: 25480,
-
-    previousHigh: 25500,
-
-    previousLow: 25420,
-
-    previousClose: 25460,
-
-    dayHigh: 25495,
-
-    dayLow: 25435
-
-  },
-
-
-  BANKNIFTY: {
-
-    price: 52320,
-
-    previousHigh: 52400,
-
-    previousLow: 52150,
-
-    previousClose: 52280,
-
-    dayHigh: 52380,
-
-    dayLow: 52200
-
-  },
-
-
-  "MCX CRUDE OIL": {
-
-    price: 9845,
-
-    previousHigh: 9880,
-
-    previousLow: 9760,
-
-    previousClose: 9820,
-
-    dayHigh: 9860,
-
-    dayLow: 9790
-
-  }
-
+const demoMarket = {
+  NIFTY: 25480,
+  BANKNIFTY: 52320,
+  "MCX CRUDE OIL": 9845
 };
 
-
 /* =========================
-   DEMO CANDLES
+   STOCK LOOKUP
 ========================= */
 
-function demoCandles(price) {
-
-  return [
-
-    {
-      open: price - 35,
-      high: price - 10,
-      low: price - 50,
-      close: price - 20
-    },
-
-    {
-      open: price - 20,
-      high: price + 5,
-      low: price - 25,
-      close: price - 5
-    },
-
-    {
-      open: price - 5,
-      high: price + 25,
-      low: price - 10,
-      close: price + 15
-    },
-
-    {
-      open: price + 15,
-      high: price + 20,
-      low: price - 5,
-      close: price + 8
-    },
-
-    {
-      open: price + 8,
-      high: price + 30,
-      low: price + 2,
-      close: price + 22
-    }
-
-  ];
+function findStock(symbol) {
+  return latestData.find(
+    row =>
+      row.symbol === symbol &&
+      row.series === "EQ"
+  );
 }
 
-
 /* =========================
-   LEVEL DETECTION
+   LEVELS
 ========================= */
 
-function findLevels(candles) {
-
-  const highs =
-    candles.map(
-      c => c.high
-    );
-
-  const lows =
-    candles.map(
-      c => c.low
-    );
+function calculateLevels(row) {
+  if (!row) {
+    return null;
+  }
 
   const resistance =
-    Math.max(...highs);
+    row.high;
 
   const support =
-    Math.min(...lows);
+    row.low;
 
-  const resistanceTouches =
-    candles.filter(
-      c =>
-        c.high >=
-        resistance - 10
-    ).length;
-
-  const supportTouches =
-    candles.filter(
-      c =>
-        c.low <=
-        support + 10
-    ).length;
+  const range =
+    resistance - support;
 
   let strength =
     "WEAK";
 
-  if (
-    resistanceTouches >= 3 ||
-    supportTouches >= 3
-  ) {
+  if (range > 0) {
+    const volume =
+      row.volume || 0;
 
-    strength =
-      "STRONG";
-
-  } else if (
-    resistanceTouches >= 2 ||
-    supportTouches >= 2
-  ) {
-
-    strength =
-      "MEDIUM";
-
+    if (volume >= 1000000) {
+      strength =
+        "STRONG";
+    } else if (
+      volume >= 100000
+    ) {
+      strength =
+        "MEDIUM";
+    }
   }
 
   return {
-
     resistance,
-
     support,
-
-    resistanceTouches,
-
-    supportTouches,
-
-    strength
-
+    strength,
+    range
   };
 }
 
-
 /* =========================
-   PRICE ACTION
+   DAILY PRICE ACTION
 ========================= */
 
-function detectPriceAction(
-  candles,
-  levels
-) {
-
-  const last =
-    candles[
-      candles.length - 1
-    ];
-
-  const previous =
-    candles[
-      candles.length - 2
-    ];
+function dailyPriceAction(row) {
+  if (!row) {
+    return {
+      structure: "No data",
+      breakout: "No data",
+      retest: "Not available",
+      falseBreakout: "Not available"
+    };
+  }
 
   let structure =
     "Neutral";
 
   if (
-    last.close >
-    last.open
+    row.close >
+    row.open
   ) {
-
     structure =
       "Bullish";
-
   } else if (
-    last.close <
-    last.open
+    row.close <
+    row.open
   ) {
-
     structure =
       "Bearish";
-
   }
-
-
-  let breakout =
-    "Waiting for close";
-
-  let retest =
-    "Not triggered";
-
-  let falseBreakout =
-    "No confirmation";
-
-
-  if (
-    last.close >
-    levels.resistance
-  ) {
-
-    breakout =
-      "Breakout above resistance";
-
-  } else if (
-    last.close <
-    levels.support
-  ) {
-
-    breakout =
-      "Breakdown below support";
-
-  }
-
-
-  const resistanceDistance =
-    Math.abs(
-      last.low -
-      levels.resistance
-    );
-
-  const supportDistance =
-    Math.abs(
-      last.high -
-      levels.support
-    );
-
-
-  if (
-    previous.close >
-      levels.resistance &&
-    resistanceDistance <= 15
-  ) {
-
-    retest =
-      "Retest of resistance";
-
-  }
-
-
-  if (
-    previous.close <
-      levels.support &&
-    supportDistance <= 15
-  ) {
-
-    retest =
-      "Retest of support";
-
-  }
-
-
-  if (
-    last.high >
-      levels.resistance &&
-    last.close <
-      levels.resistance
-  ) {
-
-    falseBreakout =
-      "False breakout above resistance";
-
-  } else if (
-    last.low <
-      levels.support &&
-    last.close >
-      levels.support
-  ) {
-
-    falseBreakout =
-      "False breakdown below support";
-
-  }
-
 
   return {
+    structure,
 
-    breakout,
+    breakout:
+      row.close > row.high
+        ? "Breakout"
+        : "Waiting for next session",
 
-    retest,
+    retest:
+      "Needs next-session data",
 
-    falseBreakout,
-
-    structure
-
+    falseBreakout:
+      "Needs next-session data"
   };
-
 }
-
 
 /* =========================
    SCANNER
 ========================= */
 
 function scanner(symbol) {
+  const row =
+    findStock(symbol);
 
-  const m =
-    market[symbol];
-
-  const candles5m =
-    demoCandles(
-      m.price
-    );
-
-  const candles15m =
-    demoCandles(
-      m.price
-    );
+  if (!row) {
+    return {
+      symbol,
+      status: "No NSE equity row found",
+      mode: "nse-bhavcopy",
+      note:
+        "This daily CM Bhavcopy contains equity securities. Index/derivative intraday data requires a separate source."
+    };
+  }
 
   const levels =
-    findLevels(
-      candles15m
-    );
-
-  const priceAction =
-    detectPriceAction(
-      candles15m,
-      levels
-    );
-
+    calculateLevels(row);
 
   return {
-
     symbol,
 
-    price:
-      m.price,
+    status:
+      "real NSE daily data",
 
     mode:
-      nseStatus === "connected" ||
-      nseStatus === "connected-sse"
-        ? "nse-bhavcopy-connected"
-        : "demo",
+      "nse-udiff-bhavcopy",
 
-    nseMcp:
-      nseStatus,
+    date:
+      row.date,
 
-    timeframes: [
-      "Daily",
-      "15m",
-      "5m"
-    ],
+    price:
+      row.last ?? row.close,
 
-    dailyLevels: {
+    open:
+      row.open,
 
-      previousDayHigh:
-        m.previousHigh,
+    high:
+      row.high,
 
-      previousDayLow:
-        m.previousLow,
+    low:
+      row.low,
 
-      previousClose:
-        m.previousClose,
+    close:
+      row.close,
 
-      currentDayHigh:
-        m.dayHigh,
+    previousClose:
+      row.previousClose,
 
-      currentDayLow:
-        m.dayLow
+    volume:
+      row.volume,
 
-    },
+    turnover:
+      row.turnover,
 
-    levels: {
+    trades:
+      row.trades,
 
-      resistance:
-        levels.resistance,
+    levels,
 
-      support:
-        levels.support,
-
-      strength:
-        levels.strength,
-
-      resistanceTouches:
-        levels.resistanceTouches,
-
-      supportTouches:
-        levels.supportTouches
-
-    },
-
-    priceAction,
-
-    candles: {
-
-      "15m":
-        candles15m,
-
-      "5m":
-        candles5m
-
-    }
-
+    priceAction:
+      dailyPriceAction(row)
   };
-
 }
-
 
 /* =========================
    ROOT
@@ -648,37 +533,28 @@ function scanner(symbol) {
 app.get(
   "/",
   (req, res) => {
-
     res.json({
-
       app:
         "Arpit Market Scanner Backend",
 
       status:
         "online",
 
-      mode:
-        nseStatus === "connected" ||
-        nseStatus === "connected-sse"
-          ? "nse-bhavcopy-connected"
-          : "demo",
+      dataSource:
+        "NSE CM-UDiFF Common Bhavcopy",
 
-      nseMcp:
-        nseStatus,
+      dataStatus,
 
-      nseProtocol,
+      latestDate,
 
-      nseToolCount:
-        nseTools.length,
+      rowCount:
+        latestData.length,
 
       message:
-        "Scanner engine ready"
-
+        "NSE daily data engine ready"
     });
-
   }
 );
-
 
 /* =========================
    HEALTH
@@ -687,182 +563,77 @@ app.get(
 app.get(
   "/health",
   (req, res) => {
-
     res.json({
-
       status:
         "ok",
 
-      nseMcp:
-        nseStatus,
+      dataSource:
+        "NSE UDiFF Bhavcopy",
 
-      nseProtocol,
+      dataStatus,
 
-      nseToolCount:
-        nseTools.length
+      latestDate,
 
+      rowCount:
+        latestData.length,
+
+      lastError
     });
-
   }
 );
 
-
 /* =========================
-   NSE STATUS
+   NSE DATA STATUS
 ========================= */
 
 app.get(
   "/nse/status",
   (req, res) => {
-
     res.json({
-
       status:
-        nseStatus,
+        dataStatus,
 
-      endpoint:
-        NSE_MCP_URL,
+      source:
+        "NSE CM-UDiFF Common Bhavcopy",
 
-      protocol:
-        nseProtocol,
+      latestDate,
 
-      toolCount:
-        nseTools.length,
+      rowCount:
+        latestData.length,
 
-      lastError:
-        nseLastError
-
+      lastError
     });
-
   }
 );
 
-
 /* =========================
-   NSE TOOLS
+   STOCK
 ========================= */
 
 app.get(
-  "/nse/tools",
+  "/stock/:symbol",
   (req, res) => {
-
-    res.json({
-
-      status:
-        nseStatus,
-
-      protocol:
-        nseProtocol,
-
-      tools:
-        nseTools.map(
-          tool => ({
-
-            name:
-              tool.name,
-
-            description:
-              tool.description || "",
-
-            inputSchema:
-              tool.inputSchema || null
-
-          })
-        )
-
-    });
-
-  }
-);
-
-
-/* =========================
-   MANUAL RECONNECT
-========================= */
-
-app.get(
-  "/nse/reconnect",
-  async (req, res) => {
-
-    const success =
-      await connectNSE();
-
-    res.json({
-
-      success,
-
-      status:
-        nseStatus,
-
-      protocol:
-        nseProtocol,
-
-      toolCount:
-        nseTools.length,
-
-      lastError:
-        nseLastError
-
-    });
-
-  }
-);
-
-
-/* =========================
-   HISTORY
-========================= */
-
-app.get(
-  "/history/:symbol",
-  (req, res) => {
-
     const symbol =
       decodeURIComponent(
         req.params.symbol
       ).toUpperCase();
 
+    const row =
+      findStock(symbol);
 
-    if (!market[symbol]) {
-
+    if (!row) {
       return res
         .status(404)
         .json({
-
           error:
-            "Instrument not supported"
-
+            "Stock not found in latest NSE Bhavcopy",
+          symbol
         });
-
     }
 
-
-    res.json({
-
-      symbol,
-
-      status:
-        "ready",
-
-      timeframes: [
-        "1D",
-        "15m",
-        "5m"
-      ],
-
-      years:
-        5,
-
-      history: [],
-
-      message:
-        "5-year history interface ready"
-
-    });
-
+    res.json(row);
   }
 );
-
 
 /* =========================
    SCANNER
@@ -871,48 +642,86 @@ app.get(
 app.get(
   "/scanner/:symbol",
   (req, res) => {
-
     const symbol =
       decodeURIComponent(
         req.params.symbol
       ).toUpperCase();
 
-
-    if (!market[symbol]) {
-
-      return res
-        .status(404)
-        .json({
-
-          error:
-            "Instrument not supported"
-
-        });
-
-    }
-
-
-    return res.json(
+    res.json(
       scanner(symbol)
     );
-
   }
 );
 
+/* =========================
+   HISTORY
+========================= */
+
+app.get(
+  "/history/:symbol",
+  (req, res) => {
+    const symbol =
+      decodeURIComponent(
+        req.params.symbol
+      ).toUpperCase();
+
+    const rows =
+      latestData.filter(
+        row =>
+          row.symbol === symbol &&
+          row.series === "EQ"
+      );
+
+    res.json({
+      symbol,
+
+      source:
+        "NSE CM-UDiFF Common Bhavcopy",
+
+      latestDate,
+
+      count:
+        rows.length,
+
+      history:
+        rows
+    });
+  }
+);
 
 /* =========================
-   START SERVER
+   START
 ========================= */
 
 app.listen(
   PORT,
-  () => {
-
+  async () => {
     console.log(
       `Server running on port ${PORT}`
     );
 
-    connectNSE();
+    /*
+      Current official NSE report URLs
+      can change. For the first test,
+      set NSE_BHAVCOPY_URL in Render
+      environment variables to the exact
+      official ZIP URL you downloaded.
+    */
 
+    const url =
+      process.env.NSE_BHAVCOPY_URL;
+
+    if (!url) {
+      dataStatus =
+        "waiting for NSE_BHAVCOPY_URL";
+
+      console.log(
+        "Set NSE_BHAVCOPY_URL in Render Environment."
+      );
+
+      return;
+    }
+
+    await loadNSEFile(url);
   }
 );
