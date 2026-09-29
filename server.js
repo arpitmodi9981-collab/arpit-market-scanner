@@ -23,8 +23,13 @@ app.use((req, res, next) => {
   next();
 });
 
+
+/* =========================
+   NSE MCP
+========================= */
+
 const NSE_MCP_URL =
-  "https://mcp.nseindia.in/cmmkt/mcp";
+  "https://mcp.nseindia.in/bhavcopy/cm/mcp";
 
 let nseClient = null;
 let nseTransport = null;
@@ -33,8 +38,10 @@ let nseTools = [];
 let nseProtocol = null;
 let nseLastError = null;
 
+
 async function connectNSE() {
-  console.log("Starting NSE MCP connection...");
+
+  console.log("Starting NSE Bhavcopy MCP connection...");
 
   nseStatus = "connecting";
   nseLastError = null;
@@ -43,7 +50,11 @@ async function connectNSE() {
   nseTools = [];
   nseProtocol = null;
 
+
+  /* Streamable HTTP */
+
   try {
+
     const client = new Client(
       {
         name: "arpit-market-scanner",
@@ -79,12 +90,25 @@ async function connectNSE() {
 
     nseStatus = "connected";
 
-    console.log("NSE MCP connected");
-    console.log("NSE protocol:", nseProtocol);
-    console.log("NSE tool count:", nseTools.length);
+    console.log(
+      "NSE Bhavcopy MCP connected"
+    );
+
+    console.log(
+      "NSE protocol:",
+      nseProtocol
+    );
+
+    console.log(
+      "NSE tool count:",
+      nseTools.length
+    );
+
     console.log(
       "NSE tools:",
-      nseTools.map(tool => tool.name)
+      nseTools.map(
+        tool => tool.name
+      )
     );
 
     return true;
@@ -92,19 +116,26 @@ async function connectNSE() {
   } catch (streamableError) {
 
     console.error(
-      "Streamable HTTP connection failed:",
+      "Bhavcopy Streamable HTTP failed:",
       streamableError.message
     );
 
-    console.log(
-      "Trying legacy SSE fallback..."
-    );
+
+    /* SSE fallback */
 
     try {
+
+      console.log(
+        "Trying Bhavcopy SSE fallback..."
+      );
+
       const client =
         new Client({
-          name: "arpit-market-scanner",
-          version: "1.0.0"
+          name:
+            "arpit-market-scanner",
+
+          version:
+            "1.0.0"
         });
 
       const transport =
@@ -112,7 +143,9 @@ async function connectNSE() {
           new URL(NSE_MCP_URL)
         );
 
-      await client.connect(transport);
+      await client.connect(
+        transport
+      );
 
       nseClient = client;
       nseTransport = transport;
@@ -128,10 +161,11 @@ async function connectNSE() {
       nseTools =
         result.tools || [];
 
-      nseStatus = "connected-sse";
+      nseStatus =
+        "connected-sse";
 
       console.log(
-        "NSE MCP connected using SSE fallback"
+        "NSE Bhavcopy MCP connected using SSE"
       );
 
       console.log(
@@ -148,18 +182,21 @@ async function connectNSE() {
 
     } catch (sseError) {
 
-      nseStatus = "connection failed";
+      nseStatus =
+        "connection failed";
 
       nseLastError = {
+
         streamableHTTP:
           streamableError.message,
 
         sse:
           sseError.message
+
       };
 
       console.error(
-        "NSE MCP connection failed:"
+        "NSE Bhavcopy MCP connection failed:"
       );
 
       console.error(
@@ -177,32 +214,57 @@ async function connectNSE() {
 ========================= */
 
 const market = {
+
   NIFTY: {
+
     price: 25480,
+
     previousHigh: 25500,
+
     previousLow: 25420,
+
     previousClose: 25460,
+
     dayHigh: 25495,
+
     dayLow: 25435
+
   },
+
 
   BANKNIFTY: {
+
     price: 52320,
+
     previousHigh: 52400,
+
     previousLow: 52150,
+
     previousClose: 52280,
+
     dayHigh: 52380,
+
     dayLow: 52200
+
   },
 
+
   "MCX CRUDE OIL": {
+
     price: 9845,
+
     previousHigh: 9880,
+
     previousLow: 9760,
+
     previousClose: 9820,
+
     dayHigh: 9860,
+
     dayLow: 9790
+
   }
+
 };
 
 
@@ -211,37 +273,44 @@ const market = {
 ========================= */
 
 function demoCandles(price) {
+
   return [
+
     {
       open: price - 35,
       high: price - 10,
       low: price - 50,
       close: price - 20
     },
+
     {
       open: price - 20,
       high: price + 5,
       low: price - 25,
       close: price - 5
     },
+
     {
       open: price - 5,
       high: price + 25,
       low: price - 10,
       close: price + 15
     },
+
     {
       open: price + 15,
       high: price + 20,
       low: price - 5,
       close: price + 8
     },
+
     {
       open: price + 8,
       high: price + 30,
       low: price + 2,
       close: price + 22
     }
+
   ];
 }
 
@@ -251,11 +320,16 @@ function demoCandles(price) {
 ========================= */
 
 function findLevels(candles) {
+
   const highs =
-    candles.map(c => c.high);
+    candles.map(
+      c => c.high
+    );
 
   const lows =
-    candles.map(c => c.low);
+    candles.map(
+      c => c.low
+    );
 
   const resistance =
     Math.max(...highs);
@@ -265,34 +339,51 @@ function findLevels(candles) {
 
   const resistanceTouches =
     candles.filter(
-      c => c.high >= resistance - 10
+      c =>
+        c.high >=
+        resistance - 10
     ).length;
 
   const supportTouches =
     candles.filter(
-      c => c.low <= support + 10
+      c =>
+        c.low <=
+        support + 10
     ).length;
 
-  let strength = "WEAK";
+  let strength =
+    "WEAK";
 
   if (
     resistanceTouches >= 3 ||
     supportTouches >= 3
   ) {
-    strength = "STRONG";
+
+    strength =
+      "STRONG";
+
   } else if (
     resistanceTouches >= 2 ||
     supportTouches >= 2
   ) {
-    strength = "MEDIUM";
+
+    strength =
+      "MEDIUM";
+
   }
 
   return {
+
     resistance,
+
     support,
+
     resistanceTouches,
+
     supportTouches,
+
     strength
+
   };
 }
 
@@ -305,21 +396,38 @@ function detectPriceAction(
   candles,
   levels
 ) {
+
   const last =
-    candles[candles.length - 1];
+    candles[
+      candles.length - 1
+    ];
 
   const previous =
-    candles[candles.length - 2];
+    candles[
+      candles.length - 2
+    ];
 
-  let structure = "Neutral";
+  let structure =
+    "Neutral";
 
-  if (last.close > last.open) {
-    structure = "Bullish";
-  } else if (
-    last.close < last.open
+  if (
+    last.close >
+    last.open
   ) {
-    structure = "Bearish";
+
+    structure =
+      "Bullish";
+
+  } else if (
+    last.close <
+    last.open
+  ) {
+
+    structure =
+      "Bearish";
+
   }
+
 
   let breakout =
     "Waiting for close";
@@ -330,19 +438,25 @@ function detectPriceAction(
   let falseBreakout =
     "No confirmation";
 
+
   if (
     last.close >
     levels.resistance
   ) {
+
     breakout =
       "Breakout above resistance";
+
   } else if (
     last.close <
     levels.support
   ) {
+
     breakout =
       "Breakdown below support";
+
   }
+
 
   const resistanceDistance =
     Math.abs(
@@ -356,23 +470,30 @@ function detectPriceAction(
       levels.support
     );
 
+
   if (
     previous.close >
       levels.resistance &&
     resistanceDistance <= 15
   ) {
+
     retest =
       "Retest of resistance";
+
   }
+
 
   if (
     previous.close <
       levels.support &&
     supportDistance <= 15
   ) {
+
     retest =
       "Retest of support";
+
   }
+
 
   if (
     last.high >
@@ -380,24 +501,35 @@ function detectPriceAction(
     last.close <
       levels.resistance
   ) {
+
     falseBreakout =
       "False breakout above resistance";
+
   } else if (
     last.low <
       levels.support &&
     last.close >
       levels.support
   ) {
+
     falseBreakout =
       "False breakdown below support";
+
   }
 
+
   return {
+
     breakout,
+
     retest,
+
     falseBreakout,
+
     structure
+
   };
+
 }
 
 
@@ -406,16 +538,24 @@ function detectPriceAction(
 ========================= */
 
 function scanner(symbol) {
-  const m = market[symbol];
+
+  const m =
+    market[symbol];
 
   const candles5m =
-    demoCandles(m.price);
+    demoCandles(
+      m.price
+    );
 
   const candles15m =
-    demoCandles(m.price);
+    demoCandles(
+      m.price
+    );
 
   const levels =
-    findLevels(candles15m);
+    findLevels(
+      candles15m
+    );
 
   const priceAction =
     detectPriceAction(
@@ -423,7 +563,9 @@ function scanner(symbol) {
       levels
     );
 
+
   return {
+
     symbol,
 
     price:
@@ -432,7 +574,7 @@ function scanner(symbol) {
     mode:
       nseStatus === "connected" ||
       nseStatus === "connected-sse"
-        ? "nse-mcp-connected"
+        ? "nse-bhavcopy-connected"
         : "demo",
 
     nseMcp:
@@ -445,6 +587,7 @@ function scanner(symbol) {
     ],
 
     dailyLevels: {
+
       previousDayHigh:
         m.previousHigh,
 
@@ -459,9 +602,11 @@ function scanner(symbol) {
 
       currentDayLow:
         m.dayLow
+
     },
 
     levels: {
+
       resistance:
         levels.resistance,
 
@@ -476,18 +621,23 @@ function scanner(symbol) {
 
       supportTouches:
         levels.supportTouches
+
     },
 
     priceAction,
 
     candles: {
+
       "15m":
         candles15m,
 
       "5m":
         candles5m
+
     }
+
   };
+
 }
 
 
@@ -495,128 +645,168 @@ function scanner(symbol) {
    ROOT
 ========================= */
 
-app.get("/", (req, res) => {
-  res.json({
-    app:
-      "Arpit Market Scanner Backend",
+app.get(
+  "/",
+  (req, res) => {
 
-    status:
-      "online",
+    res.json({
 
-    mode:
-      nseStatus === "connected" ||
-      nseStatus === "connected-sse"
-        ? "nse-mcp-connected"
-        : "demo",
+      app:
+        "Arpit Market Scanner Backend",
 
-    nseMcp:
-      nseStatus,
+      status:
+        "online",
 
-    nseProtocol,
+      mode:
+        nseStatus === "connected" ||
+        nseStatus === "connected-sse"
+          ? "nse-bhavcopy-connected"
+          : "demo",
 
-    nseToolCount:
-      nseTools.length,
+      nseMcp:
+        nseStatus,
 
-    message:
-      "Scanner engine ready"
-  });
-});
+      nseProtocol,
+
+      nseToolCount:
+        nseTools.length,
+
+      message:
+        "Scanner engine ready"
+
+    });
+
+  }
+);
 
 
 /* =========================
    HEALTH
 ========================= */
 
-app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
+app.get(
+  "/health",
+  (req, res) => {
 
-    nseMcp:
-      nseStatus,
+    res.json({
 
-    nseProtocol,
+      status:
+        "ok",
 
-    nseToolCount:
-      nseTools.length
-  });
-});
+      nseMcp:
+        nseStatus,
+
+      nseProtocol,
+
+      nseToolCount:
+        nseTools.length
+
+    });
+
+  }
+);
 
 
 /* =========================
    NSE STATUS
 ========================= */
 
-app.get("/nse/status", (req, res) => {
-  res.json({
-    status:
-      nseStatus,
+app.get(
+  "/nse/status",
+  (req, res) => {
 
-    endpoint:
-      NSE_MCP_URL,
+    res.json({
 
-    protocol:
-      nseProtocol,
+      status:
+        nseStatus,
 
-    toolCount:
-      nseTools.length,
+      endpoint:
+        NSE_MCP_URL,
 
-    lastError:
-      nseLastError
-  });
-});
+      protocol:
+        nseProtocol,
+
+      toolCount:
+        nseTools.length,
+
+      lastError:
+        nseLastError
+
+    });
+
+  }
+);
 
 
 /* =========================
    NSE TOOLS
 ========================= */
 
-app.get("/nse/tools", (req, res) => {
-  res.json({
-    status:
-      nseStatus,
+app.get(
+  "/nse/tools",
+  (req, res) => {
 
-    protocol:
-      nseProtocol,
+    res.json({
 
-    tools:
-      nseTools.map(tool => ({
-        name:
-          tool.name,
+      status:
+        nseStatus,
 
-        description:
-          tool.description || "",
+      protocol:
+        nseProtocol,
 
-        inputSchema:
-          tool.inputSchema || null
-      }))
-  });
-});
+      tools:
+        nseTools.map(
+          tool => ({
+
+            name:
+              tool.name,
+
+            description:
+              tool.description || "",
+
+            inputSchema:
+              tool.inputSchema || null
+
+          })
+        )
+
+    });
+
+  }
+);
 
 
 /* =========================
    MANUAL RECONNECT
 ========================= */
 
-app.get("/nse/reconnect", async (req, res) => {
-  const success =
-    await connectNSE();
+app.get(
+  "/nse/reconnect",
+  async (req, res) => {
 
-  res.json({
-    success,
+    const success =
+      await connectNSE();
 
-    status:
-      nseStatus,
+    res.json({
 
-    protocol:
-      nseProtocol,
+      success,
 
-    toolCount:
-      nseTools.length,
+      status:
+        nseStatus,
 
-    lastError:
-      nseLastError
-  });
-});
+      protocol:
+        nseProtocol,
+
+      toolCount:
+        nseTools.length,
+
+      lastError:
+        nseLastError
+
+    });
+
+  }
+);
 
 
 /* =========================
@@ -626,19 +816,29 @@ app.get("/nse/reconnect", async (req, res) => {
 app.get(
   "/history/:symbol",
   (req, res) => {
+
     const symbol =
       decodeURIComponent(
         req.params.symbol
       ).toUpperCase();
 
+
     if (!market[symbol]) {
-      return res.status(404).json({
-        error:
-          "Instrument not supported"
-      });
+
+      return res
+        .status(404)
+        .json({
+
+          error:
+            "Instrument not supported"
+
+        });
+
     }
 
+
     res.json({
+
       symbol,
 
       status:
@@ -650,39 +850,52 @@ app.get(
         "5m"
       ],
 
-      years: 5,
+      years:
+        5,
 
       history: [],
 
       message:
         "5-year history interface ready"
+
     });
+
   }
 );
 
 
 /* =========================
-   SCANNER ENDPOINT
+   SCANNER
 ========================= */
 
 app.get(
   "/scanner/:symbol",
   (req, res) => {
+
     const symbol =
       decodeURIComponent(
         req.params.symbol
       ).toUpperCase();
 
+
     if (!market[symbol]) {
-      return res.status(404).json({
-        error:
-          "Instrument not supported"
-      });
+
+      return res
+        .status(404)
+        .json({
+
+          error:
+            "Instrument not supported"
+
+        });
+
     }
+
 
     return res.json(
       scanner(symbol)
     );
+
   }
 );
 
@@ -694,10 +907,12 @@ app.get(
 app.listen(
   PORT,
   () => {
+
     console.log(
       `Server running on port ${PORT}`
     );
 
     connectNSE();
+
   }
 );
