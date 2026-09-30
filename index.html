@@ -3,40 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
 <title>Arpit Market Scanner</title>
 
 <style>
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
+  padding:14px;
   background:#070b11;
   color:#f5f7fa;
-  font-family:Arial,Helvetica,sans-serif;
-  padding:14px;
+  font-family:Arial,Helvetica,sans-serif
 }
 
-.container{
-  max-width:900px;
-  margin:auto;
-}
+.container{max-width:900px;margin:auto}
 
-.header{
-  padding:8px 4px 18px;
-}
+.header{padding:8px 4px 18px}
 
 .title{
   font-size:25px;
-  font-weight:800;
+  font-weight:800
 }
 
 .subtitle{
   color:#8995a8;
   font-size:13px;
-  margin-top:5px;
+  margin-top:5px
 }
 
 .card{
@@ -44,7 +36,7 @@ body{
   border:1px solid #29364a;
   border-radius:16px;
   padding:15px;
-  margin:12px 0;
+  margin:12px 0
 }
 
 .sectionTitle{
@@ -52,93 +44,73 @@ body{
   font-size:12px;
   text-transform:uppercase;
   letter-spacing:.7px;
-  margin-bottom:10px;
+  margin-bottom:10px
 }
 
 .controls{
   display:grid;
-  grid-template-columns:1fr auto auto;
-  gap:9px;
+  grid-template-columns:1fr 70px 70px;
+  gap:9px
 }
 
-select,
-button{
+select,button{
   width:100%;
   background:#182230;
   color:#fff;
   border:1px solid #35445a;
   border-radius:10px;
   padding:12px;
-  font-size:14px;
+  font-size:14px
 }
 
-button{
-  cursor:pointer;
-}
-
-button.active{
-  background:#40536d;
-}
+button{cursor:pointer}
+button.active{background:#40536d}
 
 .price{
   font-size:38px;
-  font-weight:800;
+  font-weight:800
 }
 
-.muted{
-  color:#8995a8;
-}
-
-.green{
-  color:#61dc96;
-}
-
-.red{
-  color:#ff7070;
-}
-
-.yellow{
-  color:#f3c96a;
-}
-
-.blue{
-  color:#72a7ff;
-}
+.muted{color:#8995a8}
+.green{color:#61dc96}
+.red{color:#ff7070}
+.yellow{color:#f3c96a}
+.blue{color:#72a7ff}
 
 .status{
   font-weight:700;
-  margin-top:5px;
+  margin-top:5px
 }
 
 .grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:10px;
+  gap:10px
 }
 
 .grid3{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:10px;
+  gap:10px
 }
 
 .box{
   background:#182230;
   border-radius:11px;
   padding:13px;
-  min-width:0;
+  min-width:0
 }
 
 .boxTitle{
   color:#8995a8;
   font-size:11px;
-  margin-bottom:5px;
+  margin-bottom:5px
 }
 
 .boxValue{
   font-size:17px;
   font-weight:750;
-  word-break:break-word;
+  word-break:break-word
 }
 
 .chartOuter{
@@ -146,62 +118,57 @@ button.active{
   background:#080e16;
   border:1px solid #202c3d;
   border-radius:12px;
-  height:330px;
-  overflow:hidden;
+  height:300px;
+  overflow:hidden
 }
 
 .chartGrid{
   position:absolute;
   inset:0;
   background:
-    linear-gradient(
-      to bottom,
-      transparent 24.5%,
-      #1a2534 25%,
-      transparent 25.5%,
-      transparent 49.5%,
-      #1a2534 50%,
-      transparent 50.5%,
-      transparent 74.5%,
-      #1a2534 75%,
-      transparent 75.5%
-    );
+  linear-gradient(
+    to bottom,
+    transparent 24.5%,
+    #1a2534 25%,
+    transparent 25.5%,
+    transparent 49.5%,
+    #1a2534 50%,
+    transparent 50.5%,
+    transparent 74.5%,
+    #1a2534 75%,
+    transparent 75.5%
+  )
 }
 
 #chart{
   position:absolute;
-  left:15px;
-  right:15px;
-  top:15px;
-  bottom:15px;
+  left:10px;
+  right:10px;
+  top:10px;
+  bottom:10px
 }
 
 .candle{
   position:absolute;
-  width:28px;
+  width:20px
 }
 
 .wick{
   position:absolute;
-  left:12px;
+  left:9px;
   width:2px;
-  background:#b8c2d1;
+  background:#b8c2d1
 }
 
 .body{
   position:absolute;
-  left:5px;
-  width:18px;
-  border-radius:3px;
+  left:3px;
+  width:14px;
+  border-radius:3px
 }
 
-.candleUp .body{
-  background:#61dc96;
-}
-
-.candleDown .body{
-  background:#ff7070;
-}
+.candleUp .body{background:#61dc96}
+.candleDown .body{background:#ff7070}
 
 .levelLine{
   position:absolute;
@@ -209,16 +176,11 @@ button.active{
   right:8px;
   height:0;
   border-top:2px dashed;
-  z-index:5;
+  z-index:5
 }
 
-.resistanceLine{
-  border-color:#ff7070;
-}
-
-.supportLine{
-  border-color:#61dc96;
-}
+.resistanceLine{border-color:#ff7070}
+.supportLine{border-color:#61dc96}
 
 .levelTag{
   position:absolute;
@@ -228,16 +190,11 @@ button.active{
   padding:3px 6px;
   border-radius:5px;
   background:#111925;
-  font-weight:bold;
+  font-weight:bold
 }
 
-.resistanceTag{
-  color:#ff7070;
-}
-
-.supportTag{
-  color:#61dc96;
-}
+.resistanceTag{color:#ff7070}
+.supportTag{color:#61dc96}
 
 .chartLegend{
   display:flex;
@@ -245,7 +202,7 @@ button.active{
   flex-wrap:wrap;
   color:#aeb8c7;
   font-size:11px;
-  margin-top:10px;
+  margin-top:10px
 }
 
 .dot{
@@ -253,33 +210,16 @@ button.active{
   width:8px;
   height:8px;
   border-radius:50%;
-  margin-right:5px;
+  margin-right:5px
 }
 
-.redDot{
-  background:#ff7070;
-}
-
-.greenDot{
-  background:#61dc96;
-}
-
-.yellowDot{
-  background:#f3c96a;
-}
+.redDot{background:#ff7070}
+.greenDot{background:#61dc96}
+.yellowDot{background:#f3c96a}
 
 .actionBig{
   font-size:18px;
-  font-weight:800;
-}
-
-.badge{
-  display:inline-block;
-  padding:5px 8px;
-  border-radius:7px;
-  background:#202c3d;
-  font-size:11px;
-  font-weight:bold;
+  font-weight:800
 }
 
 .connection{
@@ -287,61 +227,33 @@ button.active{
   justify-content:space-between;
   align-items:center;
   gap:10px;
-  flex-wrap:wrap;
+  flex-wrap:wrap
 }
 
 .refresh{
   font-size:12px;
   color:#8995a8;
+  margin-top:4px
 }
 
 .warning{
   color:#f3c96a;
   font-size:12px;
-  line-height:1.5;
+  line-height:1.5
 }
 
 .footer{
   color:#667387;
   font-size:11px;
   text-align:center;
-  padding:18px 5px;
+  padding:18px 5px
 }
 
 @media(max-width:600px){
-
-  body{
-    padding:10px;
-  }
-
-  .controls{
-    grid-template-columns:1fr 70px 70px;
-  }
-
-  .grid3{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .price{
-    font-size:34px;
-  }
-
-  .chartOuter{
-    height:290px;
-  }
-
-  .candle{
-    width:23px;
-  }
-
-  .wick{
-    left:10px;
-  }
-
-  .body{
-    left:4px;
-    width:15px;
-  }
+  body{padding:10px}
+  .grid3{grid-template-columns:1fr 1fr}
+  .price{font-size:34px}
+  .chartOuter{height:280px}
 }
 </style>
 </head>
@@ -350,587 +262,259 @@ button.active{
 
 <div class="container">
 
-  <div class="header">
-    <div class="title">Arpit Market Scanner</div>
-    <div class="subtitle">
-      Price-action learning & market-structure scanner
-    </div>
+<div class="header">
+  <div class="title">Arpit Market Scanner</div>
+  <div class="subtitle">
+    Price-action learning & market-structure scanner
   </div>
+</div>
 
+<!-- CONTROLS -->
+<div class="card">
+  <div class="sectionTitle">Instrument & Timeframe</div>
 
-  <!-- CONTROLS -->
+  <div class="controls">
 
-  <div class="card">
+    <select id="symbol">
+      <option value="NIFTY">NIFTY</option>
+      <option value="BANKNIFTY">BANKNIFTY</option>
+      <option value="20MICRONS">20MICRONS</option>
+    </select>
 
-    <div class="sectionTitle">
-      Instrument & Timeframe
-    </div>
-
-    <div class="controls">
-
-      <select id="symbol">
-        <option value="NIFTY">NIFTY</option>
-        <option value="BANKNIFTY">BANKNIFTY</option>
-        <option value="MCX CRUDE OIL">MCX CRUDE OIL</option>
-      </select>
-
-      <button id="b5" class="active">
-        5m
-      </button>
-
-      <button id="b15">
-        15m
-      </button>
-
-    </div>
+    <button id="b5" class="active">5m</button>
+    <button id="b15">15m</button>
 
   </div>
+</div>
 
+<!-- PRICE -->
+<div class="card">
+  <div class="sectionTitle">Current Price</div>
 
-  <!-- PRICE -->
+  <div id="price" class="price">Loading...</div>
 
-  <div class="card">
+  <div id="mode" class="muted">
+    Connecting to NSE backend...
+  </div>
+</div>
 
-    <div class="sectionTitle">
-      Current Price
-    </div>
+<!-- STRUCTURE -->
+<div class="card">
 
-    <div id="price" class="price">
-      Loading...
-    </div>
+  <div class="sectionTitle">Market Structure</div>
 
-    <div id="mode" class="muted">
-      Connecting...
-    </div>
-
+  <div id="structure" class="actionBig yellow">
+    Loading...
   </div>
 
+  <div style="height:10px"></div>
 
-  <!-- STRUCTURE -->
+  <div class="grid">
 
-  <div class="card">
-
-    <div class="sectionTitle">
-      Market Structure
+    <div class="box">
+      <div class="boxTitle">Resistance</div>
+      <div id="resistance" class="boxValue red">—</div>
     </div>
 
-    <div id="structure"
-         class="actionBig green">
-      Loading...
-    </div>
-
-    <div style="height:10px"></div>
-
-    <div class="grid">
-
-      <div class="box">
-        <div class="boxTitle">
-          Resistance
-        </div>
-        <div id="resistance"
-             class="boxValue red">
-          —
-        </div>
-      </div>
-
-      <div class="box">
-        <div class="boxTitle">
-          Support
-        </div>
-        <div id="support"
-             class="boxValue green">
-          —
-        </div>
-      </div>
-
+    <div class="box">
+      <div class="boxTitle">Support</div>
+      <div id="support" class="boxValue green">—</div>
     </div>
 
   </div>
+</div>
 
+<!-- CHART -->
+<div class="card">
 
-  <!-- CHART -->
+  <div class="sectionTitle">Price Chart & Auto Levels</div>
 
-  <div class="card">
+  <div class="chartOuter">
 
-    <div class="sectionTitle">
-      Price Chart & Auto Levels
+    <div class="chartGrid"></div>
+
+    <div id="resLine" class="levelLine resistanceLine">
+      <span class="levelTag resistanceTag">RESISTANCE</span>
     </div>
 
-    <div class="chartOuter">
-
-      <div class="chartGrid"></div>
-
-      <div id="resLine"
-           class="levelLine resistanceLine">
-        <span class="levelTag resistanceTag">
-          RESISTANCE
-        </span>
-      </div>
-
-      <div id="supLine"
-           class="levelLine supportLine">
-        <span class="levelTag supportTag">
-          SUPPORT
-        </span>
-      </div>
-
-      <div id="chart"></div>
-
+    <div id="supLine" class="levelLine supportLine">
+      <span class="levelTag supportTag">SUPPORT</span>
     </div>
 
-    <div class="chartLegend">
-
-      <span>
-        <span class="dot redDot"></span>
-        Resistance
-      </span>
-
-      <span>
-        <span class="dot greenDot"></span>
-        Support
-      </span>
-
-      <span>
-        <span class="dot yellowDot"></span>
-        Breakout / retest area
-      </span>
-
-    </div>
+    <div id="chart"></div>
 
   </div>
 
-
-  <!-- LEVEL DETAILS -->
-
-  <div class="card">
-
-    <div class="sectionTitle">
-      Level Analysis
-    </div>
-
-    <div class="grid3">
-
-      <div class="box">
-        <div class="boxTitle">
-          Resistance touches
-        </div>
-        <div id="resTouches"
-             class="boxValue">
-          —
-        </div>
-      </div>
-
-      <div class="box">
-        <div class="boxTitle">
-          Support touches
-        </div>
-        <div id="supTouches"
-             class="boxValue">
-          —
-        </div>
-      </div>
-
-      <div class="box">
-        <div class="boxTitle">
-          Level strength
-        </div>
-        <div id="strength"
-             class="boxValue yellow">
-          —
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- PRICE ACTION -->
-
-  <div class="card">
-
-    <div class="sectionTitle">
-      Price Action
-    </div>
-
-    <div class="grid">
-
-      <div class="box">
-
-        <div class="boxTitle">
-          Breakout
-        </div>
-
-        <div id="breakout"
-             class="boxValue">
-          —
-        </div>
-
-      </div>
-
-
-      <div class="box">
-
-        <div class="boxTitle">
-          Retest
-        </div>
-
-        <div id="retest"
-             class="boxValue">
-          —
-        </div>
-
-      </div>
-
-
-      <div class="box">
-
-        <div class="boxTitle">
-          False Breakout
-        </div>
-
-        <div id="falseBreakout"
-             class="boxValue">
-          —
-        </div>
-
-      </div>
-
-
-      <div class="box">
-
-        <div class="boxTitle">
-          Setup status
-        </div>
-
-        <div id="setupStatus"
-             class="boxValue">
-          —
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- DAILY LEVELS -->
-
-  <div class="card">
-
-    <div class="sectionTitle">
-      Daily Reference Levels
-    </div>
-
-    <div class="grid">
-
-      <div class="box">
-        <div class="boxTitle">
-          Previous Day High
-        </div>
-        <div id="pdh"
-             class="boxValue">
-          —
-        </div>
-      </div>
-
-      <div class="box">
-        <div class="boxTitle">
-          Previous Day Low
-        </div>
-        <div id="pdl"
-             class="boxValue">
-          —
-        </div>
-      </div>
-
-      <div class="box">
-        <div class="boxTitle">
-          Previous Close
-        </div>
-        <div id="previousClose"
-             class="boxValue">
-          —
-        </div>
-      </div>
-
-      <div class="box">
-        <div class="boxTitle">
-          Current Day High
-        </div>
-        <div id="dayHigh"
-             class="boxValue">
-          —
-        </div>
-      </div>
-
-      <div class="box">
-        <div class="boxTitle">
-          Current Day Low
-        </div>
-        <div id="dayLow"
-             class="boxValue">
-          —
-        </div>
-      </div>
-
-      <div class="box">
-        <div class="boxTitle">
-          Timeframe
-        </div>
-        <div id="timeframe"
-             class="boxValue">
-          5m
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- HISTORICAL DATA -->
-
-  <div class="card">
-
-    <div class="sectionTitle">
-      Historical Data
-    </div>
-
-    <div class="grid">
-
-      <div class="box">
-        <div class="boxTitle">
-          Available period
-        </div>
-        <div class="boxValue">
-          5 Years
-        </div>
-      </div>
-
-      <div class="box">
-        <div class="boxTitle">
-          Status
-        </div>
-        <div id="historyStatus"
-             class="boxValue yellow">
-          Checking...
-        </div>
-      </div>
-
-    </div>
-
-    <div style="height:10px"></div>
-
-    <div class="warning">
-      Historical-data interface is ready. The current backend
-      does not yet contain the actual historical market dataset.
-    </div>
-
-  </div>
-
-
-  <!-- CONNECTION -->
-
-  <div class="card">
-
-    <div class="sectionTitle">
-      Backend
-    </div>
-
-    <div class="connection">
-
-      <div>
-        <div id="connection"
-             class="boxValue">
-          Connecting...
-        </div>
-
-        <div id="lastUpdate"
-             class="refresh">
-          —
-        </div>
-      </div>
-
-      <button id="refreshBtn">
-        Refresh
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <div class="footer">
-    Arpit Market Scanner • Educational / informational use
+  <div class="chartLegend">
+    <span>
+      <span class="dot redDot"></span>
+      Resistance
+    </span>
+
+    <span>
+      <span class="dot greenDot"></span>
+      Support
+    </span>
+
+    <span>
+      <span class="dot yellowDot"></span>
+      Setup area
+    </span>
   </div>
 
 </div>
 
+<!-- LEVEL ANALYSIS -->
+<div class="card">
+
+  <div class="sectionTitle">Level Analysis</div>
+
+  <div class="grid3">
+
+    <div class="box">
+      <div class="boxTitle">Range</div>
+      <div id="range" class="boxValue">—</div>
+    </div>
+
+    <div class="box">
+      <div class="boxTitle">Volume</div>
+      <div id="volume" class="boxValue">—</div>
+    </div>
+
+    <div class="box">
+      <div class="boxTitle">Strength</div>
+      <div id="strength" class="boxValue yellow">—</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PRICE ACTION -->
+<div class="card">
+
+  <div class="sectionTitle">Price Action</div>
+
+  <div class="grid">
+
+    <div class="box">
+      <div class="boxTitle">Breakout</div>
+      <div id="breakout" class="boxValue">—</div>
+    </div>
+
+    <div class="box">
+      <div class="boxTitle">Retest</div>
+      <div id="retest" class="boxValue">—</div>
+    </div>
+
+    <div class="box">
+      <div class="boxTitle">False Breakout</div>
+      <div id="falseBreakout" class="boxValue">—</div>
+    </div>
+
+    <div class="box">
+      <div class="boxTitle">Setup Status</div>
+      <div id="setupStatus" class="boxValue yellow">—</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DAILY DATA -->
+<div class="card">
+
+  <div class="sectionTitle">Daily NSE Data</div>
+
+  <div class="grid">
+
+    <div class="box">
+      <div class="boxTitle">Open</div>
+      <div id="open" class="boxValue">—</div>
+    </div>
+
+    <div class="box">
+      <div class="boxTitle">High</div>
+      <div id="high" class="boxValue">—</div>
+    </div>
+
+    <div class="box">
+      <div class="boxTitle">Low</div>
+      <div id="low" class="boxValue">—</div>
+    </div>
+
+    <div class="box">
+      <div class="boxTitle">Close</div>
+      <div id="close" class="boxValue">—</div>
+    </div>
+
+    <div class="box">
+      <div class="boxTitle">Previous Close</div>
+      <div id="previousClose" class="boxValue">—</div>
+    </div>
+
+    <div class="box">
+      <div class="boxTitle">Trade Date</div>
+      <div id="date" class="boxValue">—</div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- CONNECTION -->
+<div class="card">
+
+  <div class="sectionTitle">Backend Connection</div>
+
+  <div class="connection">
+
+    <div>
+      <div id="connection" class="boxValue">
+        Connecting...
+      </div>
+
+      <div id="lastUpdate" class="refresh">
+        —
+      </div>
+    </div>
+
+    <button id="refreshBtn">
+      Refresh
+    </button>
+
+  </div>
+
+</div>
+
+<div class="footer">
+  Arpit Market Scanner • Educational / informational use
+</div>
+
+</div>
 
 <script>
 
 const API =
   "https://arpit-market-scanner-backend.onrender.com";
 
-let tf = "5m";
+let timeframe = "5m";
 
-let currentData = null;
+const $ = id =>
+  document.getElementById(id);
 
+function number(value){
 
-/* -----------------------------
-   ELEMENTS
------------------------------ */
+  const n = Number(value);
 
-const symbolEl =
-  document.getElementById("symbol");
-
-const priceEl =
-  document.getElementById("price");
-
-const modeEl =
-  document.getElementById("mode");
-
-const structureEl =
-  document.getElementById("structure");
-
-const resistanceEl =
-  document.getElementById("resistance");
-
-const supportEl =
-  document.getElementById("support");
-
-const resTouchesEl =
-  document.getElementById("resTouches");
-
-const supTouchesEl =
-  document.getElementById("supTouches");
-
-const strengthEl =
-  document.getElementById("strength");
-
-const breakoutEl =
-  document.getElementById("breakout");
-
-const retestEl =
-  document.getElementById("retest");
-
-const falseEl =
-  document.getElementById("falseBreakout");
-
-const setupEl =
-  document.getElementById("setupStatus");
-
-const connectionEl =
-  document.getElementById("connection");
-
-const lastUpdateEl =
-  document.getElementById("lastUpdate");
-
-const historyStatusEl =
-  document.getElementById("historyStatus");
-
-const chartEl =
-  document.getElementById("chart");
-
-const resLineEl =
-  document.getElementById("resLine");
-
-const supLineEl =
-  document.getElementById("supLine");
-
-
-/* -----------------------------
-   FORMAT NUMBER
------------------------------ */
-
-function formatNumber(value){
-
-  if(
-    typeof value !== "number" ||
-    !Number.isFinite(value)
-  ){
+  if(!Number.isFinite(n)){
     return "—";
   }
 
-  return value.toLocaleString("en-IN");
+  return n.toLocaleString("en-IN",{
+    maximumFractionDigits:2
+  });
 }
 
-
-/* -----------------------------
-   SETUP STATUS
------------------------------ */
-
-function getSetupStatus(priceAction){
-
-  if(!priceAction){
-    return "No confirmed setup";
-  }
-
-  const breakout =
-    String(priceAction.breakout || "");
-
-  const retest =
-    String(priceAction.retest || "");
-
-  const falseBreakout =
-    String(priceAction.falseBreakout || "");
-
-  if(
-    falseBreakout &&
-    falseBreakout !== "No confirmation"
-  ){
-    return "False breakout detected";
-  }
-
-  if(
-    retest &&
-    retest !== "Not triggered"
-  ){
-    return "Retest detected";
-  }
-
-  if(
-    breakout &&
-    breakout !== "Waiting for close"
-  ){
-    return "Breakout detected";
-  }
-
-  return "No confirmed setup";
-}
-
-
-/* -----------------------------
-   STRUCTURE COLOR
------------------------------ */
-
-function setStructureColor(value){
-
-  structureEl.classList.remove(
-    "green",
-    "red",
-    "yellow"
-  );
-
-  if(value === "Bullish"){
-    structureEl.classList.add("green");
-  }
-  else if(value === "Bearish"){
-    structureEl.classList.add("red");
-  }
-  else{
-    structureEl.classList.add("yellow");
-  }
-}
-
-
-/* -----------------------------
-   ACTION COLOR
------------------------------ */
-
-function setActionColor(element,value){
+function setColor(element,value){
 
   element.classList.remove(
     "green",
@@ -942,12 +526,13 @@ function setActionColor(element,value){
     String(value || "").toLowerCase();
 
   if(
-    text.includes("false") ||
-    text.includes("breakdown")
+    text.includes("bearish") ||
+    text.includes("false")
   ){
     element.classList.add("red");
   }
   else if(
+    text.includes("bullish") ||
     text.includes("breakout") ||
     text.includes("retest")
   ){
@@ -958,307 +543,120 @@ function setActionColor(element,value){
   }
 }
 
+function clearData(message){
 
-/* -----------------------------
-   DRAW CANDLES
------------------------------ */
+  $("price").textContent = "—";
+  $("mode").textContent = message;
 
-function drawCandles(
-  candles,
-  resistance,
-  support
-){
+  $("structure").textContent =
+    "No confirmed data";
 
-  chartEl.innerHTML = "";
+  $("resistance").textContent = "—";
+  $("support").textContent = "—";
 
-  if(
-    !Array.isArray(candles) ||
-    candles.length === 0
-  ){
-    return;
-  }
+  $("range").textContent = "—";
+  $("volume").textContent = "—";
+  $("strength").textContent = "—";
 
-  const values = [];
+  $("breakout").textContent = "—";
+  $("retest").textContent = "—";
+  $("falseBreakout").textContent = "—";
+  $("setupStatus").textContent =
+    "No confirmed setup";
 
-  candles.forEach(c => {
+  $("open").textContent = "—";
+  $("high").textContent = "—";
+  $("low").textContent = "—";
+  $("close").textContent = "—";
+  $("previousClose").textContent = "—";
+  $("date").textContent = "—";
 
-    if(
-      Number.isFinite(c.high) &&
-      Number.isFinite(c.low)
-    ){
-      values.push(c.high);
-      values.push(c.low);
-    }
+  $("chart").innerHTML = "";
 
-  });
-
-  if(Number.isFinite(resistance)){
-    values.push(resistance);
-  }
-
-  if(Number.isFinite(support)){
-    values.push(support);
-  }
-
-  if(values.length === 0){
-    return;
-  }
-
-  const max =
-    Math.max(...values);
-
-  const min =
-    Math.min(...values);
-
-  const range =
-    Math.max(1,max-min);
-
-  const chartWidth =
-    chartEl.clientWidth;
-
-  const spacing =
-    chartWidth / candles.length;
-
-  candles.forEach((c,index)=>{
-
-    if(
-      !Number.isFinite(c.open) ||
-      !Number.isFinite(c.high) ||
-      !Number.isFinite(c.low) ||
-      !Number.isFinite(c.close)
-    ){
-      return;
-    }
-
-    const candle =
-      document.createElement("div");
-
-    candle.className =
-      "candle " +
-      (
-        c.close >= c.open
-          ? "candleUp"
-          : "candleDown"
-      );
-
-    const x =
-      index * spacing +
-      spacing / 2 -
-      14;
-
-    candle.style.left =
-      Math.max(
-        0,
-        Math.min(
-          chartWidth - 28,
-          x
-        )
-      ) + "px";
-
-
-    const yHigh =
-      ((max-c.high)/range)*100;
-
-    const yLow =
-      ((max-c.low)/range)*100;
-
-    const yOpen =
-      ((max-c.open)/range)*100;
-
-    const yClose =
-      ((max-c.close)/range)*100;
-
-
-    const top =
-      Math.min(yOpen,yClose);
-
-    const bottom =
-      Math.max(yOpen,yClose);
-
-    const bodyHeight =
-      Math.max(
-        5,
-        bottom-top
-      );
-
-
-    const wick =
-      document.createElement("div");
-
-    wick.className =
-      "wick";
-
-    wick.style.top =
-      yHigh + "%";
-
-    wick.style.height =
-      Math.max(
-        2,
-        yLow-yHigh
-      ) + "%";
-
-
-    const body =
-      document.createElement("div");
-
-    body.className =
-      "body";
-
-    body.style.top =
-      top + "%";
-
-    body.style.height =
-      bodyHeight + "%";
-
-
-    candle.appendChild(wick);
-    candle.appendChild(body);
-
-    chartEl.appendChild(candle);
-
-  });
-
-
-  positionLevel(
-    resLineEl,
-    resistance,
-    max,
-    range
-  );
-
-  positionLevel(
-    supLineEl,
-    support,
-    max,
-    range
-  );
-
+  $("resLine").style.display = "none";
+  $("supLine").style.display = "none";
 }
-
-
-/* -----------------------------
-   LEVEL POSITION
------------------------------ */
-
-function positionLevel(
-  element,
-  value,
-  max,
-  range
-){
-
-  if(
-    !Number.isFinite(value)
-  ){
-    element.style.display =
-      "none";
-    return;
-  }
-
-  const percentage =
-    ((max-value)/range)*100;
-
-  element.style.display =
-    "block";
-
-  element.style.top =
-    percentage + "%";
-}
-
-
-/* -----------------------------
-   LOAD SCANNER
------------------------------ */
 
 async function loadScanner(){
 
-  connectionEl.textContent =
+  const symbol =
+    $("symbol").value;
+
+  $("connection").textContent =
     "Connecting...";
 
   try{
 
-    const url =
-      API +
-      "/scanner/" +
-      encodeURIComponent(
-        symbolEl.value
-      ) +
-      "?x=" +
-      Date.now();
-
     const response =
-      await fetch(url);
-
-    if(!response.ok){
-      throw new Error(
-        "HTTP " + response.status
+      await fetch(
+        API +
+        "/scanner/" +
+        encodeURIComponent(symbol) +
+        "?t=" +
+        Date.now()
       );
-    }
 
     const data =
       await response.json();
 
-    currentData =
-      data;
+    if(
+      !response.ok ||
+      data.status !== "real NSE daily data"
+    ){
 
+      clearData(
+        data.note ||
+        "This instrument is not available in the current NSE daily dataset."
+      );
 
-    /* PRICE */
+      $("connection").textContent =
+        "Backend online";
 
-    priceEl.textContent =
-      formatNumber(data.price);
+      $("lastUpdate").textContent =
+        "No data for " + symbol;
 
-    modeEl.textContent =
-      "Backend mode: " +
-      (data.mode || "unknown");
+      return;
+    }
 
+    $("price").textContent =
+      number(data.price);
 
-    /* STRUCTURE */
+    $("mode").textContent =
+      "Real NSE daily data • " +
+      data.date;
 
     const structure =
       data.priceAction?.structure ||
       "Neutral";
 
-    structureEl.textContent =
+    $("structure").textContent =
       structure;
 
-    setStructureColor(
+    setColor(
+      $("structure"),
       structure
     );
 
-
-    /* LEVELS */
-
     const resistance =
-      Number(
-        data.levels?.resistance
-      );
+      data.levels?.resistance;
 
     const support =
-      Number(
-        data.levels?.support
-      );
+      data.levels?.support;
 
-    resistanceEl.textContent =
-      formatNumber(resistance);
+    $("resistance").textContent =
+      number(resistance);
 
-    supportEl.textContent =
-      formatNumber(support);
+    $("support").textContent =
+      number(support);
 
+    $("range").textContent =
+      number(data.levels?.range);
 
-    resTouchesEl.textContent =
-      data.levels?.resistanceTouches ??
-      "—";
+    $("volume").textContent =
+      number(data.volume);
 
-    supTouchesEl.textContent =
-      data.levels?.supportTouches ??
-      "—";
-
-    strengthEl.textContent =
-      data.levels?.strength ||
-      "—";
-
-
-    /* PRICE ACTION */
+    $("strength").textContent =
+      data.levels?.strength || "—";
 
     const breakout =
       data.priceAction?.breakout ||
@@ -1272,276 +670,269 @@ async function loadScanner(){
       data.priceAction?.falseBreakout ||
       "No confirmation";
 
-
-    breakoutEl.textContent =
+    $("breakout").textContent =
       breakout;
 
-    retestEl.textContent =
+    $("retest").textContent =
       retest;
 
-    falseEl.textContent =
+    $("falseBreakout").textContent =
       falseBreakout;
 
-
-    setActionColor(
-      breakoutEl,
+    setColor(
+      $("breakout"),
       breakout
     );
 
-    setActionColor(
-      retestEl,
+    setColor(
+      $("retest"),
       retest
     );
 
-    setActionColor(
-      falseEl,
+    setColor(
+      $("falseBreakout"),
       falseBreakout
     );
 
+    $("setupStatus").textContent =
+      "No confirmed setup";
 
-    setupEl.textContent =
-      getSetupStatus(
-        data.priceAction
-      );
+    $("open").textContent =
+      number(data.open);
 
+    $("high").textContent =
+      number(data.high);
 
-    /* DAILY LEVELS */
+    $("low").textContent =
+      number(data.low);
 
-    const daily =
-      data.dailyLevels || {};
+    $("close").textContent =
+      number(data.close);
 
-    document.getElementById(
-      "pdh"
-    ).textContent =
-      formatNumber(
-        Number(daily.previousDayHigh)
-      );
+    $("previousClose").textContent =
+      number(data.previousClose);
 
-    document.getElementById(
-      "pdl"
-    ).textContent =
-      formatNumber(
-        Number(daily.previousDayLow)
-      );
+    $("date").textContent =
+      data.date || "—";
 
-    document.getElementById(
-      "previousClose"
-    ).textContent =
-      formatNumber(
-        Number(daily.previousClose)
-      );
+    $("connection").textContent =
+      "● Backend connected";
 
-    document.getElementById(
-      "dayHigh"
-    ).textContent =
-      formatNumber(
-        Number(daily.currentDayHigh)
-      );
+    $("connection").classList.remove("red");
+    $("connection").classList.add("green");
 
-    document.getElementById(
-      "dayLow"
-    ).textContent =
-      formatNumber(
-        Number(daily.currentDayLow)
-      );
+    $("lastUpdate").textContent =
+      "NSE daily data • " +
+      data.date;
 
-    document.getElementById(
-      "timeframe"
-    ).textContent =
-      tf;
-
-
-    /* CHART */
-
-    const candles =
-      data.candles?.[tf] || [];
-
-    drawCandles(
-      candles,
+    drawDailyCandle(
+      data.open,
+      data.high,
+      data.low,
+      data.close,
       resistance,
       support
     );
 
+  }catch(error){
 
-    /* CONNECTION */
+    clearData(
+      "Backend connection failed"
+    );
 
-    connectionEl.textContent =
-      "Backend connected";
+    $("connection").textContent =
+      "● Connection failed";
 
-    lastUpdateEl.textContent =
-      "Updated: " +
-      new Date().toLocaleTimeString(
-        "en-IN"
-      );
+    $("connection").classList.remove("green");
+    $("connection").classList.add("red");
 
-
-    /* HISTORY */
-
-    checkHistory();
-
+    $("lastUpdate").textContent =
+      error.message;
   }
-  catch(error){
-
-    console.error(error);
-
-    connectionEl.textContent =
-      "Connection error";
-
-    modeEl.textContent =
-      "Backend unavailable";
-
-  }
-
 }
 
+function drawDailyCandle(
+  open,
+  high,
+  low,
+  close,
+  resistance,
+  support
+){
 
-/* -----------------------------
-   HISTORY CHECK
------------------------------ */
+  const values = [
+    Number(high),
+    Number(low),
+    Number(resistance),
+    Number(support)
+  ].filter(Number.isFinite);
 
-async function checkHistory(){
-
-  try{
-
-    const response =
-      await fetch(
-        API +
-        "/history/" +
-        encodeURIComponent(
-          symbolEl.value
-        ) +
-        "?x=" +
-        Date.now()
-      );
-
-    if(!response.ok){
-      throw new Error(
-        "History unavailable"
-      );
-    }
-
-    const data =
-      await response.json();
-
-    if(
-      Array.isArray(data.history) &&
-      data.history.length > 0
-    ){
-
-      historyStatusEl.textContent =
-        "Data available";
-
-      historyStatusEl.className =
-        "boxValue green";
-
-    }
-    else{
-
-      historyStatusEl.textContent =
-        "Interface ready";
-
-      historyStatusEl.className =
-        "boxValue yellow";
-
-    }
-
-  }
-  catch(error){
-
-    historyStatusEl.textContent =
-      "Not connected";
-
-    historyStatusEl.className =
-      "boxValue red";
-
+  if(!values.length){
+    return;
   }
 
+  const max =
+    Math.max(...values);
+
+  const min =
+    Math.min(...values);
+
+  const range =
+    Math.max(
+      0.01,
+      max-min
+    );
+
+  const chart =
+    $("chart");
+
+  chart.innerHTML = "";
+
+  const candle =
+    document.createElement("div");
+
+  candle.className =
+    "candle " +
+    (
+      close >= open
+        ? "candleUp"
+        : "candleDown"
+    );
+
+  candle.style.left =
+    "calc(50% - 10px)";
+
+  const highY =
+    ((max-high)/range)*100;
+
+  const lowY =
+    ((max-low)/range)*100;
+
+  const openY =
+    ((max-open)/range)*100;
+
+  const closeY =
+    ((max-close)/range)*100;
+
+  const bodyTop =
+    Math.min(
+      openY,
+      closeY
+    );
+
+  const bodyBottom =
+    Math.max(
+      openY,
+      closeY
+    );
+
+  const wick =
+    document.createElement("div");
+
+  wick.className =
+    "wick";
+
+  wick.style.top =
+    highY + "%";
+
+  wick.style.height =
+    Math.max(
+      2,
+      lowY-highY
+    ) + "%";
+
+  const body =
+    document.createElement("div");
+
+  body.className =
+    "body";
+
+  body.style.top =
+    bodyTop + "%";
+
+  body.style.height =
+    Math.max(
+      5,
+      bodyBottom-bodyTop
+    ) + "%";
+
+  candle.appendChild(wick);
+  candle.appendChild(body);
+
+  chart.appendChild(candle);
+
+  positionLevel(
+    $("resLine"),
+    resistance,
+    max,
+    range
+  );
+
+  positionLevel(
+    $("supLine"),
+    support,
+    max,
+    range
+  );
 }
 
+function positionLevel(
+  element,
+  value,
+  max,
+  range
+){
 
-/* -----------------------------
-   BUTTONS
------------------------------ */
+  if(!Number.isFinite(Number(value))){
+    element.style.display =
+      "none";
+    return;
+  }
 
-document
-  .getElementById("b5")
-  .addEventListener(
-    "click",
-    () => {
+  element.style.display =
+    "block";
 
-      tf = "5m";
+  element.style.top =
+    (
+      ((max-Number(value))/range)*100
+    ) + "%";
+}
 
-      document
-        .getElementById("b5")
-        .classList
-        .add("active");
-
-      document
-        .getElementById("b15")
-        .classList
-        .remove("active");
-
-      loadScanner();
-
-    }
-  );
-
-
-document
-  .getElementById("b15")
-  .addEventListener(
-    "click",
-    () => {
-
-      tf = "15m";
-
-      document
-        .getElementById("b15")
-        .classList
-        .add("active");
-
-      document
-        .getElementById("b5")
-        .classList
-        .remove("active");
-
-      loadScanner();
-
-    }
-  );
-
-
-/* SYMBOL CHANGE */
-
-symbolEl.addEventListener(
+$("symbol").addEventListener(
   "change",
   loadScanner
 );
 
+$("b5").addEventListener(
+  "click",
+  function(){
 
-/* MANUAL REFRESH */
+    timeframe = "5m";
 
-document
-  .getElementById("refreshBtn")
-  .addEventListener(
-    "click",
-    loadScanner
-  );
+    $("b5").classList.add("active");
+    $("b15").classList.remove("active");
 
-
-/* -----------------------------
-   AUTO REFRESH
------------------------------ */
-
-setInterval(
-  loadScanner,
-  30000
+    loadScanner();
+  }
 );
 
+$("b15").addEventListener(
+  "click",
+  function(){
 
-/* -----------------------------
-   INITIAL LOAD
------------------------------ */
+    timeframe = "15m";
+
+    $("b15").classList.add("active");
+    $("b5").classList.remove("active");
+
+    loadScanner();
+  }
+);
+
+$("refreshBtn").addEventListener(
+  "click",
+  loadScanner
+);
 
 loadScanner();
 
