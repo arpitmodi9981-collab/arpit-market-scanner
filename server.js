@@ -1,131 +1,43 @@
 const express = require("express");
-const https = require("https");
-const zlib = require("zlib");
+const multer = require("multer");
 const AdmZip = require("adm-zip");
+const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-app.use(express.json());
-
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
-  }
-
-  next();
+const upload = multer({
+  dest: "/tmp/uploads",
+  limits: { fileSize: 50 * 1024 * 1024 }
 });
-
-/* =========================
-   NSE OFFICIAL REPORT
-========================= */
-
-const NSE_REPORT_PAGE =
-  "https://www.nseindia.com/all-reports";
 
 let latestData = [];
 let latestDate = null;
-let dataStatus = "not loaded";
+let dataStatus = "waiting for CSV upload";
 let lastError = null;
 
-/* =========================
-   DOWNLOAD HELPER
-========================= */
-
-function download(url, redirects = 0) {
-  return new Promise((resolve, reject) => {
-    if (redirects > 5) {
-      return reject(new Error("Too many redirects"));
-    }
-
-    const req = https.get(
-      url,
-      {
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36",
-          "Accept":
-            "application/zip,text/csv,*/*",
-          "Accept-Language":
-            "en-US,en;q=0.9",
-          "Referer":
-            "https://www.nseindia.com/"
-        }
-      },
-      res => {
-        if (
-          res.statusCode >= 300 &&
-          res.statusCode < 400 &&
-          res.headers.location
-        ) {
-          return download(
-            res.headers.location,
-            redirects + 1
-          ).then(resolve).catch(reject);
-        }
-
-        if (res.statusCode !== 200) {
-          return reject(
-            new Error(
-              `NSE returned HTTP ${res.statusCode}`
-            )
-          );
-        }
-
-        const chunks = [];
-
-        res.on("data", chunk => {
-          chunks.push(chunk);
-        });
-
-        res.on("end", () => {
-          resolve(
-            Buffer.concat(chunks)
-          );
-        });
-      }
-    );
-
-    req.on("error", reject);
-
-    req.setTimeout(30000, () => {
-      req.destroy(
-        new Error("NSE request timeout")
-      );
-    });
-  });
+function num(v) {
+  if (v === undefined || v === null || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
 }
-
-/* =========================
-   CSV PARSER
-========================= */
 
 function parseCSVLine(line) {
   const result = [];
   let current = "";
-  let insideQuotes = false;
+  let quoted = false;
 
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
 
     if (ch === '"') {
-      if (
-        insideQuotes &&
-        line[i + 1] === '"'
-      ) {
+      if (quoted && line[i + 1] === '"') {
         current += '"';
         i++;
       } else {
-        insideQuotes = !insideQuotes;
+        quoted = !quoted;
       }
-    } else if (
-      ch === "," &&
-      !insideQuotes
-    ) {
+    } else if (ch === "," && !quoted) {
       result.push(current);
       current = "";
     } else {
@@ -134,155 +46,208 @@ function parseCSVLine(line) {
   }
 
   result.push(current);
-
   return result;
 }
 
 function csvToObjects(csv) {
-  const lines =
-    csv
-      .replace(/^\uFEFF/, "")
-      .split(/\r?\n/)
-      .filter(Boolean);
+  const lines = csv
+    .replace(/^\uFEFF/, "")
+    .split(/\r?\n/)
+    .filter(line => line.trim());
 
-  if (!lines.length) {
-    return [];
+  if (lines.length < 2) {
+    throw new Error("CSV has no data rows");
   }
 
-  const headers =
-    parseCSVLine(lines[0]);
+  const headers = parseCSVLine(lines[0]);
 
-  const rows = [];
+  return lines.slice(1).map(line => {
+    const values = parseCSVLine(line);
+    const obj = {};
 
-  for (
-    let i = 1;
-    i < lines.length;
-    i++
-  ) {
-    const values =
-      parseCSVLine(lines[i]);
+    headers.forEach((header, i) => {
+      obj[header] = values[i] ?? "";
+    });
 
-    const row = {};
-
-    headers.forEach(
-      (header, index) => {
-        row[header] =
-          values[index] ?? "";
-      }
-    );
-
-    rows.push(row);
-  }
-
-  return rows;
+    return obj;
+  });
 }
-
-/* =========================
-   NUMBER HELPER
-========================= */
-
-function num(value) {
-  const n =
-    Number(
-      String(value ?? "")
-        .replace(/,/g, "")
-        .trim()
-    );
-
-  return Number.isFinite(n)
-    ? n
-    : null;
-}
-
-/* =========================
-   NORMALIZE UDIFF
-========================= */
 
 function normalizeRow(row) {
   return {
-    date:
-      row.TradDt || null,
+    date: row.TradDt || null,
+    symbol: row.TckrSymb || null,
+    series: row.SctySrs || null,
+    instrumentType: row.FinInstrmTp || null,
+    name: row.FininstrmNm || null,
 
-    symbol:
-      row.TckrSymb || null,
+    open: num(row.OpnPric),
+    high: num(row.HghPric),
+    low: num(row.LwPric),
+    close: num(row.ClsPric),
+    last: num(row.LastPric),
+    previousClose: num(row.PrvsClsgPric),
 
-    series:
-      row.SctySrs || null,
+    volume: num(row.TtlTradgVol),
+    turnover: num(row.TtlTrfVal),
+    trades: num(row.TtlNbOfTxsExctd),
 
-    name:
-      row.FininstrmNm || null,
-
-    open:
-      num(row.OpnPric),
-
-    high:
-      num(row.HghPric),
-
-    low:
-      num(row.LwPric),
-
-    close:
-      num(row.ClsPric),
-
-    last:
-      num(row.LastPric),
-
-    previousClose:
-      num(row.PrvsClsgPric),
-
-    volume:
-      num(row.TtlTradgVol),
-
-    turnover:
-      num(row.TtlTrfVal),
-
-    trades:
-      num(row.TtlNbOfTxsExctd)
+    openInterest: num(row.OpnIntrst),
+    changeInOI: num(row.ChngInOpnIntrst)
   };
 }
 
-/* =========================
-   FIND CSV INSIDE ZIP
-========================= */
+function loadCSV(csv) {
+  const rows = csvToObjects(csv);
 
-function extractCSV(buffer) {
-  const zip =
-    new AdmZip(buffer);
+  latestData = rows
+    .map(normalizeRow)
+    .filter(row => row.symbol);
 
-  const entries =
-    zip.getEntries();
+  latestDate = latestData[0]?.date || null;
+  dataStatus = "loaded";
+  lastError = null;
 
-  const csvEntry =
-    entries.find(
-      entry =>
-        !entry.isDirectory &&
-        entry.entryName
-          .toLowerCase()
-          .endsWith(".csv")
-    );
-
-  if (!csvEntry) {
-    throw new Error(
-      "CSV not found inside NSE ZIP"
-    );
-  }
-
-  return csvEntry
-    .getData()
-    .toString("utf8");
+  return latestData.length;
 }
 
-/* =========================
-   LOAD NSE FILE
-========================= */
+function findStock(symbol) {
+  const wanted = symbol.toUpperCase();
 
-async function loadNSEFile(url) {
+  return latestData.find(row =>
+    row.symbol &&
+    row.symbol.toUpperCase() === wanted &&
+    row.series === "EQ"
+  );
+}
+
+function calculateLevels(row) {
+  if (!row) return null;
+
+  const range =
+    row.high !== null && row.low !== null
+      ? row.high - row.low
+      : null;
+
+  let strength = "WEAK";
+
+  if (row.volume !== null) {
+    if (row.volume >= 1000000) strength = "STRONG";
+    else if (row.volume >= 100000) strength = "MEDIUM";
+  }
+
+  return {
+    resistance: row.high,
+    support: row.low,
+    range,
+    strength
+  };
+}
+
+function priceAction(row) {
+  if (!row) return null;
+
+  let structure = "Neutral";
+
+  if (
+    row.close !== null &&
+    row.open !== null
+  ) {
+    if (row.close > row.open) structure = "Bullish";
+    if (row.close < row.open) structure = "Bearish";
+  }
+
+  const changePercent =
+    row.previousClose &&
+    row.last !== null
+      ? ((row.last - row.previousClose) / row.previousClose) * 100
+      : null;
+
+  return {
+    structure,
+    changePercent,
+    breakout: "Needs intraday/previous-session data",
+    retest: "Needs intraday/previous-session data",
+    falseBreakout: "Needs intraday/previous-session data"
+  };
+}
+
+function scanner(symbol) {
+  const row = findStock(symbol);
+
+  if (!row) {
+    return {
+      symbol,
+      status: "No NSE equity row found",
+      mode: "nse-udiff-bhavcopy",
+      date: latestDate,
+      note:
+        "This daily CM Bhavcopy contains individual securities. " +
+        "Intraday 5m/15m index data requires a separate source."
+    };
+  }
+
+  return {
+    symbol,
+    status: "real NSE daily data",
+    mode: "nse-udiff-bhavcopy",
+    date: row.date,
+
+    price: row.last ?? row.close,
+    open: row.open,
+    high: row.high,
+    low: row.low,
+    close: row.close,
+    previousClose: row.previousClose,
+
+    volume: row.volume,
+    turnover: row.turnover,
+    trades: row.trades,
+
+    levels: calculateLevels(row),
+    priceAction: priceAction(row)
+  };
+}
+
+app.get("/", (req, res) => {
+  res.json({
+    app: "Arpit Market Scanner Backend",
+    status: "online",
+    mode: "NSE UDiFF daily data",
+    dataStatus,
+    latestDate,
+    rowCount: latestData.length
+  });
+});
+
+app.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    dataStatus,
+    latestDate,
+    rowCount: latestData.length
+  });
+});
+
+app.get("/nse/status", (req, res) => {
+  res.json({
+    status: dataStatus,
+    latestDate,
+    rowCount: latestData.length,
+    lastError
+  });
+});
+
+app.post("/upload-bhavcopy", upload.single("file"), (req, res) => {
   try {
-    dataStatus = "loading";
-    lastError = null;
+    if (!req.file) {
+      return res.status(400).json({
+        status: "error",
+        message: "CSV or ZIP file required"
+      });
+    }
 
-    const buffer =
-      await download(url);
+    const buffer = fs.readFileSync(req.file.path);
 
     let csv;
 
@@ -291,437 +256,85 @@ async function loadNSEFile(url) {
       buffer[1] === 0x4b;
 
     if (isZip) {
-      csv =
-        extractCSV(buffer);
-    } else {
-      csv =
-        buffer.toString("utf8");
-    }
+      const zip = new AdmZip(buffer);
 
-    const rows =
-      csvToObjects(csv);
-
-    const normalized =
-      rows
-        .map(normalizeRow)
-        .filter(
-          row =>
-            row.symbol &&
-            row.open !== null &&
-            row.high !== null &&
-            row.low !== null &&
-            row.close !== null
+      const entry = zip
+        .getEntries()
+        .find(e =>
+          !e.isDirectory &&
+          e.entryName.toLowerCase().endsWith(".csv")
         );
 
-    latestData =
-      normalized;
+      if (!entry) {
+        throw new Error("CSV not found inside ZIP");
+      }
 
-    latestDate =
-      normalized.length
-        ? normalized[0].date
-        : null;
+      csv = entry.getData().toString("utf8");
+    } else {
+      csv = buffer.toString("utf8");
+    }
 
-    dataStatus =
-      "loaded";
+    const count = loadCSV(csv);
 
-    console.log(
-      `NSE data loaded: ${normalized.length} rows`
-    );
+    fs.unlinkSync(req.file.path);
 
-    return normalized;
-
+    res.json({
+      status: "success",
+      message: "NSE Bhavcopy loaded",
+      latestDate,
+      rowCount: count
+    });
   } catch (error) {
-    dataStatus =
-      "error";
+    dataStatus = "load failed";
+    lastError = error.message;
 
-    lastError =
-      error.message;
+    try {
+      if (req.file?.path) fs.unlinkSync(req.file.path);
+    } catch {}
 
-    console.error(
-      "NSE data error:",
-      error.message
-    );
-
-    return [];
+    res.status(500).json({
+      status: "error",
+      message: error.message
+    });
   }
-}
+});
 
-/* =========================
-   DEMO FALLBACK
-========================= */
+app.get("/stock/:symbol", (req, res) => {
+  const row = findStock(req.params.symbol);
 
-const demoMarket = {
-  NIFTY: 25480,
-  BANKNIFTY: 52320,
-  "MCX CRUDE OIL": 9845
-};
+  if (!row) {
+    return res.status(404).json({
+      status: "not found",
+      symbol: req.params.symbol,
+      latestDate
+    });
+  }
 
-/* =========================
-   STOCK LOOKUP
-========================= */
+  res.json(row);
+});
 
-function findStock(symbol) {
-  return latestData.find(
+app.get("/scanner/:symbol", (req, res) => {
+  res.json(scanner(req.params.symbol));
+});
+
+app.get("/history/:symbol", (req, res) => {
+  const symbol = req.params.symbol.toUpperCase();
+
+  const rows = latestData.filter(
     row =>
-      row.symbol === symbol &&
+      row.symbol &&
+      row.symbol.toUpperCase() === symbol &&
       row.series === "EQ"
   );
-}
 
-/* =========================
-   LEVELS
-========================= */
-
-function calculateLevels(row) {
-  if (!row) {
-    return null;
-  }
-
-  const resistance =
-    row.high;
-
-  const support =
-    row.low;
-
-  const range =
-    resistance - support;
-
-  let strength =
-    "WEAK";
-
-  if (range > 0) {
-    const volume =
-      row.volume || 0;
-
-    if (volume >= 1000000) {
-      strength =
-        "STRONG";
-    } else if (
-      volume >= 100000
-    ) {
-      strength =
-        "MEDIUM";
-    }
-  }
-
-  return {
-    resistance,
-    support,
-    strength,
-    range
-  };
-}
-
-/* =========================
-   DAILY PRICE ACTION
-========================= */
-
-function dailyPriceAction(row) {
-  if (!row) {
-    return {
-      structure: "No data",
-      breakout: "No data",
-      retest: "Not available",
-      falseBreakout: "Not available"
-    };
-  }
-
-  let structure =
-    "Neutral";
-
-  if (
-    row.close >
-    row.open
-  ) {
-    structure =
-      "Bullish";
-  } else if (
-    row.close <
-    row.open
-  ) {
-    structure =
-      "Bearish";
-  }
-
-  return {
-    structure,
-
-    breakout:
-      row.close > row.high
-        ? "Breakout"
-        : "Waiting for next session",
-
-    retest:
-      "Needs next-session data",
-
-    falseBreakout:
-      "Needs next-session data"
-  };
-}
-
-/* =========================
-   SCANNER
-========================= */
-
-function scanner(symbol) {
-  const row =
-    findStock(symbol);
-
-  if (!row) {
-    return {
-      symbol,
-      status: "No NSE equity row found",
-      mode: "nse-bhavcopy",
-      note:
-        "This daily CM Bhavcopy contains equity securities. Index/derivative intraday data requires a separate source."
-    };
-  }
-
-  const levels =
-    calculateLevels(row);
-
-  return {
+  res.json({
     symbol,
+    status: rows.length ? "available" : "not found",
+    mode: "nse-udiff-bhavcopy",
+    rows
+  });
+});
 
-    status:
-      "real NSE daily data",
-
-    mode:
-      "nse-udiff-bhavcopy",
-
-    date:
-      row.date,
-
-    price:
-      row.last ?? row.close,
-
-    open:
-      row.open,
-
-    high:
-      row.high,
-
-    low:
-      row.low,
-
-    close:
-      row.close,
-
-    previousClose:
-      row.previousClose,
-
-    volume:
-      row.volume,
-
-    turnover:
-      row.turnover,
-
-    trades:
-      row.trades,
-
-    levels,
-
-    priceAction:
-      dailyPriceAction(row)
-  };
-}
-
-/* =========================
-   ROOT
-========================= */
-
-app.get(
-  "/",
-  (req, res) => {
-    res.json({
-      app:
-        "Arpit Market Scanner Backend",
-
-      status:
-        "online",
-
-      dataSource:
-        "NSE CM-UDiFF Common Bhavcopy",
-
-      dataStatus,
-
-      latestDate,
-
-      rowCount:
-        latestData.length,
-
-      message:
-        "NSE daily data engine ready"
-    });
-  }
-);
-
-/* =========================
-   HEALTH
-========================= */
-
-app.get(
-  "/health",
-  (req, res) => {
-    res.json({
-      status:
-        "ok",
-
-      dataSource:
-        "NSE UDiFF Bhavcopy",
-
-      dataStatus,
-
-      latestDate,
-
-      rowCount:
-        latestData.length,
-
-      lastError
-    });
-  }
-);
-
-/* =========================
-   NSE DATA STATUS
-========================= */
-
-app.get(
-  "/nse/status",
-  (req, res) => {
-    res.json({
-      status:
-        dataStatus,
-
-      source:
-        "NSE CM-UDiFF Common Bhavcopy",
-
-      latestDate,
-
-      rowCount:
-        latestData.length,
-
-      lastError
-    });
-  }
-);
-
-/* =========================
-   STOCK
-========================= */
-
-app.get(
-  "/stock/:symbol",
-  (req, res) => {
-    const symbol =
-      decodeURIComponent(
-        req.params.symbol
-      ).toUpperCase();
-
-    const row =
-      findStock(symbol);
-
-    if (!row) {
-      return res
-        .status(404)
-        .json({
-          error:
-            "Stock not found in latest NSE Bhavcopy",
-          symbol
-        });
-    }
-
-    res.json(row);
-  }
-);
-
-/* =========================
-   SCANNER
-========================= */
-
-app.get(
-  "/scanner/:symbol",
-  (req, res) => {
-    const symbol =
-      decodeURIComponent(
-        req.params.symbol
-      ).toUpperCase();
-
-    res.json(
-      scanner(symbol)
-    );
-  }
-);
-
-/* =========================
-   HISTORY
-========================= */
-
-app.get(
-  "/history/:symbol",
-  (req, res) => {
-    const symbol =
-      decodeURIComponent(
-        req.params.symbol
-      ).toUpperCase();
-
-    const rows =
-      latestData.filter(
-        row =>
-          row.symbol === symbol &&
-          row.series === "EQ"
-      );
-
-    res.json({
-      symbol,
-
-      source:
-        "NSE CM-UDiFF Common Bhavcopy",
-
-      latestDate,
-
-      count:
-        rows.length,
-
-      history:
-        rows
-    });
-  }
-);
-
-/* =========================
-   START
-========================= */
-
-app.listen(
-  PORT,
-  async () => {
-    console.log(
-      `Server running on port ${PORT}`
-    );
-
-    /*
-      Current official NSE report URLs
-      can change. For the first test,
-      set NSE_BHAVCOPY_URL in Render
-      environment variables to the exact
-      official ZIP URL you downloaded.
-    */
-
-    const url =
-      process.env.NSE_BHAVCOPY_URL;
-
-    if (!url) {
-      dataStatus =
-        "waiting for NSE_BHAVCOPY_URL";
-
-      console.log(
-        "Set NSE_BHAVCOPY_URL in Render Environment."
-      );
-
-      return;
-    }
-
-    await loadNSEFile(url);
-  }
-);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
