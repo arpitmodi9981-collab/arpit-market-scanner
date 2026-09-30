@@ -8,7 +8,9 @@ const PORT = process.env.PORT || 10000;
 
 const upload = multer({
   dest: "/tmp/uploads",
-  limits: { fileSize: 50 * 1024 * 1024 }
+  limits: {
+    fileSize: 50 * 1024 * 1024
+  }
 });
 
 let latestData = [];
@@ -16,9 +18,12 @@ let latestDate = null;
 let dataStatus = "waiting for CSV upload";
 let lastError = null;
 
-function num(v) {
-  if (v === undefined || v === null || v === "") return null;
-  const n = Number(v);
+function num(value) {
+  if (value === undefined || value === null || value === "") {
+    return null;
+  }
+
+  const n = Number(value);
   return Number.isFinite(n) ? n : null;
 }
 
@@ -65,8 +70,8 @@ function csvToObjects(csv) {
     const values = parseCSVLine(line);
     const obj = {};
 
-    headers.forEach((header, i) => {
-      obj[header] = values[i] ?? "";
+    headers.forEach((header, index) => {
+      obj[header] = values[index] ?? "";
     });
 
     return obj;
@@ -132,8 +137,11 @@ function calculateLevels(row) {
   let strength = "WEAK";
 
   if (row.volume !== null) {
-    if (row.volume >= 1000000) strength = "STRONG";
-    else if (row.volume >= 100000) strength = "MEDIUM";
+    if (row.volume >= 1000000) {
+      strength = "STRONG";
+    } else if (row.volume >= 100000) {
+      strength = "MEDIUM";
+    }
   }
 
   return {
@@ -149,26 +157,31 @@ function priceAction(row) {
 
   let structure = "Neutral";
 
-  if (
-    row.close !== null &&
-    row.open !== null
-  ) {
-    if (row.close > row.open) structure = "Bullish";
-    if (row.close < row.open) structure = "Bearish";
+  if (row.close !== null && row.open !== null) {
+    if (row.close > row.open) {
+      structure = "Bullish";
+    } else if (row.close < row.open) {
+      structure = "Bearish";
+    }
   }
 
-  const changePercent =
-    row.previousClose &&
+  let changePercent = null;
+
+  if (
+    row.previousClose !== null &&
+    row.previousClose !== 0 &&
     row.last !== null
-      ? ((row.last - row.previousClose) / row.previousClose) * 100
-      : null;
+  ) {
+    changePercent =
+      ((row.last - row.previousClose) / row.previousClose) * 100;
+  }
 
   return {
     structure,
     changePercent,
-    breakout: "Needs intraday/previous-session data",
-    retest: "Needs intraday/previous-session data",
-    falseBreakout: "Needs intraday/previous-session data"
+    breakout: "Needs previous-session/intraday data",
+    retest: "Needs previous-session/intraday data",
+    falseBreakout: "Needs previous-session/intraday data"
   };
 }
 
@@ -182,8 +195,8 @@ function scanner(symbol) {
       mode: "nse-udiff-bhavcopy",
       date: latestDate,
       note:
-        "This daily CM Bhavcopy contains individual securities. " +
-        "Intraday 5m/15m index data requires a separate source."
+        "This daily Bhavcopy contains individual securities. " +
+        "NIFTY and 5m/15m intraday data require a separate source."
     };
   }
 
@@ -209,6 +222,17 @@ function scanner(symbol) {
   };
 }
 
+function deleteTempFile(path) {
+  try {
+    if (path && fs.existsSync(path)) {
+      fs.unlinkSync(path);
+    }
+  } catch (e) {
+    console.log("Temporary file cleanup failed:", e.message);
+  }
+}
+
+/* Home */
 app.get("/", (req, res) => {
   res.json({
     app: "Arpit Market Scanner Backend",
@@ -220,6 +244,7 @@ app.get("/", (req, res) => {
   });
 });
 
+/* Health */
 app.get("/health", (req, res) => {
   res.json({
     status: "ok",
@@ -229,6 +254,7 @@ app.get("/health", (req, res) => {
   });
 });
 
+/* NSE status */
 app.get("/nse/status", (req, res) => {
   res.json({
     status: dataStatus,
@@ -238,31 +264,116 @@ app.get("/nse/status", (req, res) => {
   });
 });
 
-app.post("/upload-bhavcopy", upload.single("file"), (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({
-        status: "error",
-        message: "CSV or ZIP file required"
-      });
+/* Mobile upload page */
+app.get("/upload", (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arpit Market Scanner - NSE Upload</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      padding: 24px;
+      margin: 0;
     }
 
+    .box {
+      max-width: 520px;
+      margin: 30px auto;
+      background: #1d1d1d;
+      padding: 24px;
+      border-radius: 16px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px;
+      margin: 15px 0;
+      background: #fff;
+      color: #111;
+      border-radius: 8px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: 0;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .info {
+      color: #bbb;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="box">
+    <h2>Arpit Market Scanner</h2>
+
+    <p>Upload NSE UDiFF Bhavcopy</p>
+
+    <p class="info">
+      CSV or ZIP file upload करें.
+      Example: BhavCopy_NSE_CM_0_0_0_20260929_F_0000.csv.zip
+    </p>
+
+    <form action="/upload-bhavcopy" method="POST" enctype="multipart/form-data">
+      <input
+        type="file"
+        name="file"
+        accept=".csv,.zip"
+        required
+      >
+
+      <button type="submit">
+        Upload Bhavcopy
+      </button>
+    </form>
+  </div>
+</body>
+</html>
+  `);
+});
+
+/* Upload CSV or ZIP */
+app.post("/upload-bhavcopy", upload.single("file"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("CSV or ZIP file required");
+  }
+
+  try {
     const buffer = fs.readFileSync(req.file.path);
 
-    let csv;
-
     const isZip =
+      buffer.length >= 2 &&
       buffer[0] === 0x50 &&
       buffer[1] === 0x4b;
+
+    let csv;
 
     if (isZip) {
       const zip = new AdmZip(buffer);
 
       const entry = zip
         .getEntries()
-        .find(e =>
-          !e.isDirectory &&
-          e.entryName.toLowerCase().endsWith(".csv")
+        .find(item =>
+          !item.isDirectory &&
+          item.entryName.toLowerCase().endsWith(".csv")
         );
 
       if (!entry) {
@@ -276,29 +387,57 @@ app.post("/upload-bhavcopy", upload.single("file"), (req, res) => {
 
     const count = loadCSV(csv);
 
-    fs.unlinkSync(req.file.path);
+    deleteTempFile(req.file.path);
 
-    res.json({
-      status: "success",
-      message: "NSE Bhavcopy loaded",
-      latestDate,
-      rowCount: count
-    });
+    res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Upload Complete</title>
+</head>
+
+<body style="font-family:Arial;padding:30px;background:#111;color:#fff">
+  <h2>✅ Upload successful</h2>
+
+  <p>Date: ${latestDate || "unknown"}</p>
+  <p>Rows loaded: ${count}</p>
+
+  <p>
+    <a
+      href="/nse/status"
+      style="color:#6ea8fe"
+    >
+      View NSE Status
+    </a>
+  </p>
+
+  <p>
+    <a
+      href="/scanner/20MICRONS"
+      style="color:#6ea8fe"
+    >
+      Test Scanner
+    </a>
+  </p>
+</body>
+</html>
+    `);
+
   } catch (error) {
     dataStatus = "load failed";
     lastError = error.message;
 
-    try {
-      if (req.file?.path) fs.unlinkSync(req.file.path);
-    } catch {}
+    deleteTempFile(req.file.path);
 
-    res.status(500).json({
-      status: "error",
-      message: error.message
-    });
+    res.status(500).send(`
+      <h2>Upload failed</h2>
+      <p>${error.message}</p>
+    `);
   }
 });
 
+/* Individual stock */
 app.get("/stock/:symbol", (req, res) => {
   const row = findStock(req.params.symbol);
 
@@ -313,18 +452,19 @@ app.get("/stock/:symbol", (req, res) => {
   res.json(row);
 });
 
+/* Scanner */
 app.get("/scanner/:symbol", (req, res) => {
   res.json(scanner(req.params.symbol));
 });
 
+/* History */
 app.get("/history/:symbol", (req, res) => {
   const symbol = req.params.symbol.toUpperCase();
 
-  const rows = latestData.filter(
-    row =>
-      row.symbol &&
-      row.symbol.toUpperCase() === symbol &&
-      row.series === "EQ"
+  const rows = latestData.filter(row =>
+    row.symbol &&
+    row.symbol.toUpperCase() === symbol &&
+    row.series === "EQ"
   );
 
   res.json({
