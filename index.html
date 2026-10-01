@@ -795,6 +795,148 @@ $("refreshBtn").addEventListener(
   "click",
   loadScanner
 );
+      $("chart").innerHTML = "";
+    return;
+  }
+
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+
+  const padding =
+    Math.max((max - min) * 0.12, 0.01);
+
+  const topValue = max + padding;
+  const bottomValue = min - padding;
+  const range = topValue - bottomValue;
+
+  const chart = $("chart");
+  chart.innerHTML = "";
+
+  function y(value){
+    return ((topValue - value) / range) * 100;
+  }
+
+  /* CANDLE */
+
+  const candle = document.createElement("div");
+
+  candle.className =
+    "candle " +
+    (
+      Number(close) >= Number(open)
+        ? "candleUp"
+        : "candleDown"
+    );
+
+  candle.style.left =
+    "calc(50% - 18px)";
+
+  const wick = document.createElement("div");
+  wick.className = "wick";
+
+  wick.style.top =
+    y(Number(high)) + "%";
+
+  wick.style.height =
+    (y(Number(low)) - y(Number(high))) + "%";
+
+  const body = document.createElement("div");
+  body.className = "body";
+
+  const bodyTop =
+    y(Math.max(Number(open), Number(close)));
+
+  const bodyBottom =
+    y(Math.min(Number(open), Number(close)));
+
+  body.style.top =
+    bodyTop + "%";
+
+  body.style.height =
+    Math.max(bodyBottom - bodyTop, 2) + "%";
+
+  candle.appendChild(wick);
+  candle.appendChild(body);
+  chart.appendChild(candle);
+
+
+  /* LEVELS */
+
+  function placeLevel(id, value){
+
+    const element = $(id);
+
+    if(!Number.isFinite(Number(value))){
+      element.style.display = "none";
+      return;
+    }
+
+    let position = y(Number(value));
+
+    position = Math.max(
+      2,
+      Math.min(98, position)
+    );
+
+    element.style.display = "block";
+    element.style.top = position + "%";
+  }
+
+  placeLevel("resLine", resistance);
+  placeLevel("supLine", support);
+}
+
+
+/* 5m */
+
+$("b5").addEventListener("click", () => {
+
+  timeframe = "5m";
+
+  $("b5").classList.add("active");
+  $("b15").classList.remove("active");
+
+  loadScanner();
+});
+
+
+/* 15m */
+
+$("b15").addEventListener("click", () => {
+
+  timeframe = "15m";
+
+  $("b15").classList.add("active");
+  $("b5").classList.remove("active");
+
+  loadScanner();
+});
+
+
+/* SYMBOL */
+
+$("symbol").addEventListener(
+  "change",
+  loadScanner
+);
+
+
+/* REFRESH */
+
+$("refreshBtn").addEventListener(
+  "click",
+  loadScanner
+);
+
+
+/* START */
+
+loadScanner();
+
+</script>
+
+</body>
+</html>
 
 
 /* START */
