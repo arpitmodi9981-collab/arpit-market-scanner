@@ -7,232 +7,650 @@
 
 <style>
 *{box-sizing:border-box}
+
 body{
-  margin:0;padding:12px;background:#070b11;color:#f5f7fa;
-  font-family:Arial,Helvetica,sans-serif
+  margin:0;
+  padding:12px;
+  background:#070b11;
+  color:#f5f7fa;
+  font-family:Arial,Helvetica,sans-serif;
 }
-.container{max-width:900px;margin:auto}
-.header{padding:8px 4px 18px}
-.title{font-size:25px;font-weight:800}
-.subtitle{color:#8995a8;font-size:13px;margin-top:5px}
+
+.container{
+  max-width:900px;
+  margin:auto;
+}
+
+.header{
+  padding:8px 4px 18px;
+}
+
+.title{
+  font-size:25px;
+  font-weight:800;
+}
+
+.subtitle{
+  color:#8995a8;
+  font-size:13px;
+  margin-top:5px;
+}
 
 .card{
-  background:#111925;border:1px solid #29364a;border-radius:16px;
-  padding:15px;margin:12px 0
+  background:#111925;
+  border:1px solid #29364a;
+  border-radius:16px;
+  padding:15px;
+  margin:12px 0;
 }
+
 .sectionTitle{
-  color:#8995a8;font-size:12px;text-transform:uppercase;
-  letter-spacing:.7px;margin-bottom:10px
+  color:#8995a8;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.7px;
+  margin-bottom:10px;
 }
+
 .controls{
-  display:grid;grid-template-columns:1fr 70px 70px;gap:9px
+  display:grid;
+  grid-template-columns:1fr 70px 70px;
+  gap:9px;
 }
-select,button{
-  width:100%;background:#182230;color:#fff;border:1px solid #35445a;
-  border-radius:10px;padding:12px;font-size:14px
+
+select,
+button{
+  width:100%;
+  background:#182230;
+  color:#fff;
+  border:1px solid #35445a;
+  border-radius:10px;
+  padding:12px;
+  font-size:14px;
 }
-button{cursor:pointer}
-button.active{background:#40536d}
 
-.price{font-size:38px;font-weight:800}
-.muted{color:#8995a8}
-.green{color:#61dc96}
-.red{color:#ff7070}
-.yellow{color:#f3c96a}
+button{
+  cursor:pointer;
+}
 
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.box{background:#182230;border-radius:11px;padding:13px;min-width:0}
-.boxTitle{color:#8995a8;font-size:11px;margin-bottom:5px}
-.boxValue{font-size:17px;font-weight:750;word-break:break-word}
+button.active{
+  background:#40536d;
+}
+
+.price{
+  font-size:38px;
+  font-weight:800;
+}
+
+.muted{
+  color:#8995a8;
+}
+
+.green{
+  color:#61dc96;
+}
+
+.red{
+  color:#ff7070;
+}
+
+.yellow{
+  color:#f3c96a;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.grid3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+.box{
+  background:#182230;
+  border-radius:11px;
+  padding:13px;
+  min-width:0;
+}
+
+.boxTitle{
+  color:#8995a8;
+  font-size:11px;
+  margin-bottom:5px;
+}
+
+.boxValue{
+  font-size:17px;
+  font-weight:750;
+  word-break:break-word;
+}
+
+/* CHART */
 
 .chartOuter{
-  position:relative;background:#080e16;border:1px solid #202c3d;
-  border-radius:12px;height:320px;overflow:hidden
+  position:relative;
+  background:#080e16;
+  border:1px solid #202c3d;
+  border-radius:12px;
+  height:320px;
+  overflow:hidden;
 }
+
 .chartGrid{
-  position:absolute;inset:0;
+  position:absolute;
+  inset:0;
+
   background:
-  linear-gradient(to bottom,
-  transparent 24.5%,#1a2534 25%,transparent 25.5%,
-  transparent 49.5%,#1a2534 50%,transparent 50.5%,
-  transparent 74.5%,#1a2534 75%,transparent 75.5%)
+  linear-gradient(
+    to bottom,
+    transparent 24.5%,
+    #1a2534 25%,
+    transparent 25.5%,
+
+    transparent 49.5%,
+    #1a2534 50%,
+    transparent 50.5%,
+
+    transparent 74.5%,
+    #1a2534 75%,
+    transparent 75.5%
+  );
 }
-#chart{position:absolute;left:10px;right:10px;top:10px;bottom:10px}
+
+#chart{
+  position:absolute;
+  left:10px;
+  right:10px;
+  top:10px;
+  bottom:10px;
+}
 
 .candle{
-  position:absolute;top:0;bottom:0;width:36px
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:36px;
 }
+
 .wick{
-  position:absolute;left:17px;width:2px;border-radius:2px;background:#d7dee8
+  position:absolute;
+  left:17px;
+  width:2px;
+  background:#d7dee8;
+  border-radius:2px;
 }
+
 .body{
-  position:absolute;left:5px;width:26px;min-height:6px;border-radius:4px
+  position:absolute;
+  left:5px;
+  width:26px;
+  min-height:6px;
+  border-radius:4px;
 }
-.candleUp .body{background:#61dc96}
-.candleDown .body{background:#ff7070}
+
+.candleUp .body{
+  background:#61dc96;
+}
+
+.candleDown .body{
+  background:#ff7070;
+}
 
 .levelLine{
-  position:absolute;left:8px;right:8px;height:0;border-top:2px dashed;
-  z-index:10
+  position:absolute;
+  left:8px;
+  right:8px;
+  height:0;
+  border-top:2px dashed;
+  z-index:10;
 }
-.resistanceLine{border-color:#ff7070}
-.supportLine{border-color:#61dc96}
+
+.resistanceLine{
+  border-color:#ff7070;
+}
+
+.supportLine{
+  border-color:#61dc96;
+}
+
 .levelTag{
-  position:absolute;right:0;top:-20px;font-size:10px;padding:3px 6px;
-  border-radius:5px;background:#111925;font-weight:bold
+  position:absolute;
+  right:0;
+  top:-20px;
+  font-size:10px;
+  padding:3px 6px;
+  border-radius:5px;
+  background:#111925;
+  font-weight:bold;
 }
-.resistanceTag{color:#ff7070}
-.supportTag{color:#61dc96}
+
+.resistanceTag{
+  color:#ff7070;
+}
+
+.supportTag{
+  color:#61dc96;
+}
 
 .chartLegend{
-  display:flex;gap:15px;flex-wrap:wrap;color:#aeb8c7;
-  font-size:11px;margin-top:10px
+  display:flex;
+  gap:15px;
+  flex-wrap:wrap;
+  color:#aeb8c7;
+  font-size:11px;
+  margin-top:10px;
 }
-.dot{
-  display:inline-block;width:8px;height:8px;border-radius:50%;
-  margin-right:5px
-}
-.redDot{background:#ff7070}
-.greenDot{background:#61dc96}
-.yellowDot{background:#f3c96a}
 
-.actionBig{font-size:18px;font-weight:800}
-.connection{
-  display:flex;justify-content:space-between;align-items:center;
-  gap:10px;flex-wrap:wrap
+.dot{
+  display:inline-block;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  margin-right:5px;
 }
-.refresh{font-size:12px;color:#8995a8;margin-top:4px}
-.footer{color:#667387;font-size:11px;text-align:center;padding:18px 5px}
+
+.redDot{
+  background:#ff7070;
+}
+
+.greenDot{
+  background:#61dc96;
+}
+
+.yellowDot{
+  background:#f3c96a;
+}
+
+.actionBig{
+  font-size:18px;
+  font-weight:800;
+}
+
+.connection{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.refresh{
+  font-size:12px;
+  color:#8995a8;
+  margin-top:4px;
+}
+
+.footer{
+  color:#667387;
+  font-size:11px;
+  text-align:center;
+  padding:18px 5px;
+}
 
 @media(max-width:600px){
-  body{padding:10px}
-  .grid3{grid-template-columns:1fr 1fr}
-  .price{font-size:34px}
-  .chartOuter{height:300px}
+
+  body{
+    padding:10px;
+  }
+
+  .grid3{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .price{
+    font-size:34px;
+  }
+
+  .chartOuter{
+    height:300px;
+  }
 }
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
+<!-- HEADER -->
+
 <div class="header">
-  <div class="title">Arpit Market Scanner</div>
-  <div class="subtitle">Price-action learning & market-structure scanner</div>
-</div>
 
-<div class="card">
-  <div class="sectionTitle">Instrument & Timeframe</div>
-  <div class="controls">
-    <select id="symbol">
-      <option value="NIFTY">NIFTY</option>
-      <option value="BANKNIFTY">BANKNIFTY</option>
-      <option value="20MICRONS">20MICRONS</option>
-    </select>
-    <button id="b5" class="active">5m</button>
-    <button id="b15">15m</button>
+  <div class="title">
+    Arpit Market Scanner
   </div>
+
+  <div class="subtitle">
+    Price-action learning & market-structure scanner
+  </div>
+
 </div>
 
-<div class="card">
-  <div class="sectionTitle">Current Price</div>
-  <div id="price" class="price">Loading...</div>
-  <div id="mode" class="muted">Connecting to NSE backend...</div>
-</div>
+
+<!-- INSTRUMENT -->
 
 <div class="card">
-  <div class="sectionTitle">Market Structure</div>
-  <div id="structure" class="actionBig yellow">Loading...</div>
+
+  <div class="sectionTitle">
+    Instrument & Timeframe
+  </div>
+
+  <div class="controls">
+
+    <select id="symbol">
+
+      <option value="NIFTY">
+        NIFTY
+      </option>
+
+      <option value="BANKNIFTY">
+        BANKNIFTY
+      </option>
+
+      <option value="20MICRONS" selected>
+        20MICRONS
+      </option>
+
+    </select>
+
+    <button
+      id="b5"
+      class="active"
+      type="button">
+      5m
+    </button>
+
+    <button
+      id="b15"
+      type="button">
+      15m
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- PRICE -->
+
+<div class="card">
+
+  <div class="sectionTitle">
+    Current Price
+  </div>
+
+  <div
+    id="price"
+    class="price">
+    Loading...
+  </div>
+
+  <div
+    id="mode"
+    class="muted">
+    Connecting to NSE backend...
+  </div>
+
+</div>
+
+
+<!-- MARKET STRUCTURE -->
+
+<div class="card">
+
+  <div class="sectionTitle">
+    Market Structure
+  </div>
+
+  <div
+    id="structure"
+    class="actionBig yellow">
+    Loading...
+  </div>
+
   <div style="height:10px"></div>
 
   <div class="grid">
+
     <div class="box">
-      <div class="boxTitle">Resistance</div>
-      <div id="resistance" class="boxValue red">—</div>
+
+      <div class="boxTitle">
+        Resistance
+      </div>
+
+      <div
+        id="resistance"
+        class="boxValue red">
+        —
+      </div>
+
     </div>
+
+
     <div class="box">
-      <div class="boxTitle">Support</div>
-      <div id="support" class="boxValue green">—</div>
+
+      <div class="boxTitle">
+        Support
+      </div>
+
+      <div
+        id="support"
+        class="boxValue green">
+        —
+      </div>
+
     </div>
+
   </div>
+
 </div>
 
+
+<!-- CHART -->
+
 <div class="card">
-  <div class="sectionTitle">Price Chart & Auto Levels</div>
+
+  <div class="sectionTitle">
+    Price Chart & Auto Levels
+  </div>
 
   <div class="chartOuter">
+
     <div class="chartGrid"></div>
 
-    <div id="resLine" class="levelLine resistanceLine">
-      <span class="levelTag resistanceTag">RESISTANCE</span>
+    <div
+      id="resLine"
+      class="levelLine resistanceLine">
+
+      <span class="levelTag resistanceTag">
+        RESISTANCE
+      </span>
+
     </div>
 
-    <div id="supLine" class="levelLine supportLine">
-      <span class="levelTag supportTag">SUPPORT</span>
+    <div
+      id="supLine"
+      class="levelLine supportLine">
+
+      <span class="levelTag supportTag">
+        SUPPORT
+      </span>
+
     </div>
 
     <div id="chart"></div>
+
   </div>
 
   <div class="chartLegend">
-    <span><span class="dot redDot"></span>Resistance</span>
-    <span><span class="dot greenDot"></span>Support</span>
-    <span><span class="dot yellowDot"></span>Daily OHLC</span>
+
+    <span>
+      <span class="dot redDot"></span>
+      Resistance
+    </span>
+
+    <span>
+      <span class="dot greenDot"></span>
+      Support
+    </span>
+
+    <span>
+      <span class="dot yellowDot"></span>
+      Daily OHLC
+    </span>
+
   </div>
+
 </div>
 
+
+<!-- LEVEL ANALYSIS -->
+
 <div class="card">
-  <div class="sectionTitle">Level Analysis</div>
+
+  <div class="sectionTitle">
+    Level Analysis
+  </div>
 
   <div class="grid3">
-    <div class="box">
-      <div class="boxTitle">Range</div>
-      <div id="range" class="boxValue">—</div>
-    </div>
 
     <div class="box">
-      <div class="boxTitle">Volume</div>
-      <div id="volume" class="boxValue">—</div>
+
+      <div class="boxTitle">
+        Range
+      </div>
+
+      <div
+        id="range"
+        class="boxValue">
+        —
+      </div>
+
     </div>
 
+
     <div class="box">
-      <div class="boxTitle">Strength</div>
-      <div id="strength" class="boxValue yellow">—</div>
+
+      <div class="boxTitle">
+        Volume
+      </div>
+
+      <div
+        id="volume"
+        class="boxValue">
+        —
+      </div>
+
     </div>
+
+
+    <div class="box">
+
+      <div class="boxTitle">
+        Strength
+      </div>
+
+      <div
+        id="strength"
+        class="boxValue yellow">
+        —
+      </div>
+
+    </div>
+
   </div>
+
 </div>
 
+
+<!-- PRICE ACTION -->
+
 <div class="card">
-  <div class="sectionTitle">Price Action</div>
+
+  <div class="sectionTitle">
+    Price Action
+  </div>
 
   <div class="grid">
-    <div class="box">
-      <div class="boxTitle">Breakout</div>
-      <div id="breakout" class="boxValue">—</div>
-    </div>
 
     <div class="box">
-      <div class="boxTitle">Retest</div>
-      <div id="retest" class="boxValue">—</div>
+
+      <div class="boxTitle">
+        Breakout
+      </div>
+
+      <div
+        id="breakout"
+        class="boxValue">
+        —
+      </div>
+
     </div>
 
-    <div class="box">
-      <div class="boxTitle">False Breakout</div>
-      <div id="falseBreakout" class="boxValue">—</div>
-    </div>
 
     <div class="box">
-      <div class="boxTitle">Setup Status</div>
-      <div id="setupStatus" class="boxValue yellow">—</div>
+
+      <div class="boxTitle">
+        Retest
+      </div>
+
+      <div
+        id="retest"
+        class="boxValue">
+        —
+      </div>
+
     </div>
+
+
+    <div class="box">
+
+      <div class="boxTitle">
+        False Breakout
+      </div>
+
+      <div
+        id="falseBreakout"
+        class="boxValue">
+        —
+      </div>
+
+    </div>
+
+
+    <div class="box">
+
+      <div class="boxTitle">
+        Setup Status
+      </div>
+
+      <div
+        id="setupStatus"
+        class="boxValue yellow">
+        —
+      </div>
+
+    </div>
+
   </div>
+
 </div>
 
+
+<!-- DAILY DATA -->
+
 <div class="card">
-  <div class="sectionTitle">Daily NSE Data</div>
+
+  <div class="sectionTitle">
+    Daily NSE Data
+  </div>
 
   <div class="grid">
+
     <div class="box">
       <div class="boxTitle">Open</div>
       <div id="open" class="boxValue">—</div>
@@ -262,21 +680,48 @@ button.active{background:#40536d}
       <div class="boxTitle">Trade Date</div>
       <div id="date" class="boxValue">—</div>
     </div>
+
   </div>
+
 </div>
+
+
+<!-- BACKEND -->
 
 <div class="card">
-  <div class="sectionTitle">Backend Connection</div>
+
+  <div class="sectionTitle">
+    Backend Connection
+  </div>
 
   <div class="connection">
+
     <div>
-      <div id="connection" class="boxValue">Connecting...</div>
-      <div id="lastUpdate" class="refresh">—</div>
+
+      <div
+        id="connection"
+        class="boxValue yellow">
+        Connecting...
+      </div>
+
+      <div
+        id="lastUpdate"
+        class="refresh">
+        —
+      </div>
+
     </div>
 
-    <button id="refreshBtn" type="button">Refresh</button>
+    <button
+      id="refreshBtn"
+      type="button">
+      Refresh
+    </button>
+
   </div>
+
 </div>
+
 
 <div class="footer">
   Arpit Market Scanner • Educational / informational use
@@ -284,130 +729,230 @@ button.active{background:#40536d}
 
 </div>
 
+
 <script>
+
 const API =
   "https://arpit-market-scanner-backend.onrender.com";
 
-let timeframe = "5m";
+const $ =
+  id => document.getElementById(id);
 
-const $ = id => document.getElementById(id);
+
+/* NUMBER */
 
 function number(value){
+
   const n = Number(value);
 
   if(!Number.isFinite(n)){
     return "—";
   }
 
-  return n.toLocaleString("en-IN", {
-    maximumFractionDigits:2
-  });
+  return n.toLocaleString(
+    "en-IN",
+    {
+      maximumFractionDigits:2
+    }
+  );
 }
 
-function setColor(element,value){
-  element.classList.remove("green","red","yellow");
 
-  const text = String(value || "").toLowerCase();
+/* COLOR */
+
+function setColor(element,value){
+
+  element.classList.remove(
+    "green",
+    "red",
+    "yellow"
+  );
+
+  const text =
+    String(value || "").toLowerCase();
 
   if(
     text.includes("bearish") ||
     text.includes("false")
   ){
+
     element.classList.add("red");
+
   }
+
   else if(
     text.includes("bullish") ||
     text.includes("breakout") ||
     text.includes("retest")
   ){
+
     element.classList.add("green");
+
   }
+
   else{
+
     element.classList.add("yellow");
+
   }
 }
+
+
+/* CLEAR */
 
 function clearData(message){
 
   $("price").textContent = "—";
-  $("mode").textContent = message;
 
-  $("structure").textContent = "No confirmed data";
-  $("structure").className = "actionBig yellow";
+  $("mode").textContent =
+    message;
 
-  $("resistance").textContent = "—";
-  $("support").textContent = "—";
+  $("structure").textContent =
+    "No confirmed data";
 
-  $("range").textContent = "—";
-  $("volume").textContent = "—";
-  $("strength").textContent = "—";
+  $("structure").className =
+    "actionBig yellow";
 
-  $("breakout").textContent = "—";
-  $("retest").textContent = "—";
-  $("falseBreakout").textContent = "—";
+  $("resistance").textContent =
+    "—";
 
-  $("setupStatus").textContent = "No confirmed setup";
-  $("setupStatus").className = "boxValue yellow";
+  $("support").textContent =
+    "—";
 
-  $("open").textContent = "—";
-  $("high").textContent = "—";
-  $("low").textContent = "—";
-  $("close").textContent = "—";
-  $("previousClose").textContent = "—";
-  $("date").textContent = "—";
+  $("range").textContent =
+    "—";
 
-  $("chart").innerHTML = "";
+  $("volume").textContent =
+    "—";
 
-  $("resLine").style.display = "none";
-  $("supLine").style.display = "none";
+  $("strength").textContent =
+    "—";
+
+  $("breakout").textContent =
+    "—";
+
+  $("retest").textContent =
+    "—";
+
+  $("falseBreakout").textContent =
+    "—";
+
+  $("setupStatus").textContent =
+    "No confirmed setup";
+
+  $("setupStatus").className =
+    "boxValue yellow";
+
+  $("open").textContent =
+    "—";
+
+  $("high").textContent =
+    "—";
+
+  $("low").textContent =
+    "—";
+
+  $("close").textContent =
+    "—";
+
+  $("previousClose").textContent =
+    "—";
+
+  $("date").textContent =
+    "—";
+
+  $("chart").innerHTML =
+    "";
+
+  $("resLine").style.display =
+    "none";
+
+  $("supLine").style.display =
+    "none";
 }
 
-async function fetchWithTimeout(url, timeoutMs = 10000){
 
-  const controller = new AbortController();
+/* FETCH WITH TIMEOUT */
 
-  const timer = setTimeout(() => {
-    controller.abort();
-  }, timeoutMs);
+async function fetchWithTimeout(
+  url,
+  timeoutMs = 10000
+){
+
+  const controller =
+    new AbortController();
+
+  const timer =
+    setTimeout(
+      () => controller.abort(),
+      timeoutMs
+    );
 
   try{
-    return await fetch(url,{
-      signal:controller.signal,
-      cache:"no-store"
-    });
+
+    return await fetch(
+      url,
+      {
+        signal:controller.signal,
+        cache:"no-store"
+      }
+    );
+
   }
+
   finally{
+
     clearTimeout(timer);
+
   }
 }
+
+
+/* LOAD SCANNER */
 
 async function loadScanner(){
 
-  const symbol = $("symbol").value;
+  const symbol =
+    $("symbol").value;
 
-  $("connection").textContent = "Connecting...";
-  $("connection").className = "boxValue yellow";
+  $("connection").textContent =
+    "Connecting...";
+
+  $("connection").className =
+    "boxValue yellow";
+
 
   try{
 
-    const response = await fetchWithTimeout(
-      API +
-      "/scanner/" +
-      encodeURIComponent(symbol) +
-      "?t=" +
-      Date.now()
-    );
+    const response =
+      await fetchWithTimeout(
+        API +
+        "/scanner/" +
+        encodeURIComponent(symbol) +
+        "?t=" +
+        Date.now()
+      );
+
 
     if(!response.ok){
+
       throw new Error(
-        "Backend HTTP " + response.status
+        "Backend HTTP " +
+        response.status
       );
+
     }
 
-    const data = await response.json();
+
+    const data =
+      await response.json();
+
+
+    /* NO DATA */
 
     if(
-      data.status !== "real NSE daily data"
+      data.status !==
+      "real NSE daily data"
     ){
 
       clearData(
@@ -422,10 +967,13 @@ async function loadScanner(){
         "boxValue green";
 
       $("lastUpdate").textContent =
-        "No data for " + symbol;
+        "No data for " +
+        symbol;
 
       return;
+
     }
+
 
     /* PRICE */
 
@@ -460,20 +1008,27 @@ async function loadScanner(){
     const support =
       data.levels?.support;
 
+
     $("resistance").textContent =
       number(resistance);
 
     $("support").textContent =
       number(support);
 
+
     $("range").textContent =
-      number(data.levels?.range);
+      number(
+        data.levels?.range
+      );
+
 
     $("volume").textContent =
       number(data.volume);
 
+
     const strength =
-      data.levels?.strength || "—";
+      data.levels?.strength ||
+      "—";
 
     $("strength").textContent =
       strength;
@@ -498,6 +1053,7 @@ async function loadScanner(){
       data.priceAction?.falseBreakout ||
       "No confirmation";
 
+
     $("breakout").textContent =
       breakout;
 
@@ -506,6 +1062,7 @@ async function loadScanner(){
 
     $("falseBreakout").textContent =
       falseBreakout;
+
 
     setColor(
       $("breakout"),
@@ -528,6 +1085,7 @@ async function loadScanner(){
     const setup =
       data.priceAction?.setup ||
       "No confirmed setup";
+
 
     $("setupStatus").textContent =
       setup;
@@ -584,6 +1142,8 @@ async function loadScanner(){
     );
 
   }
+
+
   catch(error){
 
     clearData(
@@ -592,17 +1152,24 @@ async function loadScanner(){
         : "Backend connection failed"
     );
 
+
     $("connection").textContent =
       "● Connection failed";
 
     $("connection").className =
       "boxValue red";
 
+
     $("lastUpdate").textContent =
-      error.message || "Unknown error";
+      error.message ||
+      "Unknown error";
+
   }
+
 }
 
+
+/* DAILY CANDLE */
 
 function drawDailyCandle(
   open,
@@ -614,43 +1181,70 @@ function drawDailyCandle(
 ){
 
   const values = [
+
     Number(high),
     Number(low),
     Number(open),
     Number(close),
     Number(resistance),
     Number(support)
-  ].filter(Number.isFinite);
+
+  ].filter(
+    Number.isFinite
+  );
+
 
   if(values.length < 4){
-    $("chart").innerHTML = "";
+
+    $("chart").innerHTML =
+      "";
+
     return;
+
   }
 
-  const max = Math.max(...values);
-  const min = Math.min(...values);
+
+  const max =
+    Math.max(...values);
+
+  const min =
+    Math.min(...values);
+
 
   const padding =
-    Math.max((max - min) * 0.12, 0.01);
+    Math.max(
+      (max - min) * 0.12,
+      0.01
+    );
 
-  const topValue = max + padding;
-  const bottomValue = min - padding;
+
+  const topValue =
+    max + padding;
+
+  const bottomValue =
+    min - padding;
 
   const range =
     topValue - bottomValue;
 
+
   const chart =
     $("chart");
 
-  chart.innerHTML = "";
+  chart.innerHTML =
+    "";
+
 
   function y(value){
 
     return (
-      (topValue - value) /
+      (topValue - Number(value))
+      /
       range
     ) * 100;
+
   }
+
 
   /* CANDLE */
 
@@ -665,36 +1259,61 @@ function drawDailyCandle(
         : "candleDown"
     );
 
+
   candle.style.left =
     "calc(50% - 18px)";
+
+
+  /* WICK */
 
   const wick =
     document.createElement("div");
 
-  wick.className = "wick";
+  wick.className =
+    "wick";
+
 
   wick.style.top =
-    y(Number(high)) + "%";
+    y(high) + "%";
+
 
   wick.style.height =
     (
-      y(Number(low)) -
-      y(Number(high))
+      y(low) -
+      y(high)
     ) + "%";
+
+
+  /* BODY */
 
   const body =
     document.createElement("div");
 
-  body.className = "body";
+  body.className =
+    "body";
+
 
   const bodyTop =
-    y(Math.max(Number(open),Number(close)));
+    y(
+      Math.max(
+        Number(open),
+        Number(close)
+      )
+    );
+
 
   const bodyBottom =
-    y(Math.min(Number(open),Number(close)));
+    y(
+      Math.min(
+        Number(open),
+        Number(close)
+      )
+    );
+
 
   body.style.top =
     bodyTop + "%";
+
 
   body.style.height =
     Math.max(
@@ -702,27 +1321,42 @@ function drawDailyCandle(
       2
     ) + "%";
 
+
   candle.appendChild(wick);
+
   candle.appendChild(body);
+
   chart.appendChild(candle);
 
 
-  /* LEVELS */
+  /* LEVEL */
 
   function placeLevel(
     id,
     value
   ){
 
-    const element = $(id);
+    const element =
+      $(id);
 
-    if(!Number.isFinite(Number(value))){
-      element.style.display = "none";
+
+    if(
+      !Number.isFinite(
+        Number(value)
+      )
+    ){
+
+      element.style.display =
+        "none";
+
       return;
+
     }
 
+
     let position =
-      y(Number(value));
+      y(value);
+
 
     position =
       Math.max(
@@ -733,184 +1367,69 @@ function drawDailyCandle(
         )
       );
 
+
     element.style.display =
       "block";
 
+
     element.style.top =
       position + "%";
+
   }
+
 
   placeLevel(
     "resLine",
     resistance
   );
 
+
   placeLevel(
     "supLine",
     support
   );
+
 }
 
 
-/* TIMEFRAME */
+/* 5 MIN */
 
 $("b5").addEventListener(
   "click",
-  () => {
+  function(){
 
-    timeframe = "5m";
+    $("b5").classList.add(
+      "active"
+    );
 
-    $("b5").classList.add("active");
-    $("b15").classList.remove("active");
+    $("b15").classList.remove(
+      "active"
+    );
 
     loadScanner();
+
   }
 );
+
+
+/* 15 MIN */
 
 $("b15").addEventListener(
   "click",
-  () => {
+  function(){
 
-    timeframe = "15m";
+    $("b15").classList.add(
+      "active"
+    );
 
-    $("b15").classList.add("active");
-    $("b5").classList.remove("active");
+    $("b5").classList.remove(
+      "active"
+    );
 
     loadScanner();
+
   }
 );
-
-
-/* SYMBOL */
-
-$("symbol").addEventListener(
-  "change",
-  loadScanner
-);
-
-
-/* REFRESH */
-
-$("refreshBtn").addEventListener(
-  "click",
-  loadScanner
-);
-      $("chart").innerHTML = "";
-    return;
-  }
-
-  const max = Math.max(...values);
-  const min = Math.min(...values);
-
-  const padding =
-    Math.max((max - min) * 0.12, 0.01);
-
-  const topValue = max + padding;
-  const bottomValue = min - padding;
-  const range = topValue - bottomValue;
-
-  const chart = $("chart");
-  chart.innerHTML = "";
-
-  function y(value){
-    return ((topValue - value) / range) * 100;
-  }
-
-  /* CANDLE */
-
-  const candle = document.createElement("div");
-
-  candle.className =
-    "candle " +
-    (
-      Number(close) >= Number(open)
-        ? "candleUp"
-        : "candleDown"
-    );
-
-  candle.style.left =
-    "calc(50% - 18px)";
-
-  const wick = document.createElement("div");
-  wick.className = "wick";
-
-  wick.style.top =
-    y(Number(high)) + "%";
-
-  wick.style.height =
-    (y(Number(low)) - y(Number(high))) + "%";
-
-  const body = document.createElement("div");
-  body.className = "body";
-
-  const bodyTop =
-    y(Math.max(Number(open), Number(close)));
-
-  const bodyBottom =
-    y(Math.min(Number(open), Number(close)));
-
-  body.style.top =
-    bodyTop + "%";
-
-  body.style.height =
-    Math.max(bodyBottom - bodyTop, 2) + "%";
-
-  candle.appendChild(wick);
-  candle.appendChild(body);
-  chart.appendChild(candle);
-
-
-  /* LEVELS */
-
-  function placeLevel(id, value){
-
-    const element = $(id);
-
-    if(!Number.isFinite(Number(value))){
-      element.style.display = "none";
-      return;
-    }
-
-    let position = y(Number(value));
-
-    position = Math.max(
-      2,
-      Math.min(98, position)
-    );
-
-    element.style.display = "block";
-    element.style.top = position + "%";
-  }
-
-  placeLevel("resLine", resistance);
-  placeLevel("supLine", support);
-}
-
-
-/* 5m */
-
-$("b5").addEventListener("click", () => {
-
-  timeframe = "5m";
-
-  $("b5").classList.add("active");
-  $("b15").classList.remove("active");
-
-  loadScanner();
-});
-
-
-/* 15m */
-
-$("b15").addEventListener("click", () => {
-
-  timeframe = "15m";
-
-  $("b15").classList.add("active");
-  $("b5").classList.remove("active");
-
-  loadScanner();
-});
 
 
 /* SYMBOL */
@@ -935,14 +1454,5 @@ loadScanner();
 
 </script>
 
-</body>
-</html>
-
-
-/* START */
-
-loadScanner();
-
-</script>
 </body>
 </html>
