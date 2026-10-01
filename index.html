@@ -145,8 +145,6 @@ button.active{background:#40536d}
   bottom:10px
 }
 
-/* IMPORTANT: candle itself fills chart */
-
 .candle{
   position:absolute;
   top:0;
@@ -294,7 +292,6 @@ button.active{background:#40536d}
   </div>
 </div>
 
-
 <!-- INSTRUMENT -->
 
 <div class="card">
@@ -333,7 +330,6 @@ button.active{background:#40536d}
 
 </div>
 
-
 <!-- PRICE -->
 
 <div class="card">
@@ -351,7 +347,6 @@ button.active{background:#40536d}
   </div>
 
 </div>
-
 
 <!-- MARKET STRUCTURE -->
 
@@ -399,7 +394,6 @@ button.active{background:#40536d}
   </div>
 
 </div>
-
 
 <!-- CHART -->
 
@@ -456,7 +450,6 @@ button.active{background:#40536d}
 
 </div>
 
-
 <!-- LEVEL ANALYSIS -->
 
 <div class="card">
@@ -509,7 +502,6 @@ button.active{background:#40536d}
   </div>
 
 </div>
-
 
 <!-- PRICE ACTION -->
 
@@ -576,7 +568,6 @@ button.active{background:#40536d}
   </div>
 
 </div>
-
 
 <!-- DAILY DATA -->
 
@@ -670,7 +661,6 @@ button.active{background:#40536d}
 
 </div>
 
-
 <!-- BACKEND -->
 
 <div class="card">
@@ -703,22 +693,18 @@ button.active{background:#40536d}
 
 </div>
 
-
 <div class="footer">
   Arpit Market Scanner • Educational / informational use
 </div>
 
 </div>
 
-
 <script>
 
 const API =
   "https://arpit-market-scanner-backend.onrender.com";
 
-
 let timeframe = "5m";
-
 
 const $ = id =>
   document.getElementById(id);
@@ -752,6 +738,7 @@ function setColor(element,value){
   const text =
     String(value || "")
       .toLowerCase();
+
 
   if(
     text.includes("bearish") ||
@@ -823,6 +810,15 @@ function clearData(message){
 
   $("setupStatus").textContent =
     "No confirmed setup";
+
+  $("setupStatus").classList.remove(
+    "green",
+    "red"
+  );
+
+  $("setupStatus").classList.add(
+    "yellow"
+  );
 
   $("open").textContent =
     "—";
@@ -952,6 +948,13 @@ async function loadScanner(){
       "—";
 
 
+    setColor(
+      $("strength"),
+      data.levels?.strength ||
+      ""
+    );
+
+
     /* PRICE ACTION */
 
     const breakout =
@@ -993,8 +996,25 @@ async function loadScanner(){
     );
 
 
-    $("setupStatus").textContent =
+    /*
+      SETUP STATUS
+
+      Backend se actual setup
+      read kiya ja raha hai.
+    */
+
+    const setup =
+      data.priceAction?.setup ||
       "No confirmed setup";
+
+
+    $("setupStatus").textContent =
+      setup;
+
+    setColor(
+      $("setupStatus"),
+      setup
+    );
 
 
     /* DAILY DATA */
@@ -1097,262 +1117,3 @@ function drawDailyCandle(
 
 
   if(values.length < 4){
-    return;
-  }
-
-
-  const max =
-    Math.max(...values);
-
-  const min =
-    Math.min(...values);
-
-  const range =
-    Math.max(
-      0.01,
-      max - min
-    );
-
-
-  const chart =
-    $("chart");
-
-  chart.innerHTML =
-    "";
-
-
-  /*
-    Candle fills the complete
-    chart height.
-  */
-
-  const candle =
-    document.createElement(
-      "div"
-    );
-
-  candle.className =
-    "candle " +
-    (
-      Number(close) >=
-      Number(open)
-        ? "candleUp"
-        : "candleDown"
-    );
-
-
-  candle.style.left =
-    "calc(50% - 18px)";
-
-
-  /* Price -> chart percentage */
-
-  const priceToY =
-    price =>
-      (
-        (max - Number(price)) /
-        range
-      ) * 100;
-
-
-  const highY =
-    priceToY(high);
-
-  const lowY =
-    priceToY(low);
-
-  const openY =
-    priceToY(open);
-
-  const closeY =
-    priceToY(close);
-
-
-  /* WICK */
-
-  const wick =
-    document.createElement(
-      "div"
-    );
-
-  wick.className =
-    "wick";
-
-  wick.style.top =
-    highY + "%";
-
-  wick.style.height =
-    Math.max(
-      2,
-      lowY - highY
-    ) + "%";
-
-
-  /* BODY */
-
-  const body =
-    document.createElement(
-      "div"
-    );
-
-  body.className =
-    "body";
-
-  body.style.top =
-    Math.min(
-      openY,
-      closeY
-    ) + "%";
-
-  body.style.height =
-    Math.max(
-      6,
-      Math.abs(
-        closeY - openY
-      )
-    ) + "%";
-
-
-  candle.appendChild(
-    wick
-  );
-
-  candle.appendChild(
-    body
-  );
-
-  chart.appendChild(
-    candle
-  );
-
-
-  /* LEVELS */
-
-  positionLevel(
-    $("resLine"),
-    resistance,
-    max,
-    range
-  );
-
-  positionLevel(
-    $("supLine"),
-    support,
-    max,
-    range
-  );
-}
-
-
-function positionLevel(
-  element,
-  value,
-  max,
-  range
-){
-
-  if(
-    !Number.isFinite(
-      Number(value)
-    )
-  ){
-
-    element.style.display =
-      "none";
-
-    return;
-  }
-
-
-  element.style.display =
-    "block";
-
-
-  const y =
-    (
-      (max - Number(value)) /
-      range
-    ) * 100;
-
-
-  element.style.top =
-    Math.max(
-      0,
-      Math.min(
-        100,
-        y
-      )
-    ) + "%";
-}
-
-
-/* TIMEFRAME BUTTONS */
-
-$("b5").addEventListener(
-  "click",
-  function(){
-
-    timeframe =
-      "5m";
-
-    $("b5")
-      .classList.add(
-        "active"
-      );
-
-    $("b15")
-      .classList.remove(
-        "active"
-      );
-
-    loadScanner();
-  }
-);
-
-
-$("b15").addEventListener(
-  "click",
-  function(){
-
-    timeframe =
-      "15m";
-
-    $("b15")
-      .classList.add(
-        "active"
-      );
-
-    $("b5")
-      .classList.remove(
-        "active"
-      );
-
-    loadScanner();
-  }
-);
-
-
-/* SYMBOL */
-
-$("symbol").addEventListener(
-  "change",
-  loadScanner
-);
-
-
-/* REFRESH */
-
-$("refreshBtn").addEventListener(
-  "click",
-  loadScanner
-);
-
-
-/* FIRST LOAD */
-
-loadScanner();
-
-</script>
-
-</body>
-</html>
