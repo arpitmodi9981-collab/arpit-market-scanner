@@ -36,6 +36,18 @@ body{
   margin-top:5px;
 }
 
+.demoNotice{
+  margin-top:9px;
+  display:inline-block;
+  padding:6px 9px;
+  border-radius:7px;
+  background:#2a2110;
+  border:1px solid #665025;
+  color:#f3c96a;
+  font-size:11px;
+  font-weight:700;
+}
+
 .card{
   background:#111925;
   border:1px solid #29364a;
@@ -173,12 +185,12 @@ button.active{
   position:absolute;
   top:0;
   bottom:0;
-  width:36px;
+  width:14px;
 }
 
 .wick{
   position:absolute;
-  left:17px;
+  left:6px;
   width:2px;
   background:#d7dee8;
   border-radius:2px;
@@ -186,10 +198,10 @@ button.active{
 
 .body{
   position:absolute;
-  left:5px;
-  width:26px;
-  min-height:6px;
-  border-radius:4px;
+  left:1px;
+  width:12px;
+  min-height:3px;
+  border-radius:2px;
 }
 
 .candleUp .body{
@@ -206,7 +218,7 @@ button.active{
   right:8px;
   height:0;
   border-top:2px dashed;
-  z-index:10;
+  z-index:20;
 }
 
 .resistanceLine{
@@ -316,8 +328,6 @@ button.active{
 
 <div class="container">
 
-<!-- HEADER -->
-
 <div class="header">
 
   <div class="title">
@@ -326,6 +336,10 @@ button.active{
 
   <div class="subtitle">
     Price-action learning & market-structure scanner
+  </div>
+
+  <div class="demoNotice">
+    EDUCATIONAL DEMO • INTRADAY CANDLES ARE NOT LIVE MARKET DATA
   </div>
 
 </div>
@@ -357,16 +371,11 @@ button.active{
 
     </select>
 
-    <button
-      id="b5"
-      class="active"
-      type="button">
+    <button id="b5" class="active" type="button">
       5m
     </button>
 
-    <button
-      id="b15"
-      type="button">
+    <button id="b15" type="button">
       15m
     </button>
 
@@ -380,19 +389,15 @@ button.active{
 <div class="card">
 
   <div class="sectionTitle">
-    Current Price
+    Current Demo Candle Close
   </div>
 
-  <div
-    id="price"
-    class="price">
+  <div id="price" class="price">
     Loading...
   </div>
 
-  <div
-    id="mode"
-    class="muted">
-    Connecting to NSE backend...
+  <div id="mode" class="muted">
+    Loading demo intraday data...
   </div>
 
 </div>
@@ -406,9 +411,7 @@ button.active{
     Market Structure
   </div>
 
-  <div
-    id="structure"
-    class="actionBig yellow">
+  <div id="structure" class="actionBig yellow">
     Loading...
   </div>
 
@@ -422,14 +425,11 @@ button.active{
         Resistance
       </div>
 
-      <div
-        id="resistance"
-        class="boxValue red">
+      <div id="resistance" class="boxValue red">
         —
       </div>
 
     </div>
-
 
     <div class="box">
 
@@ -437,9 +437,7 @@ button.active{
         Support
       </div>
 
-      <div
-        id="support"
-        class="boxValue green">
+      <div id="support" class="boxValue green">
         —
       </div>
 
@@ -455,16 +453,14 @@ button.active{
 <div class="card">
 
   <div class="sectionTitle">
-    Price Chart & Auto Levels
+    Intraday Demo Chart
   </div>
 
   <div class="chartOuter">
 
     <div class="chartGrid"></div>
 
-    <div
-      id="resLine"
-      class="levelLine resistanceLine">
+    <div id="resLine" class="levelLine resistanceLine">
 
       <span class="levelTag resistanceTag">
         RESISTANCE
@@ -472,9 +468,7 @@ button.active{
 
     </div>
 
-    <div
-      id="supLine"
-      class="levelLine supportLine">
+    <div id="supLine" class="levelLine supportLine">
 
       <span class="levelTag supportTag">
         SUPPORT
@@ -499,8 +493,13 @@ button.active{
     </span>
 
     <span>
-      <span class="dot yellowDot"></span>
-      Daily OHLC
+      <span class="dot greenDot"></span>
+      Bullish candle
+    </span>
+
+    <span>
+      <span class="dot redDot"></span>
+      Bearish candle
     </span>
 
   </div>
@@ -513,7 +512,7 @@ button.active{
 <div class="card">
 
   <div class="sectionTitle">
-    Level Analysis
+    Intraday Analysis
   </div>
 
   <div class="grid3">
@@ -521,42 +520,34 @@ button.active{
     <div class="box">
 
       <div class="boxTitle">
-        Range
+        Candle Range
       </div>
 
-      <div
-        id="range"
-        class="boxValue">
+      <div id="range" class="boxValue">
         —
       </div>
 
     </div>
 
-
     <div class="box">
 
       <div class="boxTitle">
-        Volume
+        Last Volume
       </div>
 
-      <div
-        id="volume"
-        class="boxValue">
+      <div id="volume" class="boxValue">
         —
       </div>
 
     </div>
 
-
     <div class="box">
 
       <div class="boxTitle">
-        Strength
+        Timeframe
       </div>
 
-      <div
-        id="strength"
-        class="boxValue yellow">
+      <div id="timeframe" class="boxValue yellow">
         —
       </div>
 
@@ -572,7 +563,7 @@ button.active{
 <div class="card">
 
   <div class="sectionTitle">
-    Price Action
+    Price Action Classification
   </div>
 
   <div class="grid">
@@ -583,14 +574,11 @@ button.active{
         Breakout
       </div>
 
-      <div
-        id="breakout"
-        class="boxValue">
+      <div id="breakout" class="boxValue">
         —
       </div>
 
     </div>
-
 
     <div class="box">
 
@@ -598,14 +586,11 @@ button.active{
         Retest
       </div>
 
-      <div
-        id="retest"
-        class="boxValue">
+      <div id="retest" class="boxValue">
         —
       </div>
 
     </div>
-
 
     <div class="box">
 
@@ -613,14 +598,11 @@ button.active{
         False Breakout
       </div>
 
-      <div
-        id="falseBreakout"
-        class="boxValue">
+      <div id="falseBreakout" class="boxValue">
         —
       </div>
 
     </div>
-
 
     <div class="box">
 
@@ -628,9 +610,7 @@ button.active{
         Setup Status
       </div>
 
-      <div
-        id="setupStatus"
-        class="boxValue yellow">
+      <div id="setupStatus" class="boxValue yellow">
         —
       </div>
 
@@ -698,23 +678,17 @@ button.active{
 
     <div>
 
-      <div
-        id="connection"
-        class="boxValue yellow">
+      <div id="connection" class="boxValue yellow">
         Connecting...
       </div>
 
-      <div
-        id="lastUpdate"
-        class="refresh">
+      <div id="lastUpdate" class="refresh">
         —
       </div>
 
     </div>
 
-    <button
-      id="refreshBtn"
-      type="button">
+    <button id="refreshBtn" type="button">
       Refresh
     </button>
 
@@ -734,6 +708,8 @@ button.active{
 
 const API =
   "https://arpit-market-scanner-backend.onrender.com";
+
+let currentInterval = "5m";
 
 const $ =
   id => document.getElementById(id);
@@ -804,8 +780,7 @@ function clearData(message){
 
   $("price").textContent = "—";
 
-  $("mode").textContent =
-    message;
+  $("mode").textContent = message;
 
   $("structure").textContent =
     "No confirmed data";
@@ -813,29 +788,16 @@ function clearData(message){
   $("structure").className =
     "actionBig yellow";
 
-  $("resistance").textContent =
-    "—";
+  $("resistance").textContent = "—";
+  $("support").textContent = "—";
 
-  $("support").textContent =
-    "—";
+  $("range").textContent = "—";
+  $("volume").textContent = "—";
+  $("timeframe").textContent = "—";
 
-  $("range").textContent =
-    "—";
-
-  $("volume").textContent =
-    "—";
-
-  $("strength").textContent =
-    "—";
-
-  $("breakout").textContent =
-    "—";
-
-  $("retest").textContent =
-    "—";
-
-  $("falseBreakout").textContent =
-    "—";
+  $("breakout").textContent = "—";
+  $("retest").textContent = "—";
+  $("falseBreakout").textContent = "—";
 
   $("setupStatus").textContent =
     "No confirmed setup";
@@ -843,40 +805,25 @@ function clearData(message){
   $("setupStatus").className =
     "boxValue yellow";
 
-  $("open").textContent =
-    "—";
+  $("open").textContent = "—";
+  $("high").textContent = "—";
+  $("low").textContent = "—";
+  $("close").textContent = "—";
+  $("previousClose").textContent = "—";
+  $("date").textContent = "—";
 
-  $("high").textContent =
-    "—";
+  $("chart").innerHTML = "";
 
-  $("low").textContent =
-    "—";
-
-  $("close").textContent =
-    "—";
-
-  $("previousClose").textContent =
-    "—";
-
-  $("date").textContent =
-    "—";
-
-  $("chart").innerHTML =
-    "";
-
-  $("resLine").style.display =
-    "none";
-
-  $("supLine").style.display =
-    "none";
+  $("resLine").style.display = "none";
+  $("supLine").style.display = "none";
 }
 
 
-/* FETCH WITH TIMEOUT */
+/* FETCH */
 
 async function fetchWithTimeout(
   url,
-  timeoutMs = 10000
+  timeoutMs = 12000
 ){
 
   const controller =
@@ -908,7 +855,61 @@ async function fetchWithTimeout(
 }
 
 
-/* LOAD SCANNER */
+/* DAILY DATA */
+
+async function loadDaily(symbol){
+
+  const response =
+    await fetchWithTimeout(
+      API +
+      "/scanner/" +
+      encodeURIComponent(symbol) +
+      "?t=" +
+      Date.now()
+    );
+
+  if(!response.ok){
+
+    throw new Error(
+      "Daily backend HTTP " +
+      response.status
+    );
+
+  }
+
+  return await response.json();
+}
+
+
+/* INTRADAY DEMO */
+
+async function loadIntraday(symbol){
+
+  const response =
+    await fetchWithTimeout(
+      API +
+      "/intraday/" +
+      encodeURIComponent(symbol) +
+      "?interval=" +
+      encodeURIComponent(currentInterval) +
+      "&t=" +
+      Date.now()
+    );
+
+  if(!response.ok){
+
+    throw new Error(
+      "Intraday backend HTTP " +
+      response.status
+    );
+
+  }
+
+  return await response.json();
+}
+
+
+/* LOAD EVERYTHING */
 
 async function loadScanner(){
 
@@ -924,40 +925,22 @@ async function loadScanner(){
 
   try{
 
-    const response =
-      await fetchWithTimeout(
-        API +
-        "/scanner/" +
-        encodeURIComponent(symbol) +
-        "?t=" +
-        Date.now()
-      );
+    /*
+      DAILY DATA
+    */
 
+    const daily =
+      await loadDaily(symbol);
 
-    if(!response.ok){
-
-      throw new Error(
-        "Backend HTTP " +
-        response.status
-      );
-
-    }
-
-
-    const data =
-      await response.json();
-
-
-    /* NO DATA */
 
     if(
-      data.status !==
+      daily.status !==
       "real NSE daily data"
     ){
 
       clearData(
-        data.note ||
-        "No data available"
+        daily.note ||
+        "No NSE daily data available"
       );
 
       $("connection").textContent =
@@ -967,7 +950,7 @@ async function loadScanner(){
         "boxValue green";
 
       $("lastUpdate").textContent =
-        "No data for " +
+        "No daily data for " +
         symbol;
 
       return;
@@ -975,20 +958,85 @@ async function loadScanner(){
     }
 
 
-    /* PRICE */
+    /*
+      DAILY DISPLAY
+    */
+
+    $("resistance").textContent =
+      number(daily.levels?.resistance);
+
+    $("support").textContent =
+      number(daily.levels?.support);
+
+    $("open").textContent =
+      number(daily.open);
+
+    $("high").textContent =
+      number(daily.high);
+
+    $("low").textContent =
+      number(daily.low);
+
+    $("close").textContent =
+      number(daily.close);
+
+    $("previousClose").textContent =
+      number(daily.previousClose);
+
+    $("date").textContent =
+      daily.date || "—";
+
+
+    /*
+      INTRADAY DATA
+    */
+
+    const intraday =
+      await loadIntraday(symbol);
+
+
+    if(
+      intraday.status !==
+      "demo intraday data" ||
+      !Array.isArray(intraday.candles) ||
+      intraday.candles.length === 0
+    ){
+
+      throw new Error(
+        "No intraday demo candles"
+      );
+
+    }
+
+
+    const candles =
+      intraday.candles;
+
+
+    const last =
+      candles[candles.length - 1];
+
+
+    /*
+      CURRENT PRICE
+    */
 
     $("price").textContent =
-      number(data.price);
+      number(last.close);
 
     $("mode").textContent =
-      "Real NSE daily data • " +
-      data.date;
+      "Educational demo • " +
+      currentInterval +
+      " • " +
+      intraday.baseDate;
 
 
-    /* STRUCTURE */
+    /*
+      STRUCTURE
+    */
 
     const structure =
-      data.priceAction?.structure ||
+      intraday.analysis?.structure ||
       "Neutral";
 
     $("structure").textContent =
@@ -1000,58 +1048,57 @@ async function loadScanner(){
     );
 
 
-    /* LEVELS */
+    /*
+      INTRADAY RANGE
+    */
 
-    const resistance =
-      data.levels?.resistance;
-
-    const support =
-      data.levels?.support;
-
-
-    $("resistance").textContent =
-      number(resistance);
-
-    $("support").textContent =
-      number(support);
-
-
-    $("range").textContent =
-      number(
-        data.levels?.range
+    const intradayHigh =
+      Math.max(
+        ...candles.map(
+          c => Number(c.high)
+        )
       );
 
+    const intradayLow =
+      Math.min(
+        ...candles.map(
+          c => Number(c.low)
+        )
+      );
+
+    const candleRange =
+      Number(last.high) -
+      Number(last.low);
+
+    $("range").textContent =
+      number(candleRange);
 
     $("volume").textContent =
-      number(data.volume);
+      number(last.volume);
+
+    $("timeframe").textContent =
+      currentInterval;
 
 
-    const strength =
-      data.levels?.strength ||
-      "—";
-
-    $("strength").textContent =
-      strength;
-
-    setColor(
-      $("strength"),
-      strength
-    );
-
-
-    /* PRICE ACTION */
+    /*
+      PRICE ACTION
+    */
 
     const breakout =
-      data.priceAction?.breakout ||
-      "Waiting for close";
+      intraday.analysis?.breakout ||
+      "No confirmed breakout";
 
     const retest =
-      data.priceAction?.retest ||
-      "Not triggered";
+      intraday.analysis?.retest ||
+      "No confirmed retest";
 
     const falseBreakout =
-      data.priceAction?.falseBreakout ||
-      "No confirmation";
+      intraday.analysis?.falseBreakout ||
+      "No confirmed false breakout";
+
+    const setup =
+      intraday.analysis?.setup ||
+      "No confirmed setup";
 
 
     $("breakout").textContent =
@@ -1062,6 +1109,9 @@ async function loadScanner(){
 
     $("falseBreakout").textContent =
       falseBreakout;
+
+    $("setupStatus").textContent =
+      setup;
 
 
     setColor(
@@ -1079,45 +1129,26 @@ async function loadScanner(){
       falseBreakout
     );
 
-
-    /* SETUP */
-
-    const setup =
-      data.priceAction?.setup ||
-      "No confirmed setup";
-
-
-    $("setupStatus").textContent =
-      setup;
-
     setColor(
       $("setupStatus"),
       setup
     );
 
 
-    /* DAILY DATA */
+    /*
+      CHART
+    */
 
-    $("open").textContent =
-      number(data.open);
-
-    $("high").textContent =
-      number(data.high);
-
-    $("low").textContent =
-      number(data.low);
-
-    $("close").textContent =
-      number(data.close);
-
-    $("previousClose").textContent =
-      number(data.previousClose);
-
-    $("date").textContent =
-      data.date || "—";
+    drawIntradayChart(
+      candles,
+      daily.levels?.resistance,
+      daily.levels?.support
+    );
 
 
-    /* CONNECTION */
+    /*
+      CONNECTION
+    */
 
     $("connection").textContent =
       "● Backend connected";
@@ -1126,39 +1157,31 @@ async function loadScanner(){
       "boxValue green";
 
     $("lastUpdate").textContent =
-      "NSE daily data • " +
-      data.date;
+      "Demo " +
+      currentInterval +
+      " • " +
+      intraday.baseDate +
+      " • " +
+      candles.length +
+      " candles";
 
-
-    /* CHART */
-
-    drawDailyCandle(
-      data.open,
-      data.high,
-      data.low,
-      data.close,
-      resistance,
-      support
-    );
 
   }
-
 
   catch(error){
 
     clearData(
       error.name === "AbortError"
         ? "Backend request timed out"
-        : "Backend connection failed"
+        : error.message ||
+          "Backend connection failed"
     );
-
 
     $("connection").textContent =
       "● Connection failed";
 
     $("connection").className =
       "boxValue red";
-
 
     $("lastUpdate").textContent =
       error.message ||
@@ -1169,35 +1192,60 @@ async function loadScanner(){
 }
 
 
-/* DAILY CANDLE */
+/* INTRADAY CHART */
 
-function drawDailyCandle(
-  open,
-  high,
-  low,
-  close,
+function drawIntradayChart(
+  candles,
   resistance,
   support
 ){
 
-  const values = [
+  const values = [];
 
-    Number(high),
-    Number(low),
-    Number(open),
-    Number(close),
-    Number(resistance),
-    Number(support)
+  candles.forEach(
+    candle => {
 
-  ].filter(
-    Number.isFinite
+      values.push(
+        Number(candle.high)
+      );
+
+      values.push(
+        Number(candle.low)
+      );
+
+    }
   );
 
 
-  if(values.length < 4){
+  if(
+    Number.isFinite(
+      Number(resistance)
+    )
+  ){
 
-    $("chart").innerHTML =
-      "";
+    values.push(
+      Number(resistance)
+    );
+
+  }
+
+
+  if(
+    Number.isFinite(
+      Number(support)
+    )
+  ){
+
+    values.push(
+      Number(support)
+    );
+
+  }
+
+
+  if(values.length < 2){
+
+    $("chart").innerHTML = "";
 
     return;
 
@@ -1210,13 +1258,11 @@ function drawDailyCandle(
   const min =
     Math.min(...values);
 
-
   const padding =
     Math.max(
-      (max - min) * 0.12,
+      (max - min) * 0.08,
       0.01
     );
-
 
   const topValue =
     max + padding;
@@ -1231,8 +1277,7 @@ function drawDailyCandle(
   const chart =
     $("chart");
 
-  chart.innerHTML =
-    "";
+  chart.innerHTML = "";
 
 
   function y(value){
@@ -1246,90 +1291,153 @@ function drawDailyCandle(
   }
 
 
-  /* CANDLE */
+  /*
+    DRAW CANDLES
+  */
 
-  const candle =
-    document.createElement("div");
-
-  candle.className =
-    "candle " +
-    (
-      Number(close) >= Number(open)
-        ? "candleUp"
-        : "candleDown"
-    );
+  const count =
+    candles.length;
 
 
-  candle.style.left =
-    "calc(50% - 18px)";
+  candles.forEach(
+    (candle,index) => {
+
+      const open =
+        Number(candle.open);
+
+      const high =
+        Number(candle.high);
+
+      const low =
+        Number(candle.low);
+
+      const close =
+        Number(candle.close);
 
 
-  /* WICK */
+      if(
+        ![
+          open,
+          high,
+          low,
+          close
+        ].every(Number.isFinite)
+      ){
 
-  const wick =
-    document.createElement("div");
+        return;
 
-  wick.className =
-    "wick";
-
-
-  wick.style.top =
-    y(high) + "%";
-
-
-  wick.style.height =
-    (
-      y(low) -
-      y(high)
-    ) + "%";
+      }
 
 
-  /* BODY */
+      const candleEl =
+        document.createElement("div");
 
-  const body =
-    document.createElement("div");
-
-  body.className =
-    "body";
-
-
-  const bodyTop =
-    y(
-      Math.max(
-        Number(open),
-        Number(close)
-      )
-    );
+      candleEl.className =
+        "candle " +
+        (
+          close >= open
+            ? "candleUp"
+            : "candleDown"
+        );
 
 
-  const bodyBottom =
-    y(
-      Math.min(
-        Number(open),
-        Number(close)
-      )
-    );
+      const leftPercent =
+        count === 1
+          ? 50
+          : (
+              index /
+              (count - 1)
+            ) * 100;
 
 
-  body.style.top =
-    bodyTop + "%";
+      candleEl.style.left =
+        "calc(" +
+        leftPercent +
+        "% - 7px)";
 
 
-  body.style.height =
-    Math.max(
-      bodyBottom - bodyTop,
-      2
-    ) + "%";
+      /*
+        WICK
+      */
+
+      const wick =
+        document.createElement("div");
+
+      wick.className =
+        "wick";
+
+      wick.style.top =
+        y(high) + "%";
+
+      wick.style.height =
+        Math.max(
+          y(low) - y(high),
+          0.4
+        ) + "%";
 
 
-  candle.appendChild(wick);
+      /*
+        BODY
+      */
 
-  candle.appendChild(body);
+      const body =
+        document.createElement("div");
 
-  chart.appendChild(candle);
+      body.className =
+        "body";
 
 
-  /* LEVEL */
+      const bodyTop =
+        y(
+          Math.max(
+            open,
+            close
+          )
+        );
+
+
+      const bodyBottom =
+        y(
+          Math.min(
+            open,
+            close
+          )
+        );
+
+
+      body.style.top =
+        bodyTop + "%";
+
+      body.style.height =
+        Math.max(
+          bodyBottom - bodyTop,
+          1
+        ) + "%";
+
+
+      candleEl.appendChild(wick);
+      candleEl.appendChild(body);
+
+      chart.appendChild(candleEl);
+
+    }
+  );
+
+
+  /*
+    LEVELS
+  */
+
+  placeLevel(
+    "resLine",
+    resistance
+  );
+
+  placeLevel(
+    "supLine",
+    support
+  );
+
 
   function placeLevel(
     id,
@@ -1371,23 +1479,10 @@ function drawDailyCandle(
     element.style.display =
       "block";
 
-
     element.style.top =
       position + "%";
 
   }
-
-
-  placeLevel(
-    "resLine",
-    resistance
-  );
-
-
-  placeLevel(
-    "supLine",
-    support
-  );
 
 }
 
@@ -1397,6 +1492,8 @@ function drawDailyCandle(
 $("b5").addEventListener(
   "click",
   function(){
+
+    currentInterval = "5m";
 
     $("b5").classList.add(
       "active"
@@ -1417,6 +1514,8 @@ $("b5").addEventListener(
 $("b15").addEventListener(
   "click",
   function(){
+
+    currentInterval = "15m";
 
     $("b15").classList.add(
       "active"
