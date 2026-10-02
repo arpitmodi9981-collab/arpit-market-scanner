@@ -1616,6 +1616,41 @@ async function initializeMcp() {
 ========================================================= */
 
 app.listen(
+  async function getMcpLiveStock(symbol) {
+  const client = await connectMcp("cmMarket");
+
+  const result = await client.callTool({
+    name: "cm_get_equity_stocks",
+    arguments: {
+      limit: 10,
+      symbolFilter: symbol.toUpperCase()
+    }
+  });
+
+  return result;
+}
+
+app.get("/nse/live/:symbol", async (req, res) => {
+  try {
+    const symbol = req.params.symbol.toUpperCase();
+
+    const result = await getMcpLiveStock(symbol);
+
+    res.json({
+      status: "ok",
+      symbol,
+      source: "NSE CM Market MCP",
+      data: result
+    });
+  } catch (error) {
+    console.error("NSE live error:", error);
+
+    res.status(500).json({
+      status: "error",
+      message: error.message
+    });
+  }
+});
   PORT,
   () => {
 
