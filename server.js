@@ -12,6 +12,10 @@ const app = express();
 
 const PORT = process.env.PORT || 10000;
 
+/* =========================================================
+   NSE MCP URLS
+========================================================= */
+
 const NSE_BHAVCOPY_MCP =
   "https://mcp.nseindia.in/bhavcopy/cm/mcp";
 
@@ -23,11 +27,16 @@ const NSE_CM_MARKET_MCP =
 ========================================================= */
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "*"
+  );
+
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET,POST,OPTIONS"
   );
+
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Content-Type"
@@ -40,12 +49,15 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(express.json());
+
 /* =========================================================
    UPLOAD
 ========================================================= */
 
 const upload = multer({
   dest: "/tmp/uploads",
+
   limits: {
     fileSize: 50 * 1024 * 1024
   }
@@ -56,6 +68,7 @@ const upload = multer({
 ========================================================= */
 
 let latestData = [];
+
 let latestDate = null;
 
 let dataStatus =
@@ -76,7 +89,7 @@ let bhavcopyClient = null;
 let cmMarketClient = null;
 
 /* =========================================================
-   HELPERS
+   BASIC NUMBER HELPER
 ========================================================= */
 
 function num(value) {
@@ -95,13 +108,21 @@ function num(value) {
     : null;
 }
 
+/* =========================================================
+   CSV PARSER
+========================================================= */
+
 function parseCSVLine(line) {
   const result = [];
 
   let current = "";
   let quoted = false;
 
-  for (let i = 0; i < line.length; i++) {
+  for (
+    let i = 0;
+    i < line.length;
+    i++
+  ) {
     const ch = line[i];
 
     if (ch === '"') {
@@ -131,10 +152,13 @@ function parseCSVLine(line) {
 }
 
 function csvToObjects(csv) {
-  const lines = csv
-    .replace(/^\uFEFF/, "")
-    .split(/\r?\n/)
-    .filter(line => line.trim());
+  const lines =
+    csv
+      .replace(/^\uFEFF/, "")
+      .split(/\r?\n/)
+      .filter(
+        line => line.trim()
+      );
 
   if (lines.length < 2) {
     throw new Error(
@@ -163,6 +187,10 @@ function csvToObjects(csv) {
       return obj;
     });
 }
+
+/* =========================================================
+   NORMALIZE NSE UDIFF ROW
+========================================================= */
 
 function normalizeRow(row) {
   return {
@@ -279,7 +307,8 @@ function loadCSV(csv) {
     latestData[0]?.date ||
     null;
 
-  dataStatus = "loaded";
+  dataStatus =
+    "loaded";
 
   lastError = null;
 
@@ -348,7 +377,9 @@ function priceAction(row) {
     return null;
   }
 
-  let structure = "Neutral";
+  let structure =
+    "Neutral";
+
   let setup =
     "No confirmed setup";
 
@@ -360,14 +391,20 @@ function priceAction(row) {
       row.close >
       row.open
     ) {
-      structure = "Bullish";
-      setup = "Bullish setup";
+      structure =
+        "Bullish";
+
+      setup =
+        "Bullish setup";
     } else if (
       row.close <
       row.open
     ) {
-      structure = "Bearish";
-      setup = "Bearish setup";
+      structure =
+        "Bearish";
+
+      setup =
+        "Bearish setup";
     }
   }
 
@@ -388,7 +425,9 @@ function priceAction(row) {
 
   return {
     structure,
+
     setup,
+
     changePercent,
 
     breakout:
@@ -425,7 +464,9 @@ function generateDemoCandles(
       row.close
     );
 
-  if (!Number.isFinite(base)) {
+  if (
+    !Number.isFinite(base)
+  ) {
     return [];
   }
 
@@ -505,13 +546,11 @@ function generateDemoCandles(
     const hour =
       9 +
       Math.floor(
-        (30 + minutes) /
-          60
+        (30 + minutes) / 60
       );
 
     const minute =
-      (30 + minutes) %
-      60;
+      (30 + minutes) % 60;
 
     candles.push({
       time:
@@ -563,13 +602,18 @@ function analyzeIntraday(
     candles.length < 5
   ) {
     return {
-      structure: "Neutral",
+      structure:
+        "Neutral",
+
       breakout:
         "Insufficient candles",
+
       retest:
         "Insufficient candles",
+
       falseBreakout:
         "Insufficient candles",
+
       setup:
         "No confirmed setup"
     };
@@ -614,12 +658,14 @@ function analyzeIntraday(
     last.close >
     previous.close
   ) {
-    structure = "Bullish";
+    structure =
+      "Bullish";
   } else if (
     last.close <
     previous.close
   ) {
-    structure = "Bearish";
+    structure =
+      "Bearish";
   }
 
   let breakout =
@@ -640,20 +686,16 @@ function analyzeIntraday(
   }
 
   if (
-    last.low <=
-      resistance &&
-    last.close >
-      resistance
+    last.low <= resistance &&
+    last.close > resistance
   ) {
     retest =
       "Retest confirmed";
   }
 
   if (
-    last.high >
-      resistance &&
-    last.close <
-      resistance
+    last.high > resistance &&
+    last.close < resistance
   ) {
     falseBreakout =
       "False breakout";
@@ -680,11 +722,17 @@ function analyzeIntraday(
 
   return {
     structure,
+
     breakout,
+
     retest,
+
     falseBreakout,
+
     setup,
+
     support,
+
     resistance
   };
 }
@@ -693,9 +741,7 @@ function analyzeIntraday(
    MCP CONNECTION
 ========================================================= */
 
-async function connectMcp(
-  type
-) {
+async function connectMcp(type) {
   const isBhavcopy =
     type === "bhavcopy";
 
@@ -717,6 +763,7 @@ async function connectMcp(
     new Client({
       name:
         "arpit-market-scanner",
+
       version:
         "1.0.0"
     });
@@ -751,22 +798,15 @@ async function connectMcp(
    MCP TOOL DISCOVERY
 ========================================================= */
 
-async function getMcpTools(
-  type
-) {
+async function getMcpTools(type) {
   const client =
-    await connectMcp(
-      type
-    );
+    await connectMcp(type);
 
-  const result =
-    await client.listTools();
-
-  return result;
+  return await client.listTools();
 }
 
 /* =========================================================
-   MCP TOOL LIST ENDPOINT
+   MCP TOOL LIST
 ========================================================= */
 
 app.get(
@@ -781,18 +821,21 @@ app.get(
           getMcpTools(
             "bhavcopy"
           ),
+
           getMcpTools(
             "cmMarket"
           )
         ]);
 
       res.json({
-        status: "connected",
+        status:
+          "connected",
 
         servers: {
           bhavcopy: {
             url:
               NSE_BHAVCOPY_MCP,
+
             tools:
               bhavcopy.tools ||
               []
@@ -801,6 +844,7 @@ app.get(
           cmMarket: {
             url:
               NSE_CM_MARKET_MCP,
+
             tools:
               cmMarket.tools ||
               []
@@ -830,14 +874,15 @@ app.get(
 
 app.post(
   "/nse/mcp/call",
-  express.json(),
   async (req, res) => {
     try {
       const {
         server,
         tool,
-        arguments: toolArguments
-      } = req.body || {};
+        arguments:
+          toolArguments
+      } =
+        req.body || {};
 
       if (
         !server ||
@@ -869,10 +914,14 @@ app.post(
 
       res.json({
         status: "ok",
+
         server,
+
         tool,
+
         result
       });
+
     } catch (error) {
       lastError =
         error.message;
@@ -882,6 +931,91 @@ app.post(
           "MCP tool call failed",
 
         error:
+          error.message
+      });
+    }
+  }
+);
+
+/* =========================================================
+   LIVE NSE STOCK
+========================================================= */
+
+async function getMcpLiveStock(
+  symbol
+) {
+  const client =
+    await connectMcp(
+      "cmMarket"
+    );
+
+  const result =
+    await client.callTool({
+      name:
+        "cm_get_equity_stocks",
+
+      arguments: {
+        limit: 10,
+
+        symbolFilter:
+          String(symbol)
+            .toUpperCase()
+      }
+    });
+
+  return result;
+}
+
+/* =========================================================
+   LIVE STOCK TEST ENDPOINT
+========================================================= */
+
+app.get(
+  "/nse/live/:symbol",
+  async (req, res) => {
+    try {
+      const symbol =
+        req.params.symbol
+          .toUpperCase();
+
+      const result =
+        await getMcpLiveStock(
+          symbol
+        );
+
+      res.json({
+        status: "ok",
+
+        symbol,
+
+        source:
+          "NSE CM Market MCP",
+
+        data:
+          result,
+
+        disclaimer:
+          "NSE market data is provided for informational and educational purposes."
+      });
+
+    } catch (error) {
+      console.error(
+        "NSE live error:",
+        error
+      );
+
+      lastError =
+        error.message;
+
+      res.status(500).json({
+        status:
+          "error",
+
+        symbol:
+          req.params.symbol
+            .toUpperCase(),
+
+        message:
           error.message
       });
     }
@@ -985,7 +1119,7 @@ function scanner(symbol) {
         latestDate,
 
       note:
-        "Daily BhavCopy contains individual securities. NIFTY/BANKNIFTY and live intraday data require a separate data source."
+        "Daily BhavCopy contains individual securities. Live market data is available separately through NSE CM Market MCP."
     };
   }
 
@@ -1038,12 +1172,73 @@ function scanner(symbol) {
 }
 
 /* =========================================================
-   TEMP FILE
+   SCANNER ENDPOINT
 ========================================================= */
 
-function deleteTempFile(
-  path
-) {
+app.get(
+  "/scanner/:symbol",
+  (req, res) => {
+    try {
+      const symbol =
+        req.params.symbol
+          .toUpperCase();
+
+      res.json(
+        scanner(symbol)
+      );
+
+    } catch (error) {
+      lastError =
+        error.message;
+
+      res.status(500).json({
+        status:
+          "scanner error",
+
+        error:
+          error.message
+      });
+    }
+  }
+);
+
+/* =========================================================
+   DAILY STOCK ENDPOINT
+========================================================= */
+
+app.get(
+  "/stock/:symbol",
+  (req, res) => {
+    const symbol =
+      req.params.symbol
+        .toUpperCase();
+
+    const row =
+      findStock(symbol);
+
+    if (!row) {
+      return res.status(404)
+        .json({
+          status:
+            "not found",
+
+          symbol
+        });
+    }
+
+    res.json({
+      status: "ok",
+
+      stock: row
+    });
+  }
+);
+
+/* =========================================================
+   TEMP FILE CLEANUP
+========================================================= */
+
+function deleteTempFile(path) {
   try {
     if (
       path &&
@@ -1146,7 +1341,9 @@ app.get(
     res.send(`
 <!DOCTYPE html>
 <html>
+
 <head>
+
 <meta
   name="viewport"
   content="width=device-width, initial-scale=1"
@@ -1196,7 +1393,7 @@ button {
   line-height: 1.5;
 }
 
-a {
+code {
   color: #6ea8fe;
 }
 
@@ -1218,16 +1415,26 @@ Upload NSE UDiFF Bhavcopy
 
 <p class="info">
 
-CSV or ZIP file upload करें.
+CSV या ZIP file upload करें.
 
 <br><br>
 
-MCP connection is also available at:
+NSE MCP connected:
 
 <br>
 
 <code>
 /nse/mcp/tools
+</code>
+
+<br><br>
+
+Live stock test:
+
+<br>
+
+<code>
+/nse/live/20MICRONS
 </code>
 
 </p>
@@ -1254,6 +1461,7 @@ Upload Bhavcopy
 </div>
 
 </body>
+
 </html>
     `);
   }
@@ -1277,7 +1485,6 @@ app.post(
     }
 
     try {
-
       const buffer =
         fs.readFileSync(
           req.file.path
@@ -1288,7 +1495,7 @@ app.post(
         buffer[0] === 0x50 &&
         buffer[1] === 0x4b;
 
-      let csv;
+      let csv = null;
 
       if (isZip) {
 
@@ -1297,31 +1504,28 @@ app.post(
             buffer
           );
 
-        const entry =
-          zip
-            .getEntries()
-            .find(
-              item =>
-                !item.isDirectory &&
-                item.entryName
-                  .toLowerCase()
-                  .endsWith(
-                    ".csv"
-                  )
-            );
+        const entries =
+          zip.getEntries();
 
-        if (!entry) {
+        const csvEntry =
+          entries.find(
+            entry =>
+              !entry.isDirectory &&
+              entry.entryName
+                .toLowerCase()
+                .endsWith(".csv")
+          );
+
+        if (!csvEntry) {
           throw new Error(
-            "CSV not found inside ZIP"
+            "ZIP does not contain a CSV file"
           );
         }
 
         csv =
-          entry
+          csvEntry
             .getData()
-            .toString(
-              "utf8"
-            );
+            .toString("utf8");
 
       } else {
 
@@ -1338,157 +1542,162 @@ app.post(
         req.file.path
       );
 
-      res.send(`
-<!DOCTYPE html>
-<html>
-<head>
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1"
-/>
-<title>
-Upload Complete
-</title>
-</head>
+      res.json({
+        status:
+          "uploaded",
 
-<body
-style="
-font-family:Arial;
-padding:30px;
-background:#111;
-color:#fff
-"
->
+        rows:
+          count,
 
-<h2>
-✅ Upload successful
-</h2>
+        latestDate,
 
-<p>
-Date:
-${latestDate || "unknown"}
-</p>
+        dataStatus,
 
-<p>
-Rows loaded:
-${count}
-</p>
-
-<p>
-<a
-href="/nse/status"
-style="color:#6ea8fe"
->
-View NSE Status
-</a>
-</p>
-
-<p>
-<a
-href="/nse/mcp/tools"
-style="color:#6ea8fe"
->
-View NSE MCP Tools
-</a>
-</p>
-
-<p>
-<a
-href="/scanner/20MICRONS"
-style="color:#6ea8fe"
->
-Test Scanner
-</a>
-</p>
-
-</body>
-</html>
-      `);
+        message:
+          "NSE Bhavcopy loaded successfully"
+      });
 
     } catch (error) {
-
-      dataStatus =
-        "load failed";
-
-      lastError =
-        error.message;
 
       deleteTempFile(
         req.file.path
       );
 
-      res
-        .status(500)
-        .send(`
-<h2>
-Upload failed
-</h2>
+      lastError =
+        error.message;
 
-<p>
-${error.message}
-</p>
-        `);
+      dataStatus =
+        "error";
+
+      res.status(500).json({
+        status:
+          "upload failed",
+
+        error:
+          error.message
+      });
     }
   }
 );
 
 /* =========================================================
-   STOCK
+   GENERIC OLD UPLOAD ENDPOINT
 ========================================================= */
 
-app.get(
-  "/stock/:symbol",
+app.post(
+  "/upload",
+  upload.single("file"),
   (req, res) => {
 
-    const row =
-      findStock(
-        req.params.symbol
-      );
-
-    if (!row) {
-
+    if (!req.file) {
       return res
-        .status(404)
+        .status(400)
         .json({
-
-          status:
-            "not found",
-
-          symbol:
-            req.params.symbol,
-
-          latestDate
+          error:
+            "file required"
         });
     }
 
-    res.json(row);
+    try {
+      const buffer =
+        fs.readFileSync(
+          req.file.path
+        );
+
+      const isZip =
+        buffer.length >= 2 &&
+        buffer[0] === 0x50 &&
+        buffer[1] === 0x4b;
+
+      let csv = null;
+
+      if (isZip) {
+
+        const zip =
+          new AdmZip(
+            buffer
+          );
+
+        const entries =
+          zip.getEntries();
+
+        const csvEntry =
+          entries.find(
+            entry =>
+              !entry.isDirectory &&
+              entry.entryName
+                .toLowerCase()
+                .endsWith(".csv")
+          );
+
+        if (!csvEntry) {
+          throw new Error(
+            "No CSV file found inside ZIP"
+          );
+        }
+
+        csv =
+          csvEntry
+            .getData()
+            .toString("utf8");
+
+      } else {
+
+        csv =
+          buffer.toString(
+            "utf8"
+          );
+      }
+
+      const count =
+        loadCSV(csv);
+
+      deleteTempFile(
+        req.file.path
+      );
+
+      res.json({
+        status:
+          "ok",
+
+        rows:
+          count,
+
+        latestDate,
+
+        dataStatus
+      });
+
+    } catch (error) {
+
+      deleteTempFile(
+        req.file.path
+      );
+
+      lastError =
+        error.message;
+
+      dataStatus =
+        "error";
+
+      res.status(500).json({
+        status:
+          "error",
+
+        error:
+          error.message
+      });
+    }
   }
 );
 
 /* =========================================================
-   SCANNER ENDPOINT
-========================================================= */
-
-app.get(
-  "/scanner/:symbol",
-  (req, res) => {
-
-    res.json(
-      scanner(
-        req.params.symbol
-      )
-    );
-  }
-);
-
-/* =========================================================
-   HISTORY
+   HISTORY ENDPOINT
 ========================================================= */
 
 app.get(
   "/history/:symbol",
   (req, res) => {
-
     const symbol =
       req.params.symbol
         .toUpperCase();
@@ -1497,170 +1706,107 @@ app.get(
       latestData.filter(
         row =>
           row.symbol &&
-          row.symbol
-            .toUpperCase() ===
-            symbol &&
-          row.series === "EQ"
+          row.symbol.toUpperCase() ===
+            symbol
       );
 
     res.json({
+      status: "ok",
 
       symbol,
 
-      status:
-        rows.length
-          ? "available"
-          : "not found",
+      count:
+        rows.length,
 
-      mode:
-        "nse-udiff-bhavcopy",
-
-      rows
+      data:
+        rows
     });
   }
 );
 
 /* =========================================================
-   MCP AUTO CONNECTION TEST
+   404
 ========================================================= */
 
-async function initializeMcp() {
+app.use(
+  (req, res) => {
+    res.status(404).json({
+      status:
+        "not found",
 
-  try {
-
-    console.log(
-      "Connecting to NSE Bhavcopy MCP..."
-    );
-
-    const bhavcopy =
-      await connectMcp(
-        "bhavcopy"
-      );
-
-    const tools =
-      await bhavcopy.listTools();
-
-    console.log(
-      "NSE Bhavcopy MCP connected."
-    );
-
-    console.log(
-      "Bhavcopy tools:",
-      (tools.tools || [])
-        .map(
-          t => t.name
-        )
-        .join(", ")
-    );
-
-  } catch (error) {
-
-    mcpStatus.bhavcopy =
-      "connection failed";
-
-    lastError =
-      "Bhavcopy MCP: " +
-      error.message;
-
-    console.log(
-      "Bhavcopy MCP connection failed:",
-      error.message
-    );
+      path:
+        req.originalUrl
+    });
   }
-
-  try {
-
-    console.log(
-      "Connecting to NSE CM Market MCP..."
-    );
-
-    const cmMarket =
-      await connectMcp(
-        "cmMarket"
-      );
-
-    const tools =
-      await cmMarket.listTools();
-
-    console.log(
-      "NSE CM Market MCP connected."
-    );
-
-    console.log(
-      "CM Market tools:",
-      (tools.tools || [])
-        .map(
-          t => t.name
-        )
-        .join(", ")
-    );
-
-  } catch (error) {
-
-    mcpStatus.cmMarket =
-      "connection failed";
-
-    lastError =
-      "CM Market MCP: " +
-      error.message;
-
-    console.log(
-      "CM Market MCP connection failed:",
-      error.message
-    );
-  }
-}
+);
 
 /* =========================================================
-   START
+   GLOBAL ERROR
+========================================================= */
+
+app.use(
+  (
+    error,
+    req,
+    res,
+    next
+  ) => {
+
+    console.error(
+      "Global error:",
+      error
+    );
+
+    lastError =
+      error.message;
+
+    res.status(500).json({
+      status:
+        "server error",
+
+      error:
+        error.message
+    });
+  }
+);
+
+/* =========================================================
+   START SERVER
 ========================================================= */
 
 app.listen(
-  async function getMcpLiveStock(symbol) {
-  const client = await connectMcp("cmMarket");
-
-  const result = await client.callTool({
-    name: "cm_get_equity_stocks",
-    arguments: {
-      limit: 10,
-      symbolFilter: symbol.toUpperCase()
-    }
-  });
-
-  return result;
-}
-
-app.get("/nse/live/:symbol", async (req, res) => {
-  try {
-    const symbol = req.params.symbol.toUpperCase();
-
-    const result = await getMcpLiveStock(symbol);
-
-    res.json({
-      status: "ok",
-      symbol,
-      source: "NSE CM Market MCP",
-      data: result
-    });
-  } catch (error) {
-    console.error("NSE live error:", error);
-
-    res.status(500).json({
-      status: "error",
-      message: error.message
-    });
-  }
-});
   PORT,
-  () => {
+  async () => {
 
     console.log(
-      `Server running on port ${PORT}`
+      `Arpit Market Scanner Backend running on port ${PORT}`
     );
 
-    setTimeout(
-      initializeMcp,
-      1500
-    );
+    try {
+
+      await Promise.all([
+        connectMcp(
+          "bhavcopy"
+        ),
+
+        connectMcp(
+          "cmMarket"
+        )
+      ]);
+
+      console.log(
+        "NSE MCP connections established"
+      );
+
+    } catch (error) {
+
+      lastError =
+        error.message;
+
+      console.error(
+        "NSE MCP startup connection failed:",
+        error.message
+      );
+    }
   }
 );
