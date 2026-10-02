@@ -8,6 +8,7 @@
   "dependencies": {
     "express": "^4.21.2",
     "multer": "^2.0.2",
-    "adm-zip": "^0.5.16"
+    "adm-zip": "^0.5.16",
+    "@modelcontextprotocol/client": "^2.0.0"
   }
 }
