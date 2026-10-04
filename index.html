@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Arpit Market Scanner</title>
 
   <style>
@@ -34,210 +34,215 @@
     }
 
     .subtitle {
-      color: #8fa0b7;
+      color: #91a0b5;
       font-size: 14px;
     }
 
     .notice {
-      background: #102238;
-      border: 1px solid #1d3a59;
-      border-radius: 12px;
-      padding: 12px 14px;
-      margin-bottom: 16px;
-      color: #b9c9dc;
-      font-size: 13px;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid #26364d;
+      border-radius: 10px;
+      background: #0b1728;
+      color: #aebbd0;
+      font-size: 12px;
     }
 
-    .panel {
-      background: #0d1a2b;
-      border: 1px solid #1b3048;
+    .card {
+      background: #0c192b;
+      border: 1px solid #1c2d44;
       border-radius: 14px;
       padding: 16px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
-    .label {
-      color: #8fa0b7;
-      font-size: 12px;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: .5px;
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 13px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
     }
 
     select,
     button {
-      border: 1px solid #29425f;
-      background: #101f32;
-      color: #e8eef7;
+      min-height: 42px;
       border-radius: 9px;
-      padding: 10px 13px;
+      border: 1px solid #2b405c;
+      background: #101f33;
+      color: #e8eef7;
+      padding: 0 12px;
       font-size: 14px;
+    }
+
+    button {
       cursor: pointer;
+      font-weight: 700;
     }
 
-    select {
-      width: 100%;
-      margin-bottom: 12px;
+    button.active {
+      background: #1c3656;
+      border-color: #4d76a5;
     }
 
-    .timeframes {
-      display: flex;
-      gap: 8px;
-    }
-
-    .timeframes button.active {
-      background: #2c6bed;
-      border-color: #2c6bed;
+    button:hover {
+      background: #172b45;
     }
 
     .price-box {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       gap: 15px;
       flex-wrap: wrap;
     }
 
     .price {
-      font-size: 38px;
+      font-size: 34px;
       font-weight: 800;
     }
 
-    .price-change {
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-    .bullish {
-      color: #38d996;
-    }
-
-    .bearish {
-      color: #ff6b6b;
-    }
-
-    .neutral {
-      color: #b9c9dc;
+    .change {
+      font-size: 14px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: #122337;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
 
-    .stat {
-      background: #101f32;
-      border: 1px solid #1b3048;
+    .metric {
+      background: #0a1525;
+      border: 1px solid #1c2d44;
       border-radius: 10px;
-      padding: 13px;
+      padding: 12px;
     }
 
-    .stat-title {
-      color: #8092aa;
+    .metric-label {
+      color: #8494aa;
       font-size: 12px;
       margin-bottom: 6px;
     }
 
-    .stat-value {
-      font-size: 18px;
+    .metric-value {
+      font-size: 17px;
       font-weight: 700;
     }
 
-    .section-title {
-      font-size: 18px;
-      font-weight: 750;
-      margin-bottom: 14px;
+    .structure {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 12px;
     }
 
     .chart {
-      min-height: 240px;
-      border: 1px dashed #29425f;
+      height: 190px;
+      background: #081322;
+      border: 1px solid #1b2b42;
       border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chart-line {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      top: 50%;
+      height: 1px;
+      background: #33465f;
+    }
+
+    .chart-label {
+      position: absolute;
+      font-size: 11px;
+      color: #8291a5;
+    }
+
+    .chart-label.top {
+      top: 10px;
+      right: 10px;
+    }
+
+    .chart-label.bottom {
+      bottom: 10px;
+      right: 10px;
+    }
+
+    .chart-message {
+      position: absolute;
+      inset: 0;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       text-align: center;
       padding: 20px;
-      color: #7f91aa;
-      background: #091625;
+      color: #7f8ea4;
+      font-size: 13px;
     }
 
-    .levels {
-      position: relative;
-      width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .level-line {
-      display: flex;
-      justify-content: space-between;
+    .status {
+      display: inline-flex;
       align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid #1b3048;
-    }
-
-    .level-line:last-child {
-      border-bottom: 0;
-    }
-
-    .connection {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #a9bad0;
-      font-size: 14px;
+      gap: 7px;
+      color: #91a0b5;
+      font-size: 13px;
     }
 
     .dot {
-      width: 9px;
-      height: 9px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: #38d996;
-      display: inline-block;
+      background: #7d8ca0;
     }
 
-    .dot.offline {
-      background: #ffb84d;
-    }
-
-    .footer {
-      color: #687b94;
-      text-align: center;
-      font-size: 12px;
-      padding: 15px 0;
-    }
-
-    .loading {
-      color: #8fa0b7;
+    .dot.online {
+      background: #4ade80;
     }
 
     .error {
-      color: #ff7777;
+      color: #ff8f8f;
     }
 
-    .small {
-      font-size: 12px;
-      color: #71839b;
-      margin-top: 7px;
+    .muted {
+      color: #8291a5;
+    }
+
+    .footer {
+      text-align: center;
+      color: #66758a;
+      font-size: 11px;
+      padding: 8px;
+    }
+
+    .loading {
+      opacity: 0.6;
     }
 
     @media (max-width: 600px) {
-      .app {
-        padding: 12px;
+      .controls {
+        grid-template-columns: 1fr 1fr 1fr;
       }
 
-      .title {
-        font-size: 23px;
-      }
-
-      .price {
-        font-size: 31px;
+      select {
+        grid-column: 1 / -1;
       }
 
       .grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .price {
+        font-size: 29px;
       }
     }
   </style>
@@ -250,416 +255,183 @@
   <div class="header">
     <div class="title">Arpit Market Scanner</div>
     <div class="subtitle">
-      Price-action learning & market-structure scanner
+      Price-action learning &amp; market-structure scanner
+    </div>
+
+    <div class="notice">
+      EDUCATIONAL / INFORMATIONAL • NSE CM MARKET DATA •
+      5m/15m candles require a separate intraday candle feed
     </div>
   </div>
 
-  <div class="notice">
-    EDUCATIONAL / INFORMATIONAL • NSE CM MARKET DATA
-    <div class="small">
-      NSE quote data is provided for informational and educational purposes.
-      5m/15m candle analysis requires an actual intraday candle feed.
+  <div class="card">
+    <div class="section-title">Instrument &amp; Timeframe</div>
+
+    <div class="controls">
+      <select id="symbol">
+        <option value="20MICRONS">20MICRONS</option>
+        <option value="NIFTY">NIFTY</option>
+        <option value="BANKNIFTY">BANKNIFTY</option>
+      </select>
+
+      <button id="btn5" class="active" type="button">5m</button>
+      <button id="btn15" type="button">15m</button>
     </div>
   </div>
 
-  <div class="panel">
-
-    <div class="label">Instrument & Timeframe</div>
-
-    <select id="symbol">
-      <option value="20MICRONS">20MICRONS</option>
-      <option value="NIFTY">NIFTY</option>
-      <option value="BANKNIFTY">BANKNIFTY</option>
-    </select>
-
-    <div class="timeframes">
-      <button
-        id="tf5"
-        class="active"
-        type="button"
-      >
-        5m
-      </button>
-
-      <button
-        id="tf15"
-        type="button"
-      >
-        15m
-      </button>
-    </div>
-
-  </div>
-
-  <div class="panel">
-
-    <div class="label">Current NSE Price</div>
+  <div class="card">
+    <div class="section-title">Current NSE Price</div>
 
     <div class="price-box">
-
       <div>
-        <div
-          id="price"
-          class="price"
-        >
-          —
-        </div>
-
-        <div
-          id="priceChange"
-          class="price-change neutral"
-        >
-          —
-        </div>
+        <div id="price" class="price">—</div>
+        <div id="priceSymbol" class="muted">20MICRONS</div>
       </div>
 
-      <div
-        id="dataMode"
-        class="loading"
-      >
-        Loading NSE data...
-      </div>
-
+      <div id="change" class="change">—</div>
     </div>
-
   </div>
 
-  <div class="panel">
+  <div class="card">
+    <div class="section-title">Market Structure</div>
 
-    <div class="section-title">
-      Market Structure
+    <div id="structure" class="structure">
+      No confirmed data
     </div>
 
     <div class="grid">
-
-      <div class="stat">
-        <div class="stat-title">
-          Structure
-        </div>
-
-        <div
-          id="structure"
-          class="stat-value"
-        >
-          —
-        </div>
+      <div class="metric">
+        <div class="metric-label">Resistance</div>
+        <div id="resistance" class="metric-value">—</div>
       </div>
 
-      <div class="stat">
-        <div class="stat-title">
-          Setup
-        </div>
-
-        <div
-          id="setup"
-          class="stat-value"
-        >
-          —
-        </div>
+      <div class="metric">
+        <div class="metric-label">Support</div>
+        <div id="support" class="metric-value">—</div>
       </div>
-
-      <div class="stat">
-        <div class="stat-title">
-          Resistance
-        </div>
-
-        <div
-          id="resistance"
-          class="stat-value"
-        >
-          —
-        </div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-title">
-          Support
-        </div>
-
-        <div
-          id="support"
-          class="stat-value"
-        >
-          —
-        </div>
-      </div>
-
     </div>
-
   </div>
 
-  <div class="panel">
-
-    <div class="section-title">
-      Intraday Chart
-    </div>
+  <div class="card">
+    <div class="section-title">Intraday Chart</div>
 
     <div class="chart">
-      <div>
-        <strong>
-          5m / 15m intraday candles unavailable
-        </strong>
+      <div class="chart-label top">Resistance</div>
+      <div class="chart-label bottom">Support</div>
+      <div class="chart-line"></div>
 
-        <div class="small">
-          The connected NSE CM Market source currently
-          provides quote data, not a candle series.
-        </div>
+      <div class="chart-message">
+        Actual 5m / 15m NSE candles are not connected yet.<br>
+        No artificial candles are displayed.
       </div>
     </div>
-
   </div>
 
-  <div class="panel">
-
-    <div class="section-title">
-      Intraday Analysis
-    </div>
+  <div class="card">
+    <div class="section-title">Intraday Analysis</div>
 
     <div class="grid">
 
-      <div class="stat">
-        <div class="stat-title">
-          Candle Range
-        </div>
-
-        <div
-          id="candleRange"
-          class="stat-value"
-        >
-          —
-        </div>
+      <div class="metric">
+        <div class="metric-label">Candle Range</div>
+        <div id="range" class="metric-value">—</div>
       </div>
 
-      <div class="stat">
-        <div class="stat-title">
-          Last Volume
-        </div>
-
-        <div
-          id="volume"
-          class="stat-value"
-        >
-          —
-        </div>
+      <div class="metric">
+        <div class="metric-label">Last Volume</div>
+        <div id="volume" class="metric-value">—</div>
       </div>
 
-      <div class="stat">
-        <div class="stat-title">
-          Timeframe
-        </div>
-
-        <div
-          id="timeframe"
-          class="stat-value"
-        >
-          5m
-        </div>
+      <div class="metric">
+        <div class="metric-label">Timeframe</div>
+        <div id="timeframe" class="metric-value">5m</div>
       </div>
 
-      <div class="stat">
-        <div class="stat-title">
-          Setup Status
-        </div>
+      <div class="metric">
+        <div class="metric-label">Price Action Classification</div>
+        <div id="classification" class="metric-value">—</div>
+      </div>
 
-        <div
-          id="setupStatus"
-          class="stat-value"
-        >
-          No confirmed setup
-        </div>
+      <div class="metric">
+        <div class="metric-label">Breakout</div>
+        <div id="breakout" class="metric-value">—</div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-label">Retest</div>
+        <div id="retest" class="metric-value">—</div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-label">False Breakout</div>
+        <div id="falseBreakout" class="metric-value">—</div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-label">Setup Status</div>
+        <div id="setup" class="metric-value">No confirmed setup</div>
       </div>
 
     </div>
+  </div>
 
-    <div style="height:12px"></div>
+  <div class="card">
+    <div class="section-title">Daily NSE Data</div>
 
     <div class="grid">
 
-      <div class="stat">
-        <div class="stat-title">
-          Breakout
-        </div>
-
-        <div
-          id="breakout"
-          class="stat-value"
-        >
-          —
-        </div>
+      <div class="metric">
+        <div class="metric-label">Open</div>
+        <div id="open" class="metric-value">—</div>
       </div>
 
-      <div class="stat">
-        <div class="stat-title">
-          Retest
-        </div>
-
-        <div
-          id="retest"
-          class="stat-value"
-        >
-          —
-        </div>
+      <div class="metric">
+        <div class="metric-label">High</div>
+        <div id="high" class="metric-value">—</div>
       </div>
 
-      <div class="stat">
-        <div class="stat-title">
-          False Breakout
-        </div>
-
-        <div
-          id="falseBreakout"
-          class="stat-value"
-        >
-          —
-        </div>
+      <div class="metric">
+        <div class="metric-label">Low</div>
+        <div id="low" class="metric-value">—</div>
       </div>
 
-      <div class="stat">
-        <div class="stat-title">
-          Price Action
-        </div>
+      <div class="metric">
+        <div class="metric-label">Close / Last Price</div>
+        <div id="close" class="metric-value">—</div>
+      </div>
 
-        <div
-          id="priceAction"
-          class="stat-value"
-        >
-          —
-        </div>
+      <div class="metric">
+        <div class="metric-label">Previous Close</div>
+        <div id="previousClose" class="metric-value">—</div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-label">Trade Timestamp</div>
+        <div id="tradeDate" class="metric-value">—</div>
       </div>
 
     </div>
-
   </div>
 
-  <div class="panel">
+  <div class="card">
+    <div class="section-title">Backend Connection</div>
 
-    <div class="section-title">
-      Daily NSE Data
+    <div class="status">
+      <span id="backendDot" class="dot"></span>
+      <span id="backendStatus">Checking backend...</span>
     </div>
 
-    <div class="grid">
-
-      <div class="stat">
-        <div class="stat-title">
-          Open
-        </div>
-
-        <div
-          id="open"
-          class="stat-value"
-        >
-          —
-        </div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-title">
-          High
-        </div>
-
-        <div
-          id="high"
-          class="stat-value"
-        >
-          —
-        </div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-title">
-          Low
-        </div>
-
-        <div
-          id="low"
-          class="stat-value"
-        >
-          —
-        </div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-title">
-          Current / Close
-        </div>
-
-        <div
-          id="close"
-          class="stat-value"
-        >
-          —
-        </div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-title">
-          Previous Close
-        </div>
-
-        <div
-          id="previousClose"
-          class="stat-value"
-        >
-          —
-        </div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-title">
-          Trade Timestamp
-        </div>
-
-        <div
-          id="tradeDate"
-          class="stat-value"
-        >
-          —
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <div class="panel">
-
-    <div class="section-title">
-      Backend Connection
-    </div>
-
-    <div class="connection">
-
-      <span
-        id="connectionDot"
-        class="dot offline"
-      ></span>
-
-      <span
-        id="connectionText"
-      >
-        Checking backend...
-      </span>
-
-    </div>
-
-    <div
-      id="backendMessage"
-      class="small"
-    >
+    <div id="backendInfo" class="muted" style="margin-top:8px;">
       —
     </div>
-
-  </div>
-
-  <div class="panel">
 
     <button
       id="refresh"
       type="button"
+      style="margin-top:14px;width:100%;"
     >
       Refresh
     </button>
-
   </div>
 
   <div class="footer">
@@ -668,561 +440,484 @@
 
 </div>
 
+
 <script>
 
-const BACKEND =
-  "https://arpit-market-scanner-backend.onrender.com";
+  const BACKEND =
+    "https://arpit-market-scanner-backend.onrender.com";
 
-let timeframe = "5m";
+  let selectedTimeframe = "5m";
 
-const $ = id =>
-  document.getElementById(id);
 
-/* =========================================================
-   FORMAT
-========================================================= */
-
-function formatNumber(value) {
-
-  if (
-    value === null ||
-    value === undefined ||
-    value === "" ||
-    Number.isNaN(Number(value))
-  ) {
-    return "—";
+  function $(id) {
+    return document.getElementById(id);
   }
 
-  const n = Number(value);
 
-  return n.toLocaleString(
-    "en-IN",
-    {
-      maximumFractionDigits: 2
-    }
-  );
-}
-
-function formatVolume(value) {
-
-  if (
-    value === null ||
-    value === undefined
-  ) {
-    return "—";
-  }
-
-  return Number(value).toLocaleString(
-    "en-IN"
-  );
-}
-
-/* =========================================================
-   CLASS
-========================================================= */
-
-function applyDirection(
-  element,
-  value
-) {
-
-  if (!element) return;
-
-  element.classList.remove(
-    "bullish",
-    "bearish",
-    "neutral"
-  );
-
-  const text =
-    String(value || "")
-      .toLowerCase();
-
-  if (
-    text.includes("bullish") ||
-    text.includes("positive")
-  ) {
-    element.classList.add(
-      "bullish"
-    );
-  } else if (
-    text.includes("bearish") ||
-    text.includes("negative")
-  ) {
-    element.classList.add(
-      "bearish"
-    );
-  } else {
-    element.classList.add(
-      "neutral"
-    );
-  }
-}
-
-/* =========================================================
-   BACKEND HEALTH
-========================================================= */
-
-async function checkBackend() {
-
-  try {
-
-    const response =
-      await fetch(
-        `${BACKEND}/health`,
-        {
-          cache: "no-store"
-        }
-      );
-
-    if (!response.ok) {
-      throw new Error(
-        `HTTP ${response.status}`
-      );
-    }
-
-    const data =
-      await response.json();
-
-    $("connectionDot")
-      .classList.remove(
-        "offline"
-      );
-
-    $("connectionText")
-      .textContent =
-      "Backend online";
-
-    $("backendMessage")
-      .textContent =
-      data.mcpStatus?.cmMarket ===
-      "connected"
-        ? "NSE CM Market MCP connected"
-        : "Backend online • NSE MCP connection will be checked with scanner";
-
-    return true;
-
-  } catch (error) {
-
-    $("connectionDot")
-      .classList.add(
-        "offline"
-      );
-
-    $("connectionText")
-      .textContent =
-      "Backend unavailable";
-
-    $("backendMessage")
-      .textContent =
-      error.message;
-
-    return false;
-  }
-}
-
-/* =========================================================
-   LOAD SCANNER
-========================================================= */
-
-async function loadScanner() {
-
-  const symbol =
-    $("symbol").value;
-
-  $("dataMode")
-    .textContent =
-    "Loading NSE data...";
-
-  $("price")
-    .textContent =
-    "—";
-
-  $("priceChange")
-    .textContent =
-    "—";
-
-  $("structure")
-    .textContent =
-    "—";
-
-  $("setup")
-    .textContent =
-    "—";
-
-  $("resistance")
-    .textContent =
-    "—";
-
-  $("support")
-    .textContent =
-    "—";
-
-  try {
-
-    const response =
-      await fetch(
-        `${BACKEND}/scanner/${encodeURIComponent(symbol)}`,
-        {
-          cache: "no-store"
-        }
-      );
-
-    if (!response.ok) {
-      throw new Error(
-        `Scanner HTTP ${response.status}`
-      );
-    }
-
-    const data =
-      await response.json();
-
-    /* -----------------------------------------
-       NO DATA
-    ----------------------------------------- */
+  function money(value) {
 
     if (
-      data.mode === "no_data" ||
-      data.status ===
-      "stock_not_found"
+      value === null ||
+      value === undefined ||
+      value === "" ||
+      Number.isNaN(Number(value))
+    ) {
+      return "—";
+    }
+
+    return Number(value).toFixed(2);
+  }
+
+
+  function number(value) {
+
+    if (
+      value === null ||
+      value === undefined ||
+      value === "" ||
+      Number.isNaN(Number(value))
+    ) {
+      return "—";
+    }
+
+    return Number(value).toLocaleString("en-IN");
+  }
+
+
+  function text(value) {
+
+    if (
+      value === null ||
+      value === undefined ||
+      value === ""
+    ) {
+      return "—";
+    }
+
+    return String(value);
+  }
+
+
+  function setLoading(state) {
+
+    document.querySelector(".app")
+      .classList.toggle("loading", state);
+
+  }
+
+
+  async function checkBackend() {
+
+    try {
+
+      const response =
+        await fetch(
+          BACKEND + "/health",
+          {
+            cache: "no-store"
+          }
+        );
+
+      if (!response.ok) {
+        throw new Error("Backend HTTP " + response.status);
+      }
+
+      const data =
+        await response.json();
+
+      $("backendDot")
+        .classList.add("online");
+
+      $("backendStatus")
+        .textContent =
+        "Backend online";
+
+      $("backendInfo")
+        .textContent =
+        data.dataStatus ||
+        "NSE backend connected";
+
+      return true;
+
+    } catch (error) {
+
+      $("backendDot")
+        .classList.remove("online");
+
+      $("backendStatus")
+        .textContent =
+        "Backend connection failed";
+
+      $("backendInfo")
+        .textContent =
+        error.message;
+
+      return false;
+    }
+  }
+
+
+  function clearData() {
+
+    $("price").textContent = "—";
+    $("change").textContent = "—";
+
+    $("structure").textContent =
+      "No confirmed data";
+
+    $("resistance").textContent = "—";
+    $("support").textContent = "—";
+
+    $("range").textContent = "—";
+    $("volume").textContent = "—";
+    $("classification").textContent = "—";
+    $("breakout").textContent = "—";
+    $("retest").textContent = "—";
+    $("falseBreakout").textContent = "—";
+    $("setup").textContent =
+      "No confirmed setup";
+
+    $("open").textContent = "—";
+    $("high").textContent = "—";
+    $("low").textContent = "—";
+    $("close").textContent = "—";
+    $("previousClose").textContent = "—";
+    $("tradeDate").textContent = "—";
+  }
+
+
+  function displayScanner(data, symbol) {
+
+    if (!data) {
+      clearData();
+      return;
+    }
+
+
+    $("priceSymbol").textContent =
+      symbol;
+
+
+    /*
+      NSE CM Market response
+    */
+
+    if (
+      data.mode === "nse-cm-market-mcp" ||
+      data.status === "NSE CM Market data"
     ) {
 
-      $("dataMode")
-        .textContent =
-        "No NSE data for " +
-        symbol;
+      $("price").textContent =
+        money(data.price);
 
-      $("backendMessage")
-        .textContent =
-        data.message ||
-        "No data available";
+      const change =
+        Number(data.changePercent);
+
+      if (!Number.isNaN(change)) {
+
+        $("change").textContent =
+          (change >= 0 ? "+" : "") +
+          change.toFixed(2) +
+          "%";
+
+      } else {
+
+        $("change").textContent = "—";
+      }
+
+
+      $("structure").textContent =
+        text(
+          data.priceAction &&
+          data.priceAction.structure
+        );
+
+
+      $("resistance").textContent =
+        money(
+          data.levels &&
+          data.levels.resistance
+        );
+
+
+      $("support").textContent =
+        money(
+          data.levels &&
+          data.levels.support
+        );
+
+
+      const high =
+        Number(data.high);
+
+      const low =
+        Number(data.low);
+
+      if (
+        !Number.isNaN(high) &&
+        !Number.isNaN(low)
+      ) {
+
+        $("range").textContent =
+          (high - low).toFixed(2);
+
+      } else {
+
+        $("range").textContent =
+          "—";
+      }
+
+
+      $("volume").textContent =
+        number(data.volume);
+
+
+      $("classification").textContent =
+        text(
+          data.priceAction &&
+          data.priceAction.setup
+        );
+
+
+      $("breakout").textContent =
+        text(
+          data.priceAction &&
+          data.priceAction.breakout
+        );
+
+
+      $("retest").textContent =
+        text(
+          data.priceAction &&
+          data.priceAction.retest
+        );
+
+
+      $("falseBreakout").textContent =
+        text(
+          data.priceAction &&
+          data.priceAction.falseBreakout
+        );
+
+
+      $("setup").textContent =
+        text(
+          data.priceAction &&
+          data.priceAction.setup
+        );
+
+
+      $("open").textContent =
+        money(data.open);
+
+      $("high").textContent =
+        money(data.high);
+
+      $("low").textContent =
+        money(data.low);
+
+      $("close").textContent =
+        money(data.price);
+
+      $("previousClose").textContent =
+        money(data.previousClose);
+
+      $("tradeDate").textContent =
+        text(data.latestTimestamp);
 
       return;
     }
 
-    /* -----------------------------------------
-       PRICE
-    ----------------------------------------- */
 
-    $("price")
-      .textContent =
-      formatNumber(
-        data.price
-      );
+    /*
+      Bhavcopy / daily response
+    */
 
-    /* -----------------------------------------
-       CHANGE
-    ----------------------------------------- */
+    if (data.mode === "bhavcopy") {
 
-    const change =
-      data.changePercent;
+      $("price").textContent =
+        money(
+          data.close ||
+          data.lastPrice
+        );
 
-    $("priceChange")
-      .textContent =
-      change === null ||
-      change === undefined
-        ? "—"
-        : `${formatNumber(change)}%`;
+      $("open").textContent =
+        money(data.open);
 
-    applyDirection(
-      $("priceChange"),
-      change > 0
-        ? "Bullish"
-        : change < 0
-          ? "Bearish"
-          : "Neutral"
-    );
+      $("high").textContent =
+        money(data.high);
 
-    /* -----------------------------------------
-       MODE
-    ----------------------------------------- */
+      $("low").textContent =
+        money(data.low);
 
-    if (
-      data.mode ===
-      "nse-cm-market-mcp"
-    ) {
+      $("close").textContent =
+        money(
+          data.close ||
+          data.lastPrice
+        );
 
-      $("dataMode")
-        .textContent =
-        "NSE CM Market data";
+      $("previousClose").textContent =
+        money(data.previousClose);
 
-    } else if (
-      data.mode ===
-      "bhavcopy"
-    ) {
+      $("tradeDate").textContent =
+        text(
+          data.tradeDate ||
+          data.date
+        );
 
-      $("dataMode")
-        .textContent =
-        "NSE BhavCopy data";
-
-    } else {
-
-      $("dataMode")
-        .textContent =
-        data.status ||
-        "NSE data";
+      return;
     }
 
-    /* -----------------------------------------
-       STRUCTURE
-    ----------------------------------------- */
 
-    const structure =
-      data.priceAction?.structure ||
-      "Neutral";
+    /*
+      Unknown response
+    */
 
-    $("structure")
-      .textContent =
-      structure;
+    $("backendInfo").textContent =
+      "Backend connected, but response format is not recognised.";
 
-    applyDirection(
-      $("structure"),
-      structure
-    );
-
-    /* -----------------------------------------
-       SETUP
-    ----------------------------------------- */
-
-    $("setup")
-      .textContent =
-      data.priceAction?.setup ||
-      "No confirmed setup";
-
-    $("setupStatus")
-      .textContent =
-      data.priceAction?.setup ||
-      "No confirmed setup";
-
-    /* -----------------------------------------
-       LEVELS
-    ----------------------------------------- */
-
-    $("resistance")
-      .textContent =
-      formatNumber(
-        data.levels?.resistance
-      );
-
-    $("support")
-      .textContent =
-      formatNumber(
-        data.levels?.support
-      );
-
-    /* -----------------------------------------
-       DAILY DATA
-    ----------------------------------------- */
-
-    $("open")
-      .textContent =
-      formatNumber(
-        data.open
-      );
-
-    $("high")
-      .textContent =
-      formatNumber(
-        data.high
-      );
-
-    $("low")
-      .textContent =
-      formatNumber(
-        data.low
-      );
-
-    $("close")
-      .textContent =
-      formatNumber(
-        data.price ??
-        data.close
-      );
-
-    $("previousClose")
-      .textContent =
-      formatNumber(
-        data.previousClose
-      );
-
-    $("tradeDate")
-      .textContent =
-      data.latestTimestamp ||
-      data.date ||
-      "—";
-
-    /* -----------------------------------------
-       VOLUME
-    ----------------------------------------- */
-
-    $("volume")
-      .textContent =
-      formatVolume(
-        data.volume
-      );
-
-    /* -----------------------------------------
-       RANGE
-    ----------------------------------------- */
-
-    const range =
-      data.levels?.range;
-
-    $("candleRange")
-      .textContent =
-      formatNumber(range);
-
-    /* -----------------------------------------
-       TIMEFRAME
-    ----------------------------------------- */
-
-    $("timeframe")
-      .textContent =
-      timeframe;
-
-    /* -----------------------------------------
-       PRICE ACTION
-    ----------------------------------------- */
-
-    $("priceAction")
-      .textContent =
-      structure;
-
-    applyDirection(
-      $("priceAction"),
-      structure
-    );
-
-    /* -----------------------------------------
-       INTRADAY ANALYSIS
-    ----------------------------------------- */
-
-    $("breakout")
-      .textContent =
-      data.priceAction?.breakout ||
-      data.intraday?.breakout ||
-      "Not calculated";
-
-    $("retest")
-      .textContent =
-      data.priceAction?.retest ||
-      data.intraday?.retest ||
-      "Not calculated";
-
-    $("falseBreakout")
-      .textContent =
-      data.priceAction?.falseBreakout ||
-      data.intraday?.falseBreakout ||
-      "Not calculated";
-
-    /* -----------------------------------------
-       BACKEND MESSAGE
-    ----------------------------------------- */
-
-    $("backendMessage")
-      .textContent =
-      data.source ||
-      "NSE data connected";
-
-  } catch (error) {
-
-    $("dataMode")
-      .textContent =
-      "Data loading error";
-
-    $("backendMessage")
-      .textContent =
-      error.message;
-
-    console.error(
-      "Scanner error:",
-      error
-    );
   }
-}
 
-/* =========================================================
-   LOAD EVERYTHING
-========================================================= */
 
-async function refreshAll() {
+  async function loadScanner() {
 
-  await checkBackend();
+    const symbol =
+      $("symbol").value;
 
-  await loadScanner();
-}
+    setLoading(true);
 
-/* =========================================================
-   EVENTS
-========================================================= */
+    try {
 
-$("symbol")
-  .addEventListener(
-    "change",
-    loadScanner
-  );
-
-$("tf5")
-  .addEventListener(
-    "click",
-    () => {
-
-      timeframe = "5m";
-
-      $("tf5")
-        .classList.add(
-          "active"
+      const response =
+        await fetch(
+          BACKEND +
+          "/scanner/" +
+          encodeURIComponent(symbol),
+          {
+            cache: "no-store"
+          }
         );
 
-      $("tf15")
-        .classList.remove(
-          "active"
+
+      if (!response.ok) {
+
+        throw new Error(
+          "Scanner HTTP " +
+          response.status
         );
 
-      $("timeframe")
-        .textContent =
-        "5m";
+      }
 
-      loadScanner();
+
+      const data =
+        await response.json();
+
+
+      displayScanner(
+        data,
+        symbol
+      );
+
+
+      $("backendInfo").textContent =
+        data.source ||
+        data.status ||
+        "NSE data received";
+
+
+    } catch (error) {
+
+      clearData();
+
+      $("backendInfo").textContent =
+        "Scanner error: " +
+        error.message;
+
+    } finally {
+
+      setLoading(false);
+
     }
-  );
+  }
 
-$("tf15")
-  .addEventListener(
-    "click",
-    () => {
 
-      timeframe = "15m";
+  async function refreshAll() {
 
-      $("tf15")
-        .classList.add(
-          "active"
-        );
+    const connected =
+      await checkBackend();
 
-      $("tf5")
-        .classList.remove(
-          "active"
-        );
+    if (connected) {
 
-      $("timeframe")
-        .textContent =
-        "15m";
+      await loadScanner();
 
-      loadScanner();
     }
-  );
 
-$("refresh")
-  .addEventListener(
-    "click",
-    refreshAll
-  );
+  }
 
-/* =========================================================
-   START
-========================================================= */
 
-refreshAll();
+  function setTimeframe(tf) {
+
+    selectedTimeframe = tf;
+
+    $("timeframe").textContent =
+      tf;
+
+
+    $("btn5")
+      .classList.toggle(
+        "active",
+        tf === "5m"
+      );
+
+
+    $("btn15")
+      .classList.toggle(
+        "active",
+        tf === "15m"
+      );
+
+  }
+
+
+  $("btn5")
+    .addEventListener(
+      "click",
+      function () {
+        setTimeframe("5m");
+      }
+    );
+
+
+  $("btn15")
+    .addEventListener(
+      "click",
+      function () {
+        setTimeframe("15m");
+      }
+    );
+
+
+  $("symbol")
+    .addEventListener(
+      "change",
+      function () {
+        loadScanner();
+      }
+    );
+
+
+  $("refresh")
+    .addEventListener(
+      "click",
+      function () {
+        refreshAll();
+      }
+    );
+
+
+  setTimeframe("5m");
+
+  refreshAll();
 
 </script>
 
