@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
   <title>Arpit Market Scanner</title>
 
   <style>
@@ -12,189 +16,311 @@
 
     body {
       margin: 0;
-      background: #07111f;
-      color: #e8eef7;
-      font-family: Arial, Helvetica, sans-serif;
+      background: #080b12;
+      color: #f4f7fb;
+      font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
     }
 
     .app {
-      max-width: 900px;
+      width: 100%;
+      max-width: 1100px;
       margin: auto;
       padding: 18px;
     }
 
-    .header {
+    header {
       margin-bottom: 18px;
     }
 
     .title {
       font-size: 28px;
       font-weight: 800;
-      margin-bottom: 6px;
+      letter-spacing: -0.5px;
     }
 
     .subtitle {
-      color: #91a0b5;
+      color: #8d98aa;
+      margin-top: 5px;
       font-size: 14px;
     }
 
     .notice {
       margin-top: 12px;
       padding: 10px 12px;
-      border: 1px solid #26364d;
       border-radius: 10px;
-      background: #0b1728;
-      color: #aebbd0;
+      background: #111722;
+      border: 1px solid #242c3a;
+      color: #aeb8c8;
       font-size: 12px;
-    }
-
-    .card {
-      background: #0c192b;
-      border: 1px solid #1c2d44;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-
-    .section-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 13px;
     }
 
     .controls {
       display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 8px;
-      align-items: center;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .control-box {
+      background: #10151f;
+      border: 1px solid #252d3a;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    label {
+      display: block;
+      color: #8995a8;
+      font-size: 12px;
+      margin-bottom: 7px;
     }
 
     select,
-    button {
-      min-height: 42px;
+    input {
+      width: 100%;
+      min-height: 44px;
+      background: #080c13;
+      color: #fff;
+      border: 1px solid #303948;
       border-radius: 9px;
-      border: 1px solid #2b405c;
-      background: #101f33;
-      color: #e8eef7;
       padding: 0 12px;
-      font-size: 14px;
+      outline: none;
     }
 
     button {
-      cursor: pointer;
+      min-height: 44px;
+      border: 0;
+      border-radius: 9px;
+      padding: 0 18px;
+      background: #e8edf5;
+      color: #080b12;
       font-weight: 700;
+      cursor: pointer;
     }
 
-    button.active {
-      background: #1c3656;
-      border-color: #4d76a5;
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
     }
 
-    button:hover {
-      background: #172b45;
-    }
-
-    .price-box {
+    .symbol-row {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-      flex-wrap: wrap;
+      gap: 8px;
     }
 
-    .price {
-      font-size: 34px;
-      font-weight: 800;
+    .symbol-row input {
+      flex: 1;
     }
 
-    .change {
-      font-size: 14px;
-      padding: 7px 10px;
-      border-radius: 8px;
-      background: #122337;
+    .timeframes {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .tf {
+      flex: 1;
+      background: #0a0f17;
+      color: #9aa6b8;
+      border: 1px solid #2a3342;
+    }
+
+    .tf.active {
+      background: #e8edf5;
+      color: #080b12;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .card {
+      background: #10151f;
+      border: 1px solid #252d3a;
+      border-radius: 12px;
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .label {
+      color: #8792a5;
+      font-size: 12px;
+      margin-bottom: 7px;
+    }
+
+    .value {
+      font-size: 22px;
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #9da8b8;
+    }
+
+    .positive {
+      color: #5ee39a;
+    }
+
+    .negative {
+      color: #ff7272;
+    }
+
+    .neutral {
+      color: #c8d0dc;
+    }
+
+    .section {
+      background: #10151f;
+      border: 1px solid #252d3a;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 10px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 750;
+      margin-bottom: 13px;
+    }
+
+    .levels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
 
-    .metric {
-      background: #0a1525;
-      border: 1px solid #1c2d44;
+    .level {
+      border: 1px solid #2b3442;
       border-radius: 10px;
-      padding: 12px;
+      padding: 13px;
     }
 
-    .metric-label {
-      color: #8494aa;
-      font-size: 12px;
-      margin-bottom: 6px;
-    }
-
-    .metric-value {
-      font-size: 17px;
-      font-weight: 700;
-    }
-
-    .structure {
-      font-size: 22px;
-      font-weight: 800;
-      margin-bottom: 12px;
+    .level .value {
+      font-size: 20px;
     }
 
     .chart {
-      height: 190px;
-      background: #081322;
-      border: 1px solid #1b2b42;
-      border-radius: 12px;
       position: relative;
+      height: 250px;
+      border-radius: 10px;
+      border: 1px solid #242d3b;
+      background:
+        linear-gradient(
+          rgba(255,255,255,.035) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(255,255,255,.035) 1px,
+          transparent 1px
+        );
+      background-size: 50px 50px;
       overflow: hidden;
-    }
-
-    .chart-line {
-      position: absolute;
-      left: 10%;
-      right: 10%;
-      top: 50%;
-      height: 1px;
-      background: #33465f;
-    }
-
-    .chart-label {
-      position: absolute;
-      font-size: 11px;
-      color: #8291a5;
-    }
-
-    .chart-label.top {
-      top: 10px;
-      right: 10px;
-    }
-
-    .chart-label.bottom {
-      bottom: 10px;
-      right: 10px;
     }
 
     .chart-message {
       position: absolute;
       inset: 0;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       text-align: center;
       padding: 20px;
-      color: #7f8ea4;
+      color: #8995a8;
       font-size: 13px;
+    }
+
+    .line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+    }
+
+    .resistance-line {
+      background: #ff6f6f;
+      top: 28%;
+    }
+
+    .support-line {
+      background: #58d997;
+      top: 72%;
+    }
+
+    .line-label {
+      position: absolute;
+      right: 8px;
+      transform: translateY(-50%);
+      font-size: 11px;
+      padding: 3px 6px;
+      border-radius: 5px;
+      background: #0b1018;
+    }
+
+    .resistance-label {
+      top: 28%;
+      color: #ff7d7d;
+    }
+
+    .support-label {
+      top: 72%;
+      color: #62df9d;
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .analysis-card {
+      border: 1px solid #2a3340;
+      border-radius: 10px;
+      padding: 12px;
+      background: #0d121a;
+    }
+
+    .analysis-card .heading {
+      font-size: 11px;
+      color: #7f8b9d;
+      margin-bottom: 7px;
+    }
+
+    .analysis-card .text {
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .status {
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      color: #91a0b5;
+      color: #aab4c3;
       font-size: 13px;
     }
 
@@ -202,47 +328,93 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #7d8ca0;
+      background: #6d7788;
     }
 
     .dot.online {
-      background: #4ade80;
+      background: #55df96;
     }
 
-    .error {
-      color: #ff8f8f;
+    .dot.error {
+      background: #ff6969;
     }
 
-    .muted {
-      color: #8291a5;
+    .data-table {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px 20px;
     }
 
-    .footer {
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid #1d2530;
+      font-size: 13px;
+    }
+
+    .data-row span:first-child {
+      color: #8792a4;
+    }
+
+    .data-row span:last-child {
+      font-weight: 650;
+      text-align: right;
+    }
+
+    footer {
+      padding: 18px 0 5px;
       text-align: center;
-      color: #66758a;
+      color: #677285;
       font-size: 11px;
-      padding: 8px;
     }
 
     .loading {
-      opacity: 0.6;
+      opacity: .6;
     }
 
-    @media (max-width: 600px) {
-      .controls {
-        grid-template-columns: 1fr 1fr 1fr;
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
       }
 
-      select {
-        grid-column: 1 / -1;
+      .analysis-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .data-table {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .app {
+        padding: 12px;
+      }
+
+      .title {
+        font-size: 23px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
       }
 
       .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .value {
+        font-size: 19px;
+      }
+
+      .analysis-grid {
         grid-template-columns: 1fr 1fr;
       }
 
-      .price {
-        font-size: 29px;
+      .chart {
+        height: 220px;
       }
     }
   </style>
@@ -252,672 +424,821 @@
 
 <div class="app">
 
-  <div class="header">
+  <header>
     <div class="title">Arpit Market Scanner</div>
+
     <div class="subtitle">
-      Price-action learning &amp; market-structure scanner
+      Price-action learning & market-structure scanner
     </div>
 
     <div class="notice">
       EDUCATIONAL / INFORMATIONAL • NSE CM MARKET DATA •
-      5m/15m candles require a separate intraday candle feed
+      Actual 5m / 15m candle feed is not connected yet.
     </div>
-  </div>
+  </header>
 
-  <div class="card">
-    <div class="section-title">Instrument &amp; Timeframe</div>
 
-    <div class="controls">
-      <select id="symbol">
-        <option value="20MICRONS">20MICRONS</option>
-        <option value="NIFTY">NIFTY</option>
-        <option value="BANKNIFTY">BANKNIFTY</option>
-      </select>
+  <div class="controls">
 
-      <button id="btn5" class="active" type="button">5m</button>
-      <button id="btn15" type="button">15m</button>
-    </div>
-  </div>
+    <div class="control-box">
 
-  <div class="card">
-    <div class="section-title">Current NSE Price</div>
+      <label>Instrument</label>
 
-    <div class="price-box">
-      <div>
-        <div id="price" class="price">—</div>
-        <div id="priceSymbol" class="muted">20MICRONS</div>
+      <div class="symbol-row">
+        <input
+          id="symbol"
+          value="20MICRONS"
+          placeholder="Enter NSE symbol"
+          autocomplete="off"
+        />
+
+        <button id="scanBtn">
+          Scan
+        </button>
       </div>
 
-      <div id="change" class="change">—</div>
-    </div>
-  </div>
+      <div class="timeframes">
 
-  <div class="card">
-    <div class="section-title">Market Structure</div>
+        <button
+          class="tf active"
+          data-timeframe="5m"
+          type="button"
+        >
+          5m
+        </button>
 
-    <div id="structure" class="structure">
-      No confirmed data
-    </div>
+        <button
+          class="tf"
+          data-timeframe="15m"
+          type="button"
+        >
+          15m
+        </button>
 
-    <div class="grid">
-      <div class="metric">
-        <div class="metric-label">Resistance</div>
-        <div id="resistance" class="metric-value">—</div>
       </div>
 
-      <div class="metric">
-        <div class="metric-label">Support</div>
-        <div id="support" class="metric-value">—</div>
-      </div>
     </div>
+
+
+    <div class="control-box">
+
+      <label>Auto Refresh</label>
+
+      <button
+        id="refreshBtn"
+        type="button"
+      >
+        Refresh
+      </button>
+
+    </div>
+
   </div>
 
-  <div class="card">
-    <div class="section-title">Intraday Chart</div>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="label">Current NSE Price</div>
+      <div
+        id="price"
+        class="value"
+      >
+        —
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">Change</div>
+      <div
+        id="change"
+        class="value"
+      >
+        —
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">Market Structure</div>
+      <div
+        id="structure"
+        class="value"
+      >
+        —
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">Volume</div>
+      <div
+        id="volume"
+        class="value"
+      >
+        —
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="section">
+
+    <div class="section-title">
+      Support & Resistance
+    </div>
+
+    <div class="levels">
+
+      <div class="level">
+        <div class="label">
+          Resistance
+        </div>
+
+        <div
+          id="resistance"
+          class="value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="level">
+        <div class="label">
+          Support
+        </div>
+
+        <div
+          id="support"
+          class="value"
+        >
+          —
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="section">
+
+    <div class="section-title">
+      Intraday Chart
+    </div>
 
     <div class="chart">
-      <div class="chart-label top">Resistance</div>
-      <div class="chart-label bottom">Support</div>
-      <div class="chart-line"></div>
+
+      <div class="line resistance-line"></div>
+
+      <div class="line support-line"></div>
+
+      <div
+        id="resistanceLabel"
+        class="line-label resistance-label"
+      >
+        Resistance
+      </div>
+
+      <div
+        id="supportLabel"
+        class="line-label support-label"
+      >
+        Support
+      </div>
 
       <div class="chart-message">
         Actual 5m / 15m NSE candles are not connected yet.<br>
         No artificial candles are displayed.
       </div>
+
     </div>
+
   </div>
 
-  <div class="card">
-    <div class="section-title">Intraday Analysis</div>
 
-    <div class="grid">
+  <div class="section">
 
-      <div class="metric">
-        <div class="metric-label">Candle Range</div>
-        <div id="range" class="metric-value">—</div>
+    <div class="section-title">
+      Intraday Analysis
+    </div>
+
+    <div class="analysis-grid">
+
+      <div class="analysis-card">
+        <div class="heading">
+          Candle Range
+        </div>
+
+        <div
+          id="range"
+          class="text"
+        >
+          —
+        </div>
       </div>
 
-      <div class="metric">
-        <div class="metric-label">Last Volume</div>
-        <div id="volume" class="metric-value">—</div>
+      <div class="analysis-card">
+        <div class="heading">
+          Timeframe
+        </div>
+
+        <div
+          id="timeframe"
+          class="text"
+        >
+          5m
+        </div>
       </div>
 
-      <div class="metric">
-        <div class="metric-label">Timeframe</div>
-        <div id="timeframe" class="metric-value">5m</div>
+      <div class="analysis-card">
+        <div class="heading">
+          Breakout
+        </div>
+
+        <div
+          id="breakout"
+          class="text"
+        >
+          —
+        </div>
       </div>
 
-      <div class="metric">
-        <div class="metric-label">Price Action Classification</div>
-        <div id="classification" class="metric-value">—</div>
+      <div class="analysis-card">
+        <div class="heading">
+          Retest
+        </div>
+
+        <div
+          id="retest"
+          class="text"
+        >
+          —
+        </div>
       </div>
 
-      <div class="metric">
-        <div class="metric-label">Breakout</div>
-        <div id="breakout" class="metric-value">—</div>
+      <div class="analysis-card">
+        <div class="heading">
+          False Breakout
+        </div>
+
+        <div
+          id="falseBreakout"
+          class="text"
+        >
+          —
+        </div>
       </div>
 
-      <div class="metric">
-        <div class="metric-label">Retest</div>
-        <div id="retest" class="metric-value">—</div>
-      </div>
+      <div class="analysis-card">
+        <div class="heading">
+          Setup Status
+        </div>
 
-      <div class="metric">
-        <div class="metric-label">False Breakout</div>
-        <div id="falseBreakout" class="metric-value">—</div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-label">Setup Status</div>
-        <div id="setup" class="metric-value">No confirmed setup</div>
+        <div
+          id="setup"
+          class="text"
+        >
+          —
+        </div>
       </div>
 
     </div>
+
   </div>
 
-  <div class="card">
-    <div class="section-title">Daily NSE Data</div>
 
-    <div class="grid">
+  <div class="section">
 
-      <div class="metric">
-        <div class="metric-label">Open</div>
-        <div id="open" class="metric-value">—</div>
+    <div class="section-title">
+      NSE Market Data
+    </div>
+
+    <div class="data-table">
+
+      <div class="data-row">
+        <span>Symbol</span>
+        <span id="dataSymbol">—</span>
       </div>
 
-      <div class="metric">
-        <div class="metric-label">High</div>
-        <div id="high" class="metric-value">—</div>
+      <div class="data-row">
+        <span>Open</span>
+        <span id="open">—</span>
       </div>
 
-      <div class="metric">
-        <div class="metric-label">Low</div>
-        <div id="low" class="metric-value">—</div>
+      <div class="data-row">
+        <span>High</span>
+        <span id="high">—</span>
       </div>
 
-      <div class="metric">
-        <div class="metric-label">Close / Last Price</div>
-        <div id="close" class="metric-value">—</div>
+      <div class="data-row">
+        <span>Low</span>
+        <span id="low">—</span>
       </div>
 
-      <div class="metric">
-        <div class="metric-label">Previous Close</div>
-        <div id="previousClose" class="metric-value">—</div>
+      <div class="data-row">
+        <span>Previous Close</span>
+        <span id="previousClose">—</span>
       </div>
 
-      <div class="metric">
-        <div class="metric-label">Trade Timestamp</div>
-        <div id="tradeDate" class="metric-value">—</div>
+      <div class="data-row">
+        <span>52W High</span>
+        <span id="weekHigh">—</span>
+      </div>
+
+      <div class="data-row">
+        <span>52W Low</span>
+        <span id="weekLow">—</span>
+      </div>
+
+      <div class="data-row">
+        <span>Trade Timestamp</span>
+        <span id="timestamp">—</span>
       </div>
 
     </div>
+
   </div>
 
-  <div class="card">
-    <div class="section-title">Backend Connection</div>
 
-    <div class="status">
-      <span id="backendDot" class="dot"></span>
-      <span id="backendStatus">Checking backend...</span>
+  <div class="section">
+
+    <div class="status-row">
+
+      <div class="status">
+        <span
+          id="backendDot"
+          class="dot"
+        ></span>
+
+        <span id="backendStatus">
+          Backend checking...
+        </span>
+      </div>
+
+      <div class="small">
+        Source: NSE CM Market MCP
+      </div>
+
     </div>
 
-    <div id="backendInfo" class="muted" style="margin-top:8px;">
-      —
-    </div>
-
-    <button
-      id="refresh"
-      type="button"
-      style="margin-top:14px;width:100%;"
-    >
-      Refresh
-    </button>
   </div>
 
-  <div class="footer">
+
+  <footer>
     Arpit Market Scanner • Educational / informational use
-  </div>
+  </footer>
 
 </div>
 
 
 <script>
 
-  const BACKEND =
-    "https://arpit-market-scanner-backend.onrender.com";
-
-  let selectedTimeframe = "5m";
+const BACKEND =
+  "https://arpit-market-scanner-backend.onrender.com";
 
 
-  function $(id) {
-    return document.getElementById(id);
+let selectedTimeframe = "5m";
+
+
+const $ = id =>
+  document.getElementById(id);
+
+
+function money(value) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    !Number.isFinite(Number(value))
+  ) {
+    return "—";
   }
 
+  return Number(value).toFixed(2);
+}
 
-  function money(value) {
 
-    if (
-      value === null ||
-      value === undefined ||
-      value === "" ||
-      Number.isNaN(Number(value))
-    ) {
-      return "—";
-    }
+function integer(value) {
 
-    return Number(value).toFixed(2);
+  if (
+    value === null ||
+    value === undefined ||
+    !Number.isFinite(Number(value))
+  ) {
+    return "—";
   }
 
+  return Number(value).toLocaleString("en-IN");
+}
 
-  function number(value) {
 
-    if (
-      value === null ||
-      value === undefined ||
-      value === "" ||
-      Number.isNaN(Number(value))
-    ) {
-      return "—";
-    }
+function percent(value) {
 
-    return Number(value).toLocaleString("en-IN");
+  if (
+    value === null ||
+    value === undefined ||
+    !Number.isFinite(Number(value))
+  ) {
+    return "—";
   }
 
+  const n = Number(value);
 
-  function text(value) {
+  return `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
+}
 
-    if (
+
+function setClass(element, type) {
+
+  element.classList.remove(
+    "positive",
+    "negative",
+    "neutral"
+  );
+
+  element.classList.add(type);
+}
+
+
+function setText(id, value) {
+
+  const element = $(id);
+
+  if (element) {
+    element.textContent =
       value === null ||
       value === undefined ||
       value === ""
-    ) {
-      return "—";
-    }
+        ? "—"
+        : value;
+  }
+}
 
-    return String(value);
+
+async function loadScanner() {
+
+  const symbol =
+    $("symbol").value.trim().toUpperCase();
+
+  if (!symbol) {
+    return;
   }
 
-
-  function setLoading(state) {
-
-    document.querySelector(".app")
-      .classList.toggle("loading", state);
-
-  }
-
-
-  async function checkBackend() {
-
-    try {
-
-      const response =
-        await fetch(
-          BACKEND + "/health",
-          {
-            cache: "no-store"
-          }
-        );
-
-      if (!response.ok) {
-        throw new Error("Backend HTTP " + response.status);
-      }
-
-      const data =
-        await response.json();
-
-      $("backendDot")
-        .classList.add("online");
-
-      $("backendStatus")
-        .textContent =
-        "Backend online";
-
-      $("backendInfo")
-        .textContent =
-        data.dataStatus ||
-        "NSE backend connected";
-
-      return true;
-
-    } catch (error) {
-
-      $("backendDot")
-        .classList.remove("online");
-
-      $("backendStatus")
-        .textContent =
-        "Backend connection failed";
-
-      $("backendInfo")
-        .textContent =
-        error.message;
-
-      return false;
-    }
-  }
-
-
-  function clearData() {
-
-    $("price").textContent = "—";
-    $("change").textContent = "—";
-
-    $("structure").textContent =
-      "No confirmed data";
-
-    $("resistance").textContent = "—";
-    $("support").textContent = "—";
-
-    $("range").textContent = "—";
-    $("volume").textContent = "—";
-    $("classification").textContent = "—";
-    $("breakout").textContent = "—";
-    $("retest").textContent = "—";
-    $("falseBreakout").textContent = "—";
-    $("setup").textContent =
-      "No confirmed setup";
-
-    $("open").textContent = "—";
-    $("high").textContent = "—";
-    $("low").textContent = "—";
-    $("close").textContent = "—";
-    $("previousClose").textContent = "—";
-    $("tradeDate").textContent = "—";
-  }
-
-
-  function displayScanner(data, symbol) {
-
-    if (!data) {
-      clearData();
-      return;
-    }
-
-
-    $("priceSymbol").textContent =
-      symbol;
-
-
-    /*
-      NSE CM Market response
-    */
-
-    if (
-      data.mode === "nse-cm-market-mcp" ||
-      data.status === "NSE CM Market data"
-    ) {
-
-      $("price").textContent =
-        money(data.price);
-
-      const change =
-        Number(data.changePercent);
-
-      if (!Number.isNaN(change)) {
-
-        $("change").textContent =
-          (change >= 0 ? "+" : "") +
-          change.toFixed(2) +
-          "%";
-
-      } else {
-
-        $("change").textContent = "—";
-      }
-
-
-      $("structure").textContent =
-        text(
-          data.priceAction &&
-          data.priceAction.structure
-        );
-
-
-      $("resistance").textContent =
-        money(
-          data.levels &&
-          data.levels.resistance
-        );
-
-
-      $("support").textContent =
-        money(
-          data.levels &&
-          data.levels.support
-        );
-
-
-      const high =
-        Number(data.high);
-
-      const low =
-        Number(data.low);
-
-      if (
-        !Number.isNaN(high) &&
-        !Number.isNaN(low)
-      ) {
-
-        $("range").textContent =
-          (high - low).toFixed(2);
-
-      } else {
-
-        $("range").textContent =
-          "—";
-      }
-
-
-      $("volume").textContent =
-        number(data.volume);
-
-
-      $("classification").textContent =
-        text(
-          data.priceAction &&
-          data.priceAction.setup
-        );
-
-
-      $("breakout").textContent =
-        text(
-          data.priceAction &&
-          data.priceAction.breakout
-        );
-
-
-      $("retest").textContent =
-        text(
-          data.priceAction &&
-          data.priceAction.retest
-        );
-
-
-      $("falseBreakout").textContent =
-        text(
-          data.priceAction &&
-          data.priceAction.falseBreakout
-        );
-
-
-      $("setup").textContent =
-        text(
-          data.priceAction &&
-          data.priceAction.setup
-        );
-
-
-      $("open").textContent =
-        money(data.open);
-
-      $("high").textContent =
-        money(data.high);
-
-      $("low").textContent =
-        money(data.low);
-
-      $("close").textContent =
-        money(data.price);
-
-      $("previousClose").textContent =
-        money(data.previousClose);
-
-      $("tradeDate").textContent =
-        text(data.latestTimestamp);
-
-      return;
-    }
-
-
-    /*
-      Bhavcopy / daily response
-    */
-
-    if (data.mode === "bhavcopy") {
-
-      $("price").textContent =
-        money(
-          data.close ||
-          data.lastPrice
-        );
-
-      $("open").textContent =
-        money(data.open);
-
-      $("high").textContent =
-        money(data.high);
-
-      $("low").textContent =
-        money(data.low);
-
-      $("close").textContent =
-        money(
-          data.close ||
-          data.lastPrice
-        );
-
-      $("previousClose").textContent =
-        money(data.previousClose);
-
-      $("tradeDate").textContent =
-        text(
-          data.tradeDate ||
-          data.date
-        );
-
-      return;
-    }
-
-
-    /*
-      Unknown response
-    */
-
-    $("backendInfo").textContent =
-      "Backend connected, but response format is not recognised.";
-
-  }
-
-
-  async function loadScanner() {
-
-    const symbol =
-      $("symbol").value;
-
-    setLoading(true);
-
-    try {
-
-      const response =
-        await fetch(
-          BACKEND +
-          "/scanner/" +
-          encodeURIComponent(symbol),
-          {
-            cache: "no-store"
-          }
-        );
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          "Scanner HTTP " +
-          response.status
-        );
-
-      }
-
-
-      const data =
-        await response.json();
-
-
-      displayScanner(
-        data,
-        symbol
+  $("scanBtn").disabled = true;
+  $("scanBtn").textContent = "Loading...";
+
+  try {
+
+    const response =
+      await fetch(
+        `${BACKEND}/scanner/${encodeURIComponent(symbol)}`,
+        {
+          cache: "no-store"
+        }
       );
 
+    const data =
+      await response.json();
 
-      $("backendInfo").textContent =
-        data.source ||
-        data.status ||
-        "NSE data received";
-
-
-    } catch (error) {
-
-      clearData();
-
-      $("backendInfo").textContent =
-        "Scanner error: " +
-        error.message;
-
-    } finally {
-
-      setLoading(false);
-
-    }
-  }
-
-
-  async function refreshAll() {
-
-    const connected =
-      await checkBackend();
-
-    if (connected) {
-
-      await loadScanner();
-
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Scanner request failed"
+      );
     }
 
-  }
+    renderScanner(data);
 
-
-  function setTimeframe(tf) {
-
-    selectedTimeframe = tf;
-
-    $("timeframe").textContent =
-      tf;
-
-
-    $("btn5")
-      .classList.toggle(
-        "active",
-        tf === "5m"
-      );
-
-
-    $("btn15")
-      .classList.toggle(
-        "active",
-        tf === "15m"
-      );
-
-  }
-
-
-  $("btn5")
-    .addEventListener(
-      "click",
-      function () {
-        setTimeframe("5m");
-      }
+    setBackend(
+      true,
+      "Backend online"
     );
 
+  } catch (error) {
 
-  $("btn15")
-    .addEventListener(
-      "click",
-      function () {
-        setTimeframe("15m");
-      }
+    console.error(error);
+
+    setBackend(
+      false,
+      "Backend connection error"
     );
 
+    setText(
+      "structure",
+      "Unavailable"
+    );
 
-  $("symbol")
-    .addEventListener(
-      "change",
-      function () {
+  } finally {
+
+    $("scanBtn").disabled = false;
+    $("scanBtn").textContent = "Scan";
+  }
+}
+
+
+function renderScanner(data) {
+
+  const price =
+    Number(data.price);
+
+  const change =
+    Number(data.changePercent);
+
+  setText(
+    "price",
+    Number.isFinite(price)
+      ? money(price)
+      : "—"
+  );
+
+  setText(
+    "change",
+    Number.isFinite(change)
+      ? percent(change)
+      : "—"
+  );
+
+
+  if (Number.isFinite(change)) {
+
+    setClass(
+      $("change"),
+      change > 0
+        ? "positive"
+        : change < 0
+          ? "negative"
+          : "neutral"
+    );
+  }
+
+
+  const structure =
+    data.priceAction?.structure ||
+    "Unavailable";
+
+  setText(
+    "structure",
+    structure
+  );
+
+
+  if (structure === "Bullish") {
+
+    setClass(
+      $("structure"),
+      "positive"
+    );
+
+  } else if (structure === "Bearish") {
+
+    setClass(
+      $("structure"),
+      "negative"
+    );
+
+  } else {
+
+    setClass(
+      $("structure"),
+      "neutral"
+    );
+  }
+
+
+  setText(
+    "volume",
+    integer(data.volume)
+  );
+
+
+  const resistance =
+    data.levels?.resistance;
+
+  const support =
+    data.levels?.support;
+
+  setText(
+    "resistance",
+    money(resistance)
+  );
+
+  setText(
+    "support",
+    money(support)
+  );
+
+
+  setText(
+    "resistanceLabel",
+    `R ${money(resistance)}`
+  );
+
+  setText(
+    "supportLabel",
+    `S ${money(support)}`
+  );
+
+
+  const range =
+    data.levels?.range;
+
+  setText(
+    "range",
+    range !== null &&
+    range !== undefined
+      ? money(range)
+      : "—"
+  );
+
+
+  setText(
+    "timeframe",
+    selectedTimeframe
+  );
+
+
+  setText(
+    "breakout",
+    data.intraday?.breakout ||
+    data.priceAction?.breakout ||
+    "Unavailable"
+  );
+
+  setText(
+    "retest",
+    data.intraday?.retest ||
+    data.priceAction?.retest ||
+    "Unavailable"
+  );
+
+  setText(
+    "falseBreakout",
+    data.intraday?.falseBreakout ||
+    data.priceAction?.falseBreakout ||
+    "Unavailable"
+  );
+
+  setText(
+    "setup",
+    data.priceAction?.setup ||
+    "No confirmed setup"
+  );
+
+
+  setText(
+    "dataSymbol",
+    data.symbol
+  );
+
+  setText(
+    "open",
+    money(data.open)
+  );
+
+  setText(
+    "high",
+    money(data.high)
+  );
+
+  setText(
+    "low",
+    money(data.low)
+  );
+
+  setText(
+    "previousClose",
+    money(data.previousClose)
+  );
+
+  setText(
+    "weekHigh",
+    money(data.fiftyTwoWeekHigh)
+  );
+
+  setText(
+    "weekLow",
+    money(data.fiftyTwoWeekLow)
+  );
+
+  setText(
+    "timestamp",
+    data.latestTimestamp
+  );
+}
+
+
+function setBackend(online, text) {
+
+  $("backendStatus").textContent =
+    text;
+
+  $("backendDot").classList.remove(
+    "online",
+    "error"
+  );
+
+  $("backendDot").classList.add(
+    online
+      ? "online"
+      : "error"
+  );
+}
+
+
+async function checkBackend() {
+
+  try {
+
+    const response =
+      await fetch(
+        `${BACKEND}/health`,
+        {
+          cache: "no-store"
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error("Backend offline");
+    }
+
+    setBackend(
+      true,
+      "Backend online"
+    );
+
+  } catch {
+
+    setBackend(
+      false,
+      "Backend offline"
+    );
+  }
+}
+
+
+document
+  .querySelectorAll(".tf")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        document
+          .querySelectorAll(".tf")
+          .forEach(x =>
+            x.classList.remove("active")
+          );
+
+        button.classList.add("active");
+
+        selectedTimeframe =
+          button.dataset.timeframe;
+
+        setText(
+          "timeframe",
+          selectedTimeframe
+        );
+      }
+    );
+  });
+
+
+$("scanBtn")
+  .addEventListener(
+    "click",
+    loadScanner
+  );
+
+
+$("refreshBtn")
+  .addEventListener(
+    "click",
+    loadScanner
+  );
+
+
+$("symbol")
+  .addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key === "Enter") {
         loadScanner();
       }
-    );
+    }
+  );
 
 
-  $("refresh")
-    .addEventListener(
-      "click",
-      function () {
-        refreshAll();
-      }
-    );
+checkBackend();
+loadScanner();
 
 
-  setTimeframe("5m");
-
-  refreshAll();
+setInterval(
+  () => {
+    loadScanner();
+  },
+  60000
+);
 
 </script>
 
