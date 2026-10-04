@@ -9,60 +9,34 @@ const {
 } = require("@modelcontextprotocol/client");
 
 const app = express();
+
 const PORT = process.env.PORT || 10000;
 
-/* =========================================================
-   NSE MCP URLS
-========================================================= */
-
-const NSE_BHAVCOPY_MCP =
+const BHAVCOPY_MCP =
   "https://mcp.nseindia.in/bhavcopy/cm/mcp";
 
-const NSE_CM_MARKET_MCP =
+const CMMARKET_MCP =
   "https://mcp.nseindia.in/cmmkt/mcp";
-
-/* =========================================================
-   APP
-========================================================= */
-
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET,POST,OPTIONS"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type"
-  );
-
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
-  }
-
-  next();
-});
 
 app.use(express.json({ limit: "5mb" }));
 
-/* =========================================================
-   UPLOAD
-========================================================= */
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  if (req.method === "OPTIONS") return res.sendStatus(200);
+  next();
+});
 
 const upload = multer({
-  dest: "/tmp/uploads",
+  dest: "/tmp/uploads/",
   limits: {
     fileSize: 50 * 1024 * 1024
   }
 });
 
-/* =========================================================
-   MEMORY
-========================================================= */
-
 let latestData = [];
 let latestDate = null;
-
 let dataStatus = "waiting for NSE data";
 let lastError = null;
 
@@ -79,22 +53,17 @@ let mcpErrors = {
 let bhavcopyClient = null;
 let cmMarketClient = null;
 
-/* =========================================================
-   HELPERS
-========================================================= */
+
+// --------------------------------------------------
+// HELPERS
+// --------------------------------------------------
 
 function num(value) {
-  if (
-    value === undefined ||
-    value === null ||
-    value === ""
-  ) {
+  if (value === null || value === undefined || value === "") {
     return null;
   }
 
-  const n = Number(
-    String(value).replace(/,/g, "")
-  );
+  const n = Number(String(value).replace(/,/g, ""));
 
   return Number.isFinite(n) ? n : null;
 }
@@ -102,321 +71,253 @@ function num(value) {
 function cleanSymbol(symbol) {
   return String(symbol || "")
     .trim()
-    .toUpperCase();
+    .toUpperCase()
+    .replace(/[^A-Z0-9&._-]/g, "");
 }
 
-/* =========================================================
-   CSV PARSER
-========================================================= */
 
-function parseCSVLine(line) {
-  const result = [];
+// --------------------------------------------------
+// CSV PARSER
+// --------------------------------------------------
 
-  let current = "";
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let value = "";
   let quoted = false;
 
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
 
-    if (ch === '"') {
-      if (
-        quoted &&
-        line[i + 1] === '"'
-      ) {
-        current += '"';
+    if (char === '"' && quoted && next === '"') {
+      value += '"';
+      i++;
+      continue;
+    }
+
+    if (char === '"') {
+      quoted = !quoted;
+      continue;
+    }
+
+    if (char === "," && !quoted) {
+      row.push(value);
+      value = "";
+      continue;
+    }
+
+    if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && next === "\n") {
         i++;
-      } else {
-        quoted = !quoted;
       }
-    } else if (
-      ch === "," &&
-      !quoted
-    ) {
-      result.push(current);
-      current = "";
-    } else {
-      current += ch;
+
+      row.push(value);
+      value = "";
+
+      if (row.some(x => String(x).trim() !== "")) {
+        rows.push(row);
+      }
+
+      row = [];
+      continue;
+    }
+
+    value += char;
+  }
+
+  if (value.length || row.length) {
+    row.push(value);
+
+    if (row.some(x => String(x).trim() !== "")) {
+      rows.push(row);
     }
   }
 
-  result.push(current);
+  if (!rows.length) return [];
 
-  return result;
-}
+  const headers = rows[0].map(x =>
+    String(x).trim().replace(/^\uFEFF/, "")
+  );
 
-function csvToObjects(csv) {
-  const lines = String(csv)
-    .replace(/^\uFEFF/, "")
-    .split(/\r?\n/)
-    .filter(line => line.trim());
-
-  if (lines.length < 2) {
-    throw new Error("CSV has no data rows");
-  }
-
-  const headers = parseCSVLine(lines[0]);
-
-  return lines.slice(1).map(line => {
-    const values = parseCSVLine(line);
+  return rows.slice(1).map(r => {
     const obj = {};
 
-    headers.forEach((header, index) => {
-      obj[header] = values[index] ?? "";
+    headers.forEach((h, i) => {
+      obj[h] = r[i] !== undefined ? String(r[i]).trim() : "";
     });
 
     return obj;
   });
 }
 
-/* =========================================================
-   NORMALIZE BHAWCOPY
-========================================================= */
 
 function normalizeRow(row) {
   return {
-    date:
-      row.TradDt ||
-      row.date ||
-      null,
+    symbol: cleanSymbol(row.TckrSymb),
+    name: row.FinInstrmNm || "",
+    series: row.SctySrs || "",
+    isin: row.ISIN || "",
 
-    symbol:
-      row.TckrSymb ||
-      row.symbol ||
-      row.ticker ||
-      null,
+    date: row.TradDt || "",
 
-    series:
-      row.SctySrs ||
-      row.series ||
-      "EQ",
+    open: num(row.OpnPric),
+    high: num(row.HghPric),
+    low: num(row.LwPric),
+    close: num(row.ClsPric),
+    last: num(row.LastPric),
+    previousClose: num(row.PrvsClsgPric),
 
-    instrumentType:
-      row.FinInstrmTp ||
-      row.instrumentType ||
-      null,
-
-    name:
-      row.FininstrmNm ||
-      row.name ||
-      null,
-
-    open: num(
-      row.OpnPric ?? row.open
-    ),
-
-    high: num(
-      row.HghPric ?? row.high
-    ),
-
-    low: num(
-      row.LwPric ?? row.low
-    ),
-
-    close: num(
-      row.ClsPric ?? row.close
-    ),
-
-    last: num(
-      row.LastPric ?? row.last
-    ),
-
-    previousClose: num(
-      row.PrvsClsgPric ??
-      row.previousClose
-    ),
-
-    volume: num(
-      row.TtlTradgVol ??
-      row.volume
-    ),
-
-    turnover: num(
-      row.TtlTrfVal ??
-      row.turnover
-    ),
-
-    trades: num(
-      row.TtlNbOfTxsExctd ??
-      row.trades
-    ),
-
-    openInterest: num(
-      row.OpnIntrst ??
-      row.openInterest
-    ),
-
-    changeInOI: num(
-      row.ChngInOpnIntrst ??
-      row.changeInOI
-    )
+    volume: num(row.TtlTradgVol),
+    value: num(row.TtlTrfVal),
+    transactions: num(row.TtlNbOfTxsExctd)
   };
 }
 
-/* =========================================================
-   LOAD CSV
-========================================================= */
 
-function loadCSV(csv) {
-  const rows = csvToObjects(csv);
+function loadCSV(text) {
+  const parsed = parseCSV(text);
 
-  latestData = rows
+  latestData = parsed
     .map(normalizeRow)
-    .filter(
-      row =>
-        row.symbol &&
-        row.series === "EQ"
-    );
+    .filter(x => x.symbol);
 
-  latestDate =
-    latestData[0]?.date || null;
-
-  dataStatus = "loaded";
-  lastError = null;
+  if (latestData.length) {
+    latestDate = latestData[0].date || null;
+    dataStatus = "NSE bhavcopy loaded";
+  }
 
   return latestData.length;
 }
 
-/* =========================================================
-   STOCK FINDER
-========================================================= */
 
 function findStock(symbol) {
-  const wanted = cleanSymbol(symbol);
+  const s = cleanSymbol(symbol);
 
-  return latestData.find(
-    row =>
-      row.symbol &&
-      cleanSymbol(row.symbol) === wanted &&
-      row.series === "EQ"
+  return latestData.find(x =>
+    x.symbol === s &&
+    (!x.series || x.series === "EQ")
   );
 }
 
-/* =========================================================
-   DAILY LEVELS
-========================================================= */
 
-function calculateLevels(row) {
-  if (!row) {
-    return null;
+// --------------------------------------------------
+// LEVELS
+// --------------------------------------------------
+
+function calculateLevels(stock) {
+  if (!stock) {
+    return {
+      resistance: null,
+      support: null,
+      range: null,
+      strength: "UNAVAILABLE"
+    };
   }
 
+  const resistance = stock.high;
+  const support = stock.low;
+
   const range =
-    row.high !== null &&
-    row.low !== null
-      ? row.high - row.low
+    resistance !== null && support !== null
+      ? resistance - support
       : null;
 
   let strength = "WEAK";
 
-  if (row.volume !== null) {
-    if (row.volume >= 1000000) {
+  if (range !== null && stock.close !== null && stock.close !== 0) {
+    const rangePercent = Math.abs(range / stock.close) * 100;
+
+    if (rangePercent >= 5) {
+      strength = "NORMAL";
+    }
+
+    if (rangePercent >= 10) {
       strength = "STRONG";
-    } else if (row.volume >= 100000) {
-      strength = "MEDIUM";
     }
   }
 
   return {
-    resistance: row.high,
-    support: row.low,
+    resistance,
+    support,
     range,
     strength
   };
 }
 
-/* =========================================================
-   DAILY PRICE ACTION
-========================================================= */
 
-function priceAction(row) {
-  if (!row) {
-    return null;
+// --------------------------------------------------
+// EDUCATIONAL PRICE-ACTION CLASSIFICATION
+// --------------------------------------------------
+
+function priceAction(stock) {
+  if (!stock) {
+    return {
+      structure: "Unavailable",
+      setup: "No confirmed setup",
+      breakout: "Unavailable",
+      retest: "Unavailable",
+      falseBreakout: "Unavailable"
+    };
   }
+
+  const change = num(stock.changePercent);
 
   let structure = "Neutral";
-  let setup = "No confirmed setup";
 
-  if (
-    row.close !== null &&
-    row.open !== null
-  ) {
-    if (row.close > row.open) {
+  if (change !== null) {
+    if (change > 0.5) {
       structure = "Bullish";
-      setup = "Bullish structure";
-    } else if (row.close < row.open) {
+    } else if (change < -0.5) {
       structure = "Bearish";
-      setup = "Bearish structure";
     }
-  }
-
-  let changePercent = null;
-
-  if (
-    row.previousClose !== null &&
-    row.previousClose !== 0 &&
-    row.last !== null
-  ) {
-    changePercent =
-      (
-        (row.last - row.previousClose) /
-        row.previousClose
-      ) * 100;
   }
 
   return {
     structure,
-    setup,
-    changePercent,
+
+    setup:
+      structure === "Bullish"
+        ? "Bullish structure"
+        : structure === "Bearish"
+          ? "Bearish structure"
+          : "Neutral structure",
+
     breakout: "Intraday candles unavailable",
     retest: "Intraday candles unavailable",
     falseBreakout: "Intraday candles unavailable"
   };
 }
 
-/* =========================================================
-   MCP CONNECTION
-   IMPORTANT:
-   - Reuses healthy connections
-   - Clears failed connections
-   - Stores exact error
-========================================================= */
+
+// --------------------------------------------------
+// MCP CONNECTION
+// --------------------------------------------------
 
 async function connectMcp(type) {
-  const isBhavcopy =
-    type === "bhavcopy";
+  const isBhavcopy = type === "bhavcopy";
 
-  const url =
-    isBhavcopy
-      ? NSE_BHAVCOPY_MCP
-      : NSE_CM_MARKET_MCP;
+  const existing = isBhavcopy
+    ? bhavcopyClient
+    : cmMarketClient;
 
-  const currentClient =
-    isBhavcopy
-      ? bhavcopyClient
-      : cmMarketClient;
-
-  const currentStatus =
-    isBhavcopy
-      ? mcpStatus.bhavcopy
-      : mcpStatus.cmMarket;
-
-  if (
-    currentClient &&
-    currentStatus === "connected"
-  ) {
-    return currentClient;
+  if (existing) {
+    return existing;
   }
 
-  const client = new Client({
-    name: "arpit-market-scanner",
-    version: "1.0.0"
-  });
+  const url = isBhavcopy
+    ? BHAVCOPY_MCP
+    : CMMARKET_MCP;
 
   try {
-    const transport =
-      new StreamableHTTPClientTransport(
-        new URL(url)
-      );
+    const client = new Client({
+      name: "arpit-market-scanner",
+      version: "1.0.0"
+    });
+
+    const transport = new StreamableHTTPClientTransport(
+      new URL(url)
+    );
 
     await client.connect(transport);
 
@@ -432,546 +333,339 @@ async function connectMcp(type) {
 
     return client;
   } catch (error) {
-    const message =
-      error?.message ||
-      String(error);
+    const message = error?.message || String(error);
 
     if (isBhavcopy) {
       bhavcopyClient = null;
-      mcpStatus.bhavcopy = "connection failed";
+      mcpStatus.bhavcopy = "error";
       mcpErrors.bhavcopy = message;
     } else {
       cmMarketClient = null;
-      mcpStatus.cmMarket = "connection failed";
+      mcpStatus.cmMarket = "error";
       mcpErrors.cmMarket = message;
     }
-
-    lastError = message;
 
     throw error;
   }
 }
 
-/* =========================================================
-   MCP TOOLS
-========================================================= */
+
+// --------------------------------------------------
+// MCP TOOLS
+// --------------------------------------------------
 
 async function getMcpTools(type) {
-  const client =
-    await connectMcp(type);
-
-  return await client.listTools();
+  const client = await connectMcp(type);
+  return client.listTools();
 }
 
-/* =========================================================
-   MCP TOOLS ENDPOINT
-========================================================= */
 
-app.get(
-  "/nse/mcp/tools",
-  async (req, res) => {
-    try {
-      const [
-        bhavcopy,
-        cmMarket
-      ] = await Promise.all([
-        getMcpTools("bhavcopy"),
-        getMcpTools("cmMarket")
-      ]);
+app.get("/nse/mcp/tools", async (req, res) => {
+  try {
+    const cm = await getMcpTools("cmMarket");
 
-      res.json({
-        status: "connected",
+    res.json({
+      status: "ok",
+      tools: cm.tools || []
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: error.message
+    });
+  }
+});
 
-        servers: {
-          bhavcopy: {
-            url: NSE_BHAVCOPY_MCP,
-            tools: bhavcopy.tools || []
-          },
 
-          cmMarket: {
-            url: NSE_CM_MARKET_MCP,
-            tools: cmMarket.tools || []
-          }
-        }
-      });
-    } catch (error) {
-      lastError =
-        error?.message ||
-        String(error);
+app.post("/nse/mcp/call", async (req, res) => {
+  try {
+    const {
+      type = "cmMarket",
+      name,
+      arguments: args = {}
+    } = req.body || {};
 
-      res.status(500).json({
-        status: "MCP connection failed",
-        error:
-          error?.message ||
-          String(error),
-        mcpStatus,
-        mcpErrors
+    if (!name) {
+      return res.status(400).json({
+        status: "error",
+        message: "Tool name required"
       });
     }
+
+    const client = await connectMcp(type);
+
+    const result = await client.callTool({
+      name,
+      arguments: args
+    });
+
+    res.json({
+      status: "ok",
+      result
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: error.message
+    });
   }
-);
+});
 
-/* =========================================================
-   GENERIC MCP CALL
-========================================================= */
 
-app.post(
-  "/nse/mcp/call",
-  async (req, res) => {
-    try {
-      const {
-        server,
-        tool,
-        arguments: toolArguments
-      } = req.body || {};
-
-      if (!server || !tool) {
-        return res.status(400).json({
-          error:
-            "server and tool are required"
-        });
-      }
-
-      const type =
-        server === "cmMarket"
-          ? "cmMarket"
-          : "bhavcopy";
-
-      const client =
-        await connectMcp(type);
-
-      const result =
-        await client.callTool({
-          name: tool,
-          arguments:
-            toolArguments || {}
-        });
-
-      res.json({
-        status: "ok",
-        server,
-        tool,
-        result
-      });
-    } catch (error) {
-      lastError =
-        error?.message ||
-        String(error);
-
-      res.status(500).json({
-        status: "MCP tool call failed",
-        error:
-          error?.message ||
-          String(error),
-        mcpStatus,
-        mcpErrors
-      });
-    }
-  }
-);
-
-/* =========================================================
-   NSE LIVE STOCK
-========================================================= */
+// --------------------------------------------------
+// NSE CM MARKET
+// --------------------------------------------------
 
 async function getMcpLiveStock(symbol) {
-  const client =
-    await connectMcp("cmMarket");
+  const client = await connectMcp("cmMarket");
 
-  return await client.callTool({
+  const result = await client.callTool({
     name: "cm_get_equity_stocks",
-
     arguments: {
       limit: 10,
-      symbolFilter:
-        cleanSymbol(symbol)
+      symbolFilter: cleanSymbol(symbol)
     }
   });
+
+  return result;
 }
 
-/* =========================================================
-   PARSE LIVE MCP RESULT
-========================================================= */
 
 function parseLiveMcpResult(result) {
+  if (!result) return null;
+
+  const content = Array.isArray(result.content)
+    ? result.content
+    : [];
+
+  const textItem = content.find(
+    x => x && x.type === "text"
+  );
+
+  if (!textItem || !textItem.text) {
+    return null;
+  }
+
   try {
-    if (!result) {
-      return null;
-    }
-
-    const text =
-      result?.content?.find(
-        item =>
-          item &&
-          item.type === "text"
-      )?.text;
-
-    if (!text) {
-      return null;
-    }
-
-    const parsed =
-      JSON.parse(text);
+    const parsed = JSON.parse(textItem.text);
 
     if (
-      !parsed ||
-      !Array.isArray(parsed.stocks)
+      parsed &&
+      Array.isArray(parsed.stocks) &&
+      parsed.stocks.length
     ) {
-      return null;
+      return parsed.stocks[0];
     }
 
-    return parsed.stocks[0] || null;
-  } catch (error) {
-    console.error(
-      "MCP result parse error:",
-      error.message
-    );
-
+    return null;
+  } catch {
     return null;
   }
 }
 
-/* =========================================================
-   NORMALIZE LIVE STOCK
-========================================================= */
 
 function normalizeLiveStock(stock) {
-  if (!stock) {
-    return null;
-  }
+  if (!stock) return null;
 
   return {
-    symbol:
-      stock.symbol || null,
+    symbol: cleanSymbol(stock.symbol),
+    series: stock.series || "EQ",
+    type: stock.type || "CM",
 
-    series:
-      stock.series || "EQ",
+    price: num(stock.lastTradedPrice),
 
-    type:
-      stock.type || "CM",
+    open: num(stock.openPrice),
+    high: num(stock.highPrice),
+    low: num(stock.lowPrice),
 
-    price:
-      num(stock.lastTradedPrice),
+    previousClose: num(stock.preClosePrice),
 
-    open:
-      num(stock.openPrice),
+    change: num(stock.change),
+    changePercent: num(stock.perChange),
 
-    high:
-      num(stock.highPrice),
+    volume: num(stock.volume),
+    value: num(stock.value),
 
-    low:
-      num(stock.lowPrice),
+    fiftyTwoWeekHigh: num(stock.fiftyTwoWeekHigh),
+    fiftyTwoWeekLow: num(stock.fiftyTwoWeekLow),
 
-    previousClose:
-      num(stock.preClosePrice),
-
-    change:
-      num(stock.change),
-
-    changePercent:
-      num(stock.perChange),
-
-    volume:
-      num(stock.volume),
-
-    value:
-      num(stock.value),
-
-    fiftyTwoWeekHigh:
-      num(stock.fiftyTwoWeekHigh),
-
-    fiftyTwoWeekLow:
-      num(stock.fiftyTwoWeekLow),
-
-    latestTimestamp:
-      stock.latestTimestamp || null
+    latestTimestamp: stock.latestTimestamp || null
   };
 }
 
-/* =========================================================
-   LIVE PRICE ACTION
-========================================================= */
 
 function livePriceAction(stock) {
   if (!stock) {
     return {
-      structure: "Neutral",
+      structure: "Unavailable",
       setup: "No confirmed setup",
-      breakout:
-        "Intraday candles unavailable",
-      retest:
-        "Intraday candles unavailable",
-      falseBreakout:
-        "Intraday candles unavailable"
+      changePercent: null,
+      breakout: "Intraday candles unavailable",
+      retest: "Intraday candles unavailable",
+      falseBreakout: "Intraday candles unavailable"
     };
   }
 
   let structure = "Neutral";
 
-  if (
-    stock.changePercent !== null
-  ) {
-    if (stock.changePercent > 0) {
+  if (stock.changePercent !== null) {
+    if (stock.changePercent > 0.5) {
       structure = "Bullish";
-    } else if (
-      stock.changePercent < 0
-    ) {
+    } else if (stock.changePercent < -0.5) {
       structure = "Bearish";
     }
   }
 
-  let setup =
-    "No confirmed setup";
-
-  if (structure === "Bullish") {
-    setup = "Bullish structure";
-  } else if (
-    structure === "Bearish"
-  ) {
-    setup = "Bearish structure";
-  }
-
   return {
     structure,
-    setup,
 
-    changePercent:
-      stock.changePercent,
+    setup:
+      structure === "Bullish"
+        ? "Bullish structure"
+        : structure === "Bearish"
+          ? "Bearish structure"
+          : "Neutral structure",
 
-    breakout:
-      "Intraday candles unavailable",
+    changePercent: stock.changePercent,
 
-    retest:
-      "Intraday candles unavailable",
-
-    falseBreakout:
-      "Intraday candles unavailable"
+    breakout: "Intraday candles unavailable",
+    retest: "Intraday candles unavailable",
+    falseBreakout: "Intraday candles unavailable"
   };
 }
 
-/* =========================================================
-   LIVE TEST
-========================================================= */
 
-app.get(
-  "/nse/live/:symbol",
-  async (req, res) => {
-    const symbol =
-      cleanSymbol(
-        req.params.symbol
-      );
+// --------------------------------------------------
+// LIVE ENDPOINT
+// --------------------------------------------------
 
-    try {
-      const result =
-        await getMcpLiveStock(
-          symbol
-        );
+app.get("/nse/live/:symbol", async (req, res) => {
+  try {
+    const symbol = cleanSymbol(req.params.symbol);
 
-      const stock =
-        parseLiveMcpResult(
-          result
-        );
+    const raw = await getMcpLiveStock(symbol);
+    const stock = normalizeLiveStock(
+      parseLiveMcpResult(raw)
+    );
 
-      res.json({
-        status:
-          stock
-            ? "ok"
-            : "no stock found",
-
-        symbol,
-
-        source:
-          "NSE CM Market MCP",
-
-        data: result,
-
-        parsedStock:
-          normalizeLiveStock(
-            stock
-          ),
-
-        disclaimer:
-          "NSE market data is provided for informational and educational purposes."
-      });
-    } catch (error) {
-      lastError =
-        error?.message ||
-        String(error);
-
-      res.status(500).json({
-        status: "error",
-        symbol,
-        message:
-          error?.message ||
-          String(error),
-
-        mcpStatus,
-        mcpErrors
+    if (!stock) {
+      return res.status(404).json({
+        status: "not_found",
+        symbol
       });
     }
-  }
-);
-
-/* =========================================================
-   INTRADAY
-   NO FAKE CANDLES
-========================================================= */
-
-app.get(
-  "/intraday/:symbol",
-  async (req, res) => {
-    const symbol =
-      cleanSymbol(
-        req.params.symbol
-      );
-
-    const interval =
-      req.query.interval === "15m"
-        ? "15m"
-        : "5m";
 
     res.json({
-      status:
-        "intraday_data_unavailable",
-
+      status: "ok",
       symbol,
-
-      interval,
-
-      candles: [],
-
-      analysis: {
-        structure:
-          "Unavailable",
-
-        breakout:
-          "Actual intraday candles required",
-
-        retest:
-          "Actual intraday candles required",
-
-        falseBreakout:
-          "Actual intraday candles required",
-
-        setup:
-          "No confirmed setup"
-      },
-
-      message:
-        "NSE CM Market MCP currently provides quote data, not a 5m/15m candle series.",
-
+      source: "NSE CM Market MCP",
+      data: raw,
+      parsedStock: stock,
       disclaimer:
-        "Do not treat this endpoint as live 5m/15m trading data."
+        "NSE market data is provided for informational and educational purposes."
+    });
+  } catch (error) {
+    lastError = error.message;
+
+    res.status(500).json({
+      status: "error",
+      message: error.message
     });
   }
-);
+});
 
-/* =========================================================
-   SCANNER
-========================================================= */
 
-async function scanner(symbol) {
-  const wanted =
-    cleanSymbol(symbol);
+// --------------------------------------------------
+// INTRADAY
+// --------------------------------------------------
 
-  /* -----------------------------------------
-     FIRST: NSE CM MARKET MCP
-  ----------------------------------------- */
+app.get("/intraday/:symbol", async (req, res) => {
+  const symbol = cleanSymbol(req.params.symbol);
+
+  const interval =
+    req.query.interval === "15m"
+      ? "15m"
+      : "5m";
+
+  res.json({
+    status: "intraday_data_unavailable",
+    symbol,
+    interval,
+
+    candles: [],
+
+    analysis: {
+      structure: "Unavailable",
+      breakout: "Actual intraday candles required",
+      retest: "Actual intraday candles required",
+      falseBreakout: "Actual intraday candles required",
+      setup: "No confirmed setup"
+    },
+
+    message:
+      "NSE CM Market MCP currently provides quote data, not a 5m/15m candle series.",
+
+    disclaimer:
+      "Do not treat this endpoint as live 5m/15m trading data."
+  });
+});
+
+
+// --------------------------------------------------
+// SCANNER
+// --------------------------------------------------
+
+app.get("/scanner/:symbol", async (req, res) => {
+  const symbol = cleanSymbol(req.params.symbol);
 
   try {
-    const result =
-      await getMcpLiveStock(
-        wanted
-      );
+    const raw = await getMcpLiveStock(symbol);
 
-    const liveStock =
-      parseLiveMcpResult(
-        result
-      );
+    const live = normalizeLiveStock(
+      parseLiveMcpResult(raw)
+    );
 
-    const stock =
-      normalizeLiveStock(
-        liveStock
-      );
+    if (live) {
+      const levels = calculateLevels({
+        high: live.high,
+        low: live.low,
+        close: live.price
+      });
 
-    if (stock) {
-      const levels = {
-        resistance:
-          stock.high,
+      const action = livePriceAction(live);
 
-        support:
-          stock.low,
+      return res.json({
+        symbol: live.symbol,
 
-        range:
-          stock.high !== null &&
-          stock.low !== null
-            ? stock.high -
-              stock.low
-            : null,
+        status: "NSE CM Market data",
+        mode: "nse-cm-market-mcp",
+        source: "NSE CM Market MCP",
 
-        strength:
-          "WEAK"
-      };
+        price: live.price,
 
-      return {
-        symbol:
-          stock.symbol,
+        open: live.open,
+        high: live.high,
+        low: live.low,
 
-        status:
-          "NSE CM Market data",
+        previousClose: live.previousClose,
 
-        mode:
-          "nse-cm-market-mcp",
+        change: live.change,
+        changePercent: live.changePercent,
 
-        source:
-          "NSE CM Market MCP",
+        volume: live.volume,
+        value: live.value,
 
-        price:
-          stock.price,
+        fiftyTwoWeekHigh: live.fiftyTwoWeekHigh,
+        fiftyTwoWeekLow: live.fiftyTwoWeekLow,
 
-        open:
-          stock.open,
-
-        high:
-          stock.high,
-
-        low:
-          stock.low,
-
-        previousClose:
-          stock.previousClose,
-
-        change:
-          stock.change,
-
-        changePercent:
-          stock.changePercent,
-
-        volume:
-          stock.volume,
-
-        value:
-          stock.value,
-
-        fiftyTwoWeekHigh:
-          stock.fiftyTwoWeekHigh,
-
-        fiftyTwoWeekLow:
-          stock.fiftyTwoWeekLow,
-
-        latestTimestamp:
-          stock.latestTimestamp,
+        latestTimestamp: live.latestTimestamp,
 
         levels,
 
-        priceAction:
-          livePriceAction(
-            stock
-          ),
+        priceAction: action,
 
         intraday: {
-          status:
-            "unavailable",
+          status: "unavailable",
 
           interval5m:
             "Actual 5m candles required",
@@ -979,578 +673,378 @@ async function scanner(symbol) {
           interval15m:
             "Actual 15m candles required",
 
-          breakout:
-            "Not calculated",
-
-          retest:
-            "Not calculated",
-
-          falseBreakout:
-            "Not calculated"
+          breakout: "Not calculated",
+          retest: "Not calculated",
+          falseBreakout: "Not calculated"
         },
 
         disclaimer:
-          "NSE market data is provided for informational and educational purposes."
-      };
+          "Educational / informational market-data display. No trade execution."
+      });
     }
+
+    throw new Error("NSE stock not found");
+
   } catch (error) {
-    lastError =
-      error?.message ||
-      String(error);
-  }
+    lastError = error.message;
 
-  /* -----------------------------------------
-     SECOND: BHAWCOPY FALLBACK
-  ----------------------------------------- */
+    const stock = findStock(symbol);
 
-  const row =
-    findStock(wanted);
+    if (!stock) {
+      return res.status(404).json({
+        status: "error",
+        symbol,
+        message: "Stock data unavailable",
+        error: error.message
+      });
+    }
 
-  if (!row) {
-    return {
-      symbol:
-        wanted,
+    const changePercent =
+      stock.close !== null &&
+      stock.previousClose
+        ? ((stock.close - stock.previousClose) /
+            stock.previousClose) * 100
+        : null;
 
-      status:
-        "stock_not_found",
+    const fallback = {
+      symbol: stock.symbol,
+      status: "Bhavcopy data",
+      mode: "uploaded-bhavcopy",
+      source: "NSE Bhavcopy",
 
-      mode:
-        "no_data",
+      price: stock.last ?? stock.close,
 
-      message:
-        "No NSE CM Market MCP data and no uploaded BhavCopy data found.",
+      open: stock.open,
+      high: stock.high,
+      low: stock.low,
+
+      previousClose: stock.previousClose,
+
+      change:
+        stock.close !== null &&
+        stock.previousClose !== null
+          ? stock.close - stock.previousClose
+          : null,
+
+      changePercent,
+
+      volume: stock.volume,
+      value: stock.value,
+
+      latestTimestamp: stock.date,
+
+      levels: calculateLevels(stock),
+
+      priceAction: {
+        structure:
+          changePercent > 0.5
+            ? "Bullish"
+            : changePercent < -0.5
+              ? "Bearish"
+              : "Neutral",
+
+        setup: "Daily structure only",
+
+        changePercent,
+
+        breakout:
+          "Intraday candles unavailable",
+
+        retest:
+          "Intraday candles unavailable",
+
+        falseBreakout:
+          "Intraday candles unavailable"
+      },
 
       intraday: {
-        status:
-          "unavailable"
-      }
+        status: "unavailable",
+        interval5m: "Actual 5m candles required",
+        interval15m: "Actual 15m candles required",
+        breakout: "Not calculated",
+        retest: "Not calculated",
+        falseBreakout: "Not calculated"
+      },
+
+      disclaimer:
+        "Educational / informational market-data display."
     };
+
+    res.json(fallback);
+  }
+});
+
+
+// --------------------------------------------------
+// STOCK
+// --------------------------------------------------
+
+app.get("/stock/:symbol", async (req, res) => {
+  const symbol = cleanSymbol(req.params.symbol);
+
+  try {
+    const raw = await getMcpLiveStock(symbol);
+    const live = normalizeLiveStock(
+      parseLiveMcpResult(raw)
+    );
+
+    if (!live) {
+      throw new Error("Stock not found");
+    }
+
+    res.json({
+      status: "ok",
+      source: "NSE CM Market MCP",
+      stock: live
+    });
+  } catch (error) {
+    const stock = findStock(symbol);
+
+    if (!stock) {
+      return res.status(404).json({
+        status: "error",
+        message: error.message
+      });
+    }
+
+    res.json({
+      status: "ok",
+      source: "NSE Bhavcopy",
+      stock
+    });
+  }
+});
+
+
+// --------------------------------------------------
+// UPLOAD BHAVCOPY
+// --------------------------------------------------
+
+async function processUploadedFile(filePath) {
+  const ext = filePath.toLowerCase();
+
+  if (ext.endsWith(".zip")) {
+    const zip = new AdmZip(filePath);
+    const entries = zip.getEntries();
+
+    for (const entry of entries) {
+      if (
+        !entry.isDirectory &&
+        entry.entryName.toLowerCase().endsWith(".csv")
+      ) {
+        const text = entry.getData().toString("utf8");
+
+        return loadCSV(text);
+      }
+    }
+
+    throw new Error("CSV not found inside ZIP");
   }
 
-  return {
-    symbol:
-      wanted,
+  const text = fs.readFileSync(filePath, "utf8");
 
-    status:
-      "BhavCopy data",
-
-    mode:
-      "bhavcopy",
-
-    source:
-      "Uploaded NSE BhavCopy",
-
-    date:
-      row.date,
-
-    open:
-      row.open,
-
-    high:
-      row.high,
-
-    low:
-      row.low,
-
-    close:
-      row.close,
-
-    last:
-      row.last,
-
-    previousClose:
-      row.previousClose,
-
-    volume:
-      row.volume,
-
-    turnover:
-      row.turnover,
-
-    levels:
-      calculateLevels(row),
-
-    priceAction:
-      priceAction(row),
-
-    intraday: {
-      status:
-        "unavailable",
-
-      breakout:
-        "Actual 5m/15m candles required",
-
-      retest:
-        "Actual 5m/15m candles required",
-
-      falseBreakout:
-        "Actual 5m/15m candles required"
-    },
-
-    disclaimer:
-      "BhavCopy is end-of-day data and is not a 5m/15m intraday feed."
-  };
+  return loadCSV(text);
 }
 
-/* =========================================================
-   SCANNER ENDPOINT
-========================================================= */
-
-app.get(
-  "/scanner/:symbol",
-  async (req, res) => {
-    try {
-      const result =
-        await scanner(
-          req.params.symbol
-        );
-
-      res.json(result);
-    } catch (error) {
-      lastError =
-        error?.message ||
-        String(error);
-
-      res.status(500).json({
-        status: "error",
-
-        symbol:
-          cleanSymbol(
-            req.params.symbol
-          ),
-
-        message:
-          error?.message ||
-          String(error)
-      });
-    }
-  }
-);
-
-/* =========================================================
-   STOCK ENDPOINT
-========================================================= */
-
-app.get(
-  "/stock/:symbol",
-  async (req, res) => {
-    try {
-      const result =
-        await scanner(
-          req.params.symbol
-        );
-
-      res.json(result);
-    } catch (error) {
-      lastError =
-        error?.message ||
-        String(error);
-
-      res.status(500).json({
-        status: "error",
-
-        message:
-          error?.message ||
-          String(error)
-      });
-    }
-  }
-);
-
-/* =========================================================
-   UPLOAD BHAWCOPY
-========================================================= */
 
 app.post(
   "/upload-bhavcopy",
   upload.single("file"),
-  (req, res) => {
+  async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({
           status: "error",
-          message:
-            "No file uploaded"
+          message: "File required"
         });
       }
 
-      const originalName =
-        req.file.originalname ||
-        "";
-
-      const isZip =
-        originalName
-          .toLowerCase()
-          .endsWith(".zip");
-
-      let csvText = "";
-
-      if (isZip) {
-        const zip =
-          new AdmZip(
-            req.file.path
-          );
-
-        const entries =
-          zip.getEntries();
-
-        const csvEntry =
-          entries.find(
-            entry =>
-              !entry.isDirectory &&
-              entry.entryName
-                .toLowerCase()
-                .endsWith(".csv")
-          );
-
-        if (!csvEntry) {
-          throw new Error(
-            "No CSV file found inside ZIP"
-          );
-        }
-
-        csvText =
-          csvEntry.getData()
-            .toString("utf8");
-      } else {
-        csvText =
-          fs.readFileSync(
-            req.file.path,
-            "utf8"
-          );
-      }
-
-      const count =
-        loadCSV(csvText);
+      const count = await processUploadedFile(
+        req.file.path
+      );
 
       try {
-        fs.unlinkSync(
-          req.file.path
-        );
-      } catch (_) {}
+        fs.unlinkSync(req.file.path);
+      } catch {}
 
       res.json({
         status: "ok",
-
-        message:
-          "BhavCopy loaded successfully",
-
-        rowCount:
-          count,
-
+        rows: count,
         latestDate,
-
         dataStatus
       });
     } catch (error) {
-      try {
-        if (req.file?.path) {
-          fs.unlinkSync(
-            req.file.path
-          );
-        }
-      } catch (_) {}
-
-      lastError =
-        error?.message ||
-        String(error);
+      lastError = error.message;
 
       res.status(500).json({
         status: "error",
-
-        message:
-          error?.message ||
-          String(error)
+        message: error.message
       });
     }
   }
 );
 
-/* =========================================================
-   GENERIC UPLOAD ALIAS
-========================================================= */
 
 app.post(
   "/upload",
   upload.single("file"),
-  (req, res) => {
+  async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({
           status: "error",
-          message:
-            "No file uploaded"
+          message: "File required"
         });
       }
 
-      const originalName =
-        req.file.originalname ||
-        "";
-
-      const isZip =
-        originalName
-          .toLowerCase()
-          .endsWith(".zip");
-
-      let csvText = "";
-
-      if (isZip) {
-        const zip =
-          new AdmZip(
-            req.file.path
-          );
-
-        const entries =
-          zip.getEntries();
-
-        const csvEntry =
-          entries.find(
-            entry =>
-              !entry.isDirectory &&
-              entry.entryName
-                .toLowerCase()
-                .endsWith(".csv")
-          );
-
-        if (!csvEntry) {
-          throw new Error(
-            "No CSV file found inside ZIP"
-          );
-        }
-
-        csvText =
-          csvEntry.getData()
-            .toString("utf8");
-      } else {
-        csvText =
-          fs.readFileSync(
-            req.file.path,
-            "utf8"
-          );
-      }
-
-      const count =
-        loadCSV(csvText);
+      const count = await processUploadedFile(
+        req.file.path
+      );
 
       try {
-        fs.unlinkSync(
-          req.file.path
-        );
-      } catch (_) {}
+        fs.unlinkSync(req.file.path);
+      } catch {}
 
       res.json({
         status: "ok",
-
-        rowCount:
-          count,
-
+        rows: count,
         latestDate,
-
         dataStatus
       });
     } catch (error) {
-      try {
-        if (req.file?.path) {
-          fs.unlinkSync(
-            req.file.path
-          );
-        }
-      } catch (_) {}
-
-      lastError =
-        error?.message ||
-        String(error);
+      lastError = error.message;
 
       res.status(500).json({
         status: "error",
-
-        message:
-          error?.message ||
-          String(error)
+        message: error.message
       });
     }
   }
 );
 
-/* =========================================================
-   NSE STATUS
-========================================================= */
 
-app.get(
-  "/nse/status",
-  async (req, res) => {
-    res.json({
-      status: "ok",
+// --------------------------------------------------
+// HEALTH
+// --------------------------------------------------
 
-      mcpStatus,
+app.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
 
-      mcpErrors,
+    app: "Arpit Market Scanner Backend",
 
-      dataStatus,
+    dataStatus,
 
-      latestDate,
+    latestDate,
 
-      rowCount:
-        latestData.length,
+    rowCount: latestData.length,
 
-      lastError,
+    mcpStatus,
 
-      urls: {
-        bhavcopy:
-          NSE_BHAVCOPY_MCP,
+    mcpErrors,
 
-        cmMarket:
-          NSE_CM_MARKET_MCP
-      },
+    lastError,
 
-      intraday:
-        "5m/15m actual candle feed not connected"
-    });
-  }
-);
+    intraday:
+      "5m/15m actual candle feed not connected"
+  });
+});
 
-/* =========================================================
-   HEALTH
-========================================================= */
 
-app.get(
-  "/health",
-  (req, res) => {
-    res.json({
-      status: "ok",
+// --------------------------------------------------
+// NSE STATUS
+// --------------------------------------------------
 
-      app:
-        "Arpit Market Scanner Backend",
+app.get("/nse/status", (req, res) => {
+  res.json({
+    status: "ok",
 
-      dataStatus,
+    source: {
+      cmMarket:
+        "https://mcp.nseindia.in/cmmkt/mcp",
 
-      latestDate,
+      bhavcopy:
+        "https://mcp.nseindia.in/bhavcopy/cm/mcp"
+    },
 
-      rowCount:
-        latestData.length,
+    mcpStatus,
+    mcpErrors,
 
-      mcpStatus,
+    dataStatus,
+    latestDate,
 
-      mcpErrors,
+    intraday: {
+      fiveMinute: false,
+      fifteenMinute: false
+    },
 
-      lastError,
+    message:
+      "CM Market quote data is connected separately from intraday candle data."
+  });
+});
 
-      intraday:
-        "5m/15m actual candle feed not connected"
-    });
-  }
-);
 
-/* =========================================================
-   ROOT
-========================================================= */
+// --------------------------------------------------
+// ROOT
+// --------------------------------------------------
 
-app.get(
-  "/",
-  (req, res) => {
-    res.json({
-      status: "ok",
+app.get("/", (req, res) => {
+  res.json({
+    app: "Arpit Market Scanner Backend",
+    status: "online",
 
-      app:
-        "Arpit Market Scanner Backend",
+    endpoints: {
+      health: "/health",
+      nseStatus: "/nse/status",
+      live: "/nse/live/20MICRONS",
+      scanner: "/scanner/20MICRONS",
+      stock: "/stock/20MICRONS",
+      intraday5m: "/intraday/20MICRONS?interval=5m",
+      intraday15m: "/intraday/20MICRONS?interval=15m",
+      tools: "/nse/mcp/tools"
+    },
 
-      version:
-        "1.0.0",
+    mode: "educational"
+  });
+});
 
-      endpoints: {
-        health:
-          "/health",
 
-        status:
-          "/nse/status",
+// --------------------------------------------------
+// 404
+// --------------------------------------------------
 
-        live:
-          "/nse/live/:symbol",
+app.use((req, res) => {
+  res.status(404).json({
+    status: "error",
+    message: "Endpoint not found",
+    path: req.path
+  });
+});
 
-        scanner:
-          "/scanner/:symbol",
 
-        stock:
-          "/stock/:symbol",
+// --------------------------------------------------
+// ERROR HANDLER
+// --------------------------------------------------
 
-        intraday:
-          "/intraday/:symbol?interval=5m",
+app.use((error, req, res, next) => {
+  console.error(error);
 
-        upload:
-          "/upload-bhavcopy",
+  lastError =
+    error?.message || String(error);
 
-        mcpTools:
-          "/nse/mcp/tools",
+  res.status(500).json({
+    status: "error",
+    message: lastError
+  });
+});
 
-        mcpCall:
-          "/nse/mcp/call"
-      },
 
-      dataSources: {
-        quote:
-          "NSE CM Market MCP",
+// --------------------------------------------------
+// START
+// --------------------------------------------------
 
-        bhavcopy:
-          "NSE BhavCopy",
-
-        intraday:
-          "Not connected"
-      }
-    });
-  }
-);
-
-/* =========================================================
-   404
-========================================================= */
-
-app.use(
-  (req, res) => {
-    res.status(404).json({
-      status:
-        "not_found",
-
-      path:
-        req.originalUrl
-    });
-  }
-);
-
-/* =========================================================
-   ERROR HANDLER
-========================================================= */
-
-app.use(
-  (error, req, res, next) => {
-    console.error(
-      "Server error:",
-      error
-    );
-
-    lastError =
-      error?.message ||
-      String(error);
-
-    res.status(500).json({
-      status:
-        "error",
-
-      message:
-        error?.message ||
-        String(error)
-    });
-  }
-);
-
-/* =========================================================
-   START
-========================================================= */
-
-app.listen(
-  PORT,
-  () => {
-    console.log(
-      `Arpit Market Scanner Backend running on port ${PORT}`
-    );
-  }
-);
+app.listen(PORT, () => {
+  console.log(
+    `Arpit Market Scanner Backend running on port ${PORT}`
+  );
+});
