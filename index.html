@@ -1,1555 +1,1228 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Arpit Market Scanner</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arpit Market Scanner</title>
 
-<style>
-*{box-sizing:border-box}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-body{
-  margin:0;
-  padding:12px;
-  background:#070b11;
-  color:#f5f7fa;
-  font-family:Arial,Helvetica,sans-serif;
-}
+    body {
+      margin: 0;
+      background: #07111f;
+      color: #e8eef7;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-.container{
-  max-width:900px;
-  margin:auto;
-}
+    .app {
+      max-width: 900px;
+      margin: auto;
+      padding: 18px;
+    }
 
-.header{
-  padding:8px 4px 18px;
-}
+    .header {
+      margin-bottom: 18px;
+    }
 
-.title{
-  font-size:25px;
-  font-weight:800;
-}
+    .title {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
 
-.subtitle{
-  color:#8995a8;
-  font-size:13px;
-  margin-top:5px;
-}
+    .subtitle {
+      color: #8fa0b7;
+      font-size: 14px;
+    }
 
-.demoNotice{
-  margin-top:9px;
-  display:inline-block;
-  padding:6px 9px;
-  border-radius:7px;
-  background:#2a2110;
-  border:1px solid #665025;
-  color:#f3c96a;
-  font-size:11px;
-  font-weight:700;
-}
+    .notice {
+      background: #102238;
+      border: 1px solid #1d3a59;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      color: #b9c9dc;
+      font-size: 13px;
+    }
 
-.card{
-  background:#111925;
-  border:1px solid #29364a;
-  border-radius:16px;
-  padding:15px;
-  margin:12px 0;
-}
+    .panel {
+      background: #0d1a2b;
+      border: 1px solid #1b3048;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
 
-.sectionTitle{
-  color:#8995a8;
-  font-size:12px;
-  text-transform:uppercase;
-  letter-spacing:.7px;
-  margin-bottom:10px;
-}
+    .label {
+      color: #8fa0b7;
+      font-size: 12px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
 
-.controls{
-  display:grid;
-  grid-template-columns:1fr 70px 70px;
-  gap:9px;
-}
+    select,
+    button {
+      border: 1px solid #29425f;
+      background: #101f32;
+      color: #e8eef7;
+      border-radius: 9px;
+      padding: 10px 13px;
+      font-size: 14px;
+      cursor: pointer;
+    }
 
-select,
-button{
-  width:100%;
-  background:#182230;
-  color:#fff;
-  border:1px solid #35445a;
-  border-radius:10px;
-  padding:12px;
-  font-size:14px;
-}
+    select {
+      width: 100%;
+      margin-bottom: 12px;
+    }
 
-button{
-  cursor:pointer;
-}
+    .timeframes {
+      display: flex;
+      gap: 8px;
+    }
 
-button.active{
-  background:#40536d;
-}
+    .timeframes button.active {
+      background: #2c6bed;
+      border-color: #2c6bed;
+    }
 
-.price{
-  font-size:38px;
-  font-weight:800;
-}
+    .price-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
 
-.muted{
-  color:#8995a8;
-}
+    .price {
+      font-size: 38px;
+      font-weight: 800;
+    }
 
-.green{
-  color:#61dc96;
-}
+    .price-change {
+      font-size: 15px;
+      font-weight: 700;
+    }
 
-.red{
-  color:#ff7070;
-}
+    .bullish {
+      color: #38d996;
+    }
 
-.yellow{
-  color:#f3c96a;
-}
+    .bearish {
+      color: #ff6b6b;
+    }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-}
+    .neutral {
+      color: #b9c9dc;
+    }
 
-.grid3{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-}
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
 
-.box{
-  background:#182230;
-  border-radius:11px;
-  padding:13px;
-  min-width:0;
-}
+    .stat {
+      background: #101f32;
+      border: 1px solid #1b3048;
+      border-radius: 10px;
+      padding: 13px;
+    }
 
-.boxTitle{
-  color:#8995a8;
-  font-size:11px;
-  margin-bottom:5px;
-}
+    .stat-title {
+      color: #8092aa;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
 
-.boxValue{
-  font-size:17px;
-  font-weight:750;
-  word-break:break-word;
-}
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+    }
 
-/* CHART */
+    .section-title {
+      font-size: 18px;
+      font-weight: 750;
+      margin-bottom: 14px;
+    }
 
-.chartOuter{
-  position:relative;
-  background:#080e16;
-  border:1px solid #202c3d;
-  border-radius:12px;
-  height:320px;
-  overflow:hidden;
-}
+    .chart {
+      min-height: 240px;
+      border: 1px dashed #29425f;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      color: #7f91aa;
+      background: #091625;
+    }
 
-.chartGrid{
-  position:absolute;
-  inset:0;
+    .levels {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
 
-  background:
-  linear-gradient(
-    to bottom,
-    transparent 24.5%,
-    #1a2534 25%,
-    transparent 25.5%,
+    .level-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #1b3048;
+    }
 
-    transparent 49.5%,
-    #1a2534 50%,
-    transparent 50.5%,
+    .level-line:last-child {
+      border-bottom: 0;
+    }
 
-    transparent 74.5%,
-    #1a2534 75%,
-    transparent 75.5%
-  );
-}
+    .connection {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #a9bad0;
+      font-size: 14px;
+    }
 
-#chart{
-  position:absolute;
-  left:10px;
-  right:10px;
-  top:10px;
-  bottom:10px;
-}
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #38d996;
+      display: inline-block;
+    }
 
-.candle{
-  position:absolute;
-  top:0;
-  bottom:0;
-  width:14px;
-}
+    .dot.offline {
+      background: #ffb84d;
+    }
 
-.wick{
-  position:absolute;
-  left:6px;
-  width:2px;
-  background:#d7dee8;
-  border-radius:2px;
-}
+    .footer {
+      color: #687b94;
+      text-align: center;
+      font-size: 12px;
+      padding: 15px 0;
+    }
 
-.body{
-  position:absolute;
-  left:1px;
-  width:12px;
-  min-height:3px;
-  border-radius:2px;
-}
+    .loading {
+      color: #8fa0b7;
+    }
 
-.candleUp .body{
-  background:#61dc96;
-}
+    .error {
+      color: #ff7777;
+    }
 
-.candleDown .body{
-  background:#ff7070;
-}
+    .small {
+      font-size: 12px;
+      color: #71839b;
+      margin-top: 7px;
+    }
 
-.levelLine{
-  position:absolute;
-  left:8px;
-  right:8px;
-  height:0;
-  border-top:2px dashed;
-  z-index:20;
-}
+    @media (max-width: 600px) {
+      .app {
+        padding: 12px;
+      }
 
-.resistanceLine{
-  border-color:#ff7070;
-}
+      .title {
+        font-size: 23px;
+      }
 
-.supportLine{
-  border-color:#61dc96;
-}
+      .price {
+        font-size: 31px;
+      }
 
-.levelTag{
-  position:absolute;
-  right:0;
-  top:-20px;
-  font-size:10px;
-  padding:3px 6px;
-  border-radius:5px;
-  background:#111925;
-  font-weight:bold;
-}
-
-.resistanceTag{
-  color:#ff7070;
-}
-
-.supportTag{
-  color:#61dc96;
-}
-
-.chartLegend{
-  display:flex;
-  gap:15px;
-  flex-wrap:wrap;
-  color:#aeb8c7;
-  font-size:11px;
-  margin-top:10px;
-}
-
-.dot{
-  display:inline-block;
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  margin-right:5px;
-}
-
-.redDot{
-  background:#ff7070;
-}
-
-.greenDot{
-  background:#61dc96;
-}
-
-.yellowDot{
-  background:#f3c96a;
-}
-
-.actionBig{
-  font-size:18px;
-  font-weight:800;
-}
-
-.connection{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.refresh{
-  font-size:12px;
-  color:#8995a8;
-  margin-top:4px;
-}
-
-.footer{
-  color:#667387;
-  font-size:11px;
-  text-align:center;
-  padding:18px 5px;
-}
-
-@media(max-width:600px){
-
-  body{
-    padding:10px;
-  }
-
-  .grid3{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .price{
-    font-size:34px;
-  }
-
-  .chartOuter{
-    height:300px;
-  }
-}
-</style>
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="app">
 
-<div class="header">
-
-  <div class="title">
-    Arpit Market Scanner
+  <div class="header">
+    <div class="title">Arpit Market Scanner</div>
+    <div class="subtitle">
+      Price-action learning & market-structure scanner
+    </div>
   </div>
 
-  <div class="subtitle">
-    Price-action learning & market-structure scanner
+  <div class="notice">
+    EDUCATIONAL / INFORMATIONAL • NSE CM MARKET DATA
+    <div class="small">
+      NSE quote data is provided for informational and educational purposes.
+      5m/15m candle analysis requires an actual intraday candle feed.
+    </div>
   </div>
 
-  <div class="demoNotice">
-    EDUCATIONAL DEMO • INTRADAY CANDLES ARE NOT LIVE MARKET DATA
-  </div>
+  <div class="panel">
 
-</div>
-
-
-<!-- INSTRUMENT -->
-
-<div class="card">
-
-  <div class="sectionTitle">
-    Instrument & Timeframe
-  </div>
-
-  <div class="controls">
+    <div class="label">Instrument & Timeframe</div>
 
     <select id="symbol">
-
-      <option value="NIFTY">
-        NIFTY
-      </option>
-
-      <option value="BANKNIFTY">
-        BANKNIFTY
-      </option>
-
-      <option value="20MICRONS" selected>
-        20MICRONS
-      </option>
-
+      <option value="20MICRONS">20MICRONS</option>
+      <option value="NIFTY">NIFTY</option>
+      <option value="BANKNIFTY">BANKNIFTY</option>
     </select>
 
-    <button id="b5" class="active" type="button">
-      5m
-    </button>
+    <div class="timeframes">
+      <button
+        id="tf5"
+        class="active"
+        type="button"
+      >
+        5m
+      </button>
 
-    <button id="b15" type="button">
-      15m
-    </button>
-
-  </div>
-
-</div>
-
-
-<!-- PRICE -->
-
-<div class="card">
-
-  <div class="sectionTitle">
-    Current Demo Candle Close
-  </div>
-
-  <div id="price" class="price">
-    Loading...
-  </div>
-
-  <div id="mode" class="muted">
-    Loading demo intraday data...
-  </div>
-
-</div>
-
-
-<!-- MARKET STRUCTURE -->
-
-<div class="card">
-
-  <div class="sectionTitle">
-    Market Structure
-  </div>
-
-  <div id="structure" class="actionBig yellow">
-    Loading...
-  </div>
-
-  <div style="height:10px"></div>
-
-  <div class="grid">
-
-    <div class="box">
-
-      <div class="boxTitle">
-        Resistance
-      </div>
-
-      <div id="resistance" class="boxValue red">
-        —
-      </div>
-
+      <button
+        id="tf15"
+        type="button"
+      >
+        15m
+      </button>
     </div>
 
-    <div class="box">
+  </div>
 
-      <div class="boxTitle">
-        Support
+  <div class="panel">
+
+    <div class="label">Current NSE Price</div>
+
+    <div class="price-box">
+
+      <div>
+        <div
+          id="price"
+          class="price"
+        >
+          —
+        </div>
+
+        <div
+          id="priceChange"
+          class="price-change neutral"
+        >
+          —
+        </div>
       </div>
 
-      <div id="support" class="boxValue green">
-        —
+      <div
+        id="dataMode"
+        class="loading"
+      >
+        Loading NSE data...
       </div>
 
     </div>
 
   </div>
 
-</div>
+  <div class="panel">
 
+    <div class="section-title">
+      Market Structure
+    </div>
 
-<!-- CHART -->
+    <div class="grid">
 
-<div class="card">
+      <div class="stat">
+        <div class="stat-title">
+          Structure
+        </div>
 
-  <div class="sectionTitle">
-    Intraday Demo Chart
+        <div
+          id="structure"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          Setup
+        </div>
+
+        <div
+          id="setup"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          Resistance
+        </div>
+
+        <div
+          id="resistance"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          Support
+        </div>
+
+        <div
+          id="support"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+    </div>
+
   </div>
 
-  <div class="chartOuter">
+  <div class="panel">
 
-    <div class="chartGrid"></div>
+    <div class="section-title">
+      Intraday Chart
+    </div>
 
-    <div id="resLine" class="levelLine resistanceLine">
+    <div class="chart">
+      <div>
+        <strong>
+          5m / 15m intraday candles unavailable
+        </strong>
 
-      <span class="levelTag resistanceTag">
-        RESISTANCE
+        <div class="small">
+          The connected NSE CM Market source currently
+          provides quote data, not a candle series.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="panel">
+
+    <div class="section-title">
+      Intraday Analysis
+    </div>
+
+    <div class="grid">
+
+      <div class="stat">
+        <div class="stat-title">
+          Candle Range
+        </div>
+
+        <div
+          id="candleRange"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          Last Volume
+        </div>
+
+        <div
+          id="volume"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          Timeframe
+        </div>
+
+        <div
+          id="timeframe"
+          class="stat-value"
+        >
+          5m
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          Setup Status
+        </div>
+
+        <div
+          id="setupStatus"
+          class="stat-value"
+        >
+          No confirmed setup
+        </div>
+      </div>
+
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="grid">
+
+      <div class="stat">
+        <div class="stat-title">
+          Breakout
+        </div>
+
+        <div
+          id="breakout"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          Retest
+        </div>
+
+        <div
+          id="retest"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          False Breakout
+        </div>
+
+        <div
+          id="falseBreakout"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          Price Action
+        </div>
+
+        <div
+          id="priceAction"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="panel">
+
+    <div class="section-title">
+      Daily NSE Data
+    </div>
+
+    <div class="grid">
+
+      <div class="stat">
+        <div class="stat-title">
+          Open
+        </div>
+
+        <div
+          id="open"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          High
+        </div>
+
+        <div
+          id="high"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          Low
+        </div>
+
+        <div
+          id="low"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          Current / Close
+        </div>
+
+        <div
+          id="close"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          Previous Close
+        </div>
+
+        <div
+          id="previousClose"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          Trade Timestamp
+        </div>
+
+        <div
+          id="tradeDate"
+          class="stat-value"
+        >
+          —
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="panel">
+
+    <div class="section-title">
+      Backend Connection
+    </div>
+
+    <div class="connection">
+
+      <span
+        id="connectionDot"
+        class="dot offline"
+      ></span>
+
+      <span
+        id="connectionText"
+      >
+        Checking backend...
       </span>
 
     </div>
 
-    <div id="supLine" class="levelLine supportLine">
-
-      <span class="levelTag supportTag">
-        SUPPORT
-      </span>
-
-    </div>
-
-    <div id="chart"></div>
-
-  </div>
-
-  <div class="chartLegend">
-
-    <span>
-      <span class="dot redDot"></span>
-      Resistance
-    </span>
-
-    <span>
-      <span class="dot greenDot"></span>
-      Support
-    </span>
-
-    <span>
-      <span class="dot greenDot"></span>
-      Bullish candle
-    </span>
-
-    <span>
-      <span class="dot redDot"></span>
-      Bearish candle
-    </span>
-
-  </div>
-
-</div>
-
-
-<!-- LEVEL ANALYSIS -->
-
-<div class="card">
-
-  <div class="sectionTitle">
-    Intraday Analysis
-  </div>
-
-  <div class="grid3">
-
-    <div class="box">
-
-      <div class="boxTitle">
-        Candle Range
-      </div>
-
-      <div id="range" class="boxValue">
-        —
-      </div>
-
-    </div>
-
-    <div class="box">
-
-      <div class="boxTitle">
-        Last Volume
-      </div>
-
-      <div id="volume" class="boxValue">
-        —
-      </div>
-
-    </div>
-
-    <div class="box">
-
-      <div class="boxTitle">
-        Timeframe
-      </div>
-
-      <div id="timeframe" class="boxValue yellow">
-        —
-      </div>
-
+    <div
+      id="backendMessage"
+      class="small"
+    >
+      —
     </div>
 
   </div>
 
-</div>
+  <div class="panel">
 
-
-<!-- PRICE ACTION -->
-
-<div class="card">
-
-  <div class="sectionTitle">
-    Price Action Classification
-  </div>
-
-  <div class="grid">
-
-    <div class="box">
-
-      <div class="boxTitle">
-        Breakout
-      </div>
-
-      <div id="breakout" class="boxValue">
-        —
-      </div>
-
-    </div>
-
-    <div class="box">
-
-      <div class="boxTitle">
-        Retest
-      </div>
-
-      <div id="retest" class="boxValue">
-        —
-      </div>
-
-    </div>
-
-    <div class="box">
-
-      <div class="boxTitle">
-        False Breakout
-      </div>
-
-      <div id="falseBreakout" class="boxValue">
-        —
-      </div>
-
-    </div>
-
-    <div class="box">
-
-      <div class="boxTitle">
-        Setup Status
-      </div>
-
-      <div id="setupStatus" class="boxValue yellow">
-        —
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- DAILY DATA -->
-
-<div class="card">
-
-  <div class="sectionTitle">
-    Daily NSE Data
-  </div>
-
-  <div class="grid">
-
-    <div class="box">
-      <div class="boxTitle">Open</div>
-      <div id="open" class="boxValue">—</div>
-    </div>
-
-    <div class="box">
-      <div class="boxTitle">High</div>
-      <div id="high" class="boxValue">—</div>
-    </div>
-
-    <div class="box">
-      <div class="boxTitle">Low</div>
-      <div id="low" class="boxValue">—</div>
-    </div>
-
-    <div class="box">
-      <div class="boxTitle">Close</div>
-      <div id="close" class="boxValue">—</div>
-    </div>
-
-    <div class="box">
-      <div class="boxTitle">Previous Close</div>
-      <div id="previousClose" class="boxValue">—</div>
-    </div>
-
-    <div class="box">
-      <div class="boxTitle">Trade Date</div>
-      <div id="date" class="boxValue">—</div>
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- BACKEND -->
-
-<div class="card">
-
-  <div class="sectionTitle">
-    Backend Connection
-  </div>
-
-  <div class="connection">
-
-    <div>
-
-      <div id="connection" class="boxValue yellow">
-        Connecting...
-      </div>
-
-      <div id="lastUpdate" class="refresh">
-        —
-      </div>
-
-    </div>
-
-    <button id="refreshBtn" type="button">
+    <button
+      id="refresh"
+      type="button"
+    >
       Refresh
     </button>
 
   </div>
 
-</div>
-
-
-<div class="footer">
-  Arpit Market Scanner • Educational / informational use
-</div>
+  <div class="footer">
+    Arpit Market Scanner • Educational / informational use
+  </div>
 
 </div>
-
 
 <script>
 
-const API =
+const BACKEND =
   "https://arpit-market-scanner-backend.onrender.com";
 
-let currentInterval = "5m";
+let timeframe = "5m";
 
-const $ =
-  id => document.getElementById(id);
+const $ = id =>
+  document.getElementById(id);
 
+/* =========================================================
+   FORMAT
+========================================================= */
 
-/* NUMBER */
+function formatNumber(value) {
 
-function number(value){
-
-  const n = Number(value);
-
-  if(!Number.isFinite(n)){
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    Number.isNaN(Number(value))
+  ) {
     return "—";
   }
+
+  const n = Number(value);
 
   return n.toLocaleString(
     "en-IN",
     {
-      maximumFractionDigits:2
+      maximumFractionDigits: 2
     }
   );
 }
 
+function formatVolume(value) {
 
-/* COLOR */
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return "—";
+  }
 
-function setColor(element,value){
+  return Number(value).toLocaleString(
+    "en-IN"
+  );
+}
+
+/* =========================================================
+   CLASS
+========================================================= */
+
+function applyDirection(
+  element,
+  value
+) {
+
+  if (!element) return;
 
   element.classList.remove(
-    "green",
-    "red",
-    "yellow"
+    "bullish",
+    "bearish",
+    "neutral"
   );
 
   const text =
-    String(value || "").toLowerCase();
+    String(value || "")
+      .toLowerCase();
 
-  if(
-    text.includes("bearish") ||
-    text.includes("false")
-  ){
-
-    element.classList.add("red");
-
-  }
-
-  else if(
+  if (
     text.includes("bullish") ||
-    text.includes("breakout") ||
-    text.includes("retest")
-  ){
-
-    element.classList.add("green");
-
-  }
-
-  else{
-
-    element.classList.add("yellow");
-
-  }
-}
-
-
-/* CLEAR */
-
-function clearData(message){
-
-  $("price").textContent = "—";
-
-  $("mode").textContent = message;
-
-  $("structure").textContent =
-    "No confirmed data";
-
-  $("structure").className =
-    "actionBig yellow";
-
-  $("resistance").textContent = "—";
-  $("support").textContent = "—";
-
-  $("range").textContent = "—";
-  $("volume").textContent = "—";
-  $("timeframe").textContent = "—";
-
-  $("breakout").textContent = "—";
-  $("retest").textContent = "—";
-  $("falseBreakout").textContent = "—";
-
-  $("setupStatus").textContent =
-    "No confirmed setup";
-
-  $("setupStatus").className =
-    "boxValue yellow";
-
-  $("open").textContent = "—";
-  $("high").textContent = "—";
-  $("low").textContent = "—";
-  $("close").textContent = "—";
-  $("previousClose").textContent = "—";
-  $("date").textContent = "—";
-
-  $("chart").innerHTML = "";
-
-  $("resLine").style.display = "none";
-  $("supLine").style.display = "none";
-}
-
-
-/* FETCH */
-
-async function fetchWithTimeout(
-  url,
-  timeoutMs = 12000
-){
-
-  const controller =
-    new AbortController();
-
-  const timer =
-    setTimeout(
-      () => controller.abort(),
-      timeoutMs
+    text.includes("positive")
+  ) {
+    element.classList.add(
+      "bullish"
     );
-
-  try{
-
-    return await fetch(
-      url,
-      {
-        signal:controller.signal,
-        cache:"no-store"
-      }
+  } else if (
+    text.includes("bearish") ||
+    text.includes("negative")
+  ) {
+    element.classList.add(
+      "bearish"
     );
-
-  }
-
-  finally{
-
-    clearTimeout(timer);
-
+  } else {
+    element.classList.add(
+      "neutral"
+    );
   }
 }
 
+/* =========================================================
+   BACKEND HEALTH
+========================================================= */
 
-/* DAILY DATA */
+async function checkBackend() {
 
-async function loadDaily(symbol){
+  try {
 
-  const response =
-    await fetchWithTimeout(
-      API +
-      "/scanner/" +
-      encodeURIComponent(symbol) +
-      "?t=" +
-      Date.now()
-    );
+    const response =
+      await fetch(
+        `${BACKEND}/health`,
+        {
+          cache: "no-store"
+        }
+      );
 
-  if(!response.ok){
+    if (!response.ok) {
+      throw new Error(
+        `HTTP ${response.status}`
+      );
+    }
 
-    throw new Error(
-      "Daily backend HTTP " +
-      response.status
-    );
+    const data =
+      await response.json();
 
+    $("connectionDot")
+      .classList.remove(
+        "offline"
+      );
+
+    $("connectionText")
+      .textContent =
+      "Backend online";
+
+    $("backendMessage")
+      .textContent =
+      data.mcpStatus?.cmMarket ===
+      "connected"
+        ? "NSE CM Market MCP connected"
+        : "Backend online • NSE MCP connection will be checked with scanner";
+
+    return true;
+
+  } catch (error) {
+
+    $("connectionDot")
+      .classList.add(
+        "offline"
+      );
+
+    $("connectionText")
+      .textContent =
+      "Backend unavailable";
+
+    $("backendMessage")
+      .textContent =
+      error.message;
+
+    return false;
   }
-
-  return await response.json();
 }
 
+/* =========================================================
+   LOAD SCANNER
+========================================================= */
 
-/* INTRADAY DEMO */
-
-async function loadIntraday(symbol){
-
-  const response =
-    await fetchWithTimeout(
-      API +
-      "/intraday/" +
-      encodeURIComponent(symbol) +
-      "?interval=" +
-      encodeURIComponent(currentInterval) +
-      "&t=" +
-      Date.now()
-    );
-
-  if(!response.ok){
-
-    throw new Error(
-      "Intraday backend HTTP " +
-      response.status
-    );
-
-  }
-
-  return await response.json();
-}
-
-
-/* LOAD EVERYTHING */
-
-async function loadScanner(){
+async function loadScanner() {
 
   const symbol =
     $("symbol").value;
 
-  $("connection").textContent =
-    "Connecting...";
+  $("dataMode")
+    .textContent =
+    "Loading NSE data...";
 
-  $("connection").className =
-    "boxValue yellow";
+  $("price")
+    .textContent =
+    "—";
 
+  $("priceChange")
+    .textContent =
+    "—";
 
-  try{
+  $("structure")
+    .textContent =
+    "—";
 
-    /*
-      DAILY DATA
-    */
+  $("setup")
+    .textContent =
+    "—";
 
-    const daily =
-      await loadDaily(symbol);
+  $("resistance")
+    .textContent =
+    "—";
 
+  $("support")
+    .textContent =
+    "—";
 
-    if(
-      daily.status !==
-      "real NSE daily data"
-    ){
+  try {
 
-      clearData(
-        daily.note ||
-        "No NSE daily data available"
+    const response =
+      await fetch(
+        `${BACKEND}/scanner/${encodeURIComponent(symbol)}`,
+        {
+          cache: "no-store"
+        }
       );
 
-      $("connection").textContent =
-        "● Backend online";
+    if (!response.ok) {
+      throw new Error(
+        `Scanner HTTP ${response.status}`
+      );
+    }
 
-      $("connection").className =
-        "boxValue green";
+    const data =
+      await response.json();
 
-      $("lastUpdate").textContent =
-        "No daily data for " +
+    /* -----------------------------------------
+       NO DATA
+    ----------------------------------------- */
+
+    if (
+      data.mode === "no_data" ||
+      data.status ===
+      "stock_not_found"
+    ) {
+
+      $("dataMode")
+        .textContent =
+        "No NSE data for " +
         symbol;
 
-      return;
+      $("backendMessage")
+        .textContent =
+        data.message ||
+        "No data available";
 
+      return;
     }
 
+    /* -----------------------------------------
+       PRICE
+    ----------------------------------------- */
 
-    /*
-      DAILY DISPLAY
-    */
-
-    $("resistance").textContent =
-      number(daily.levels?.resistance);
-
-    $("support").textContent =
-      number(daily.levels?.support);
-
-    $("open").textContent =
-      number(daily.open);
-
-    $("high").textContent =
-      number(daily.high);
-
-    $("low").textContent =
-      number(daily.low);
-
-    $("close").textContent =
-      number(daily.close);
-
-    $("previousClose").textContent =
-      number(daily.previousClose);
-
-    $("date").textContent =
-      daily.date || "—";
-
-
-    /*
-      INTRADAY DATA
-    */
-
-    const intraday =
-      await loadIntraday(symbol);
-
-
-    if(
-      intraday.status !==
-      "demo intraday data" ||
-      !Array.isArray(intraday.candles) ||
-      intraday.candles.length === 0
-    ){
-
-      throw new Error(
-        "No intraday demo candles"
+    $("price")
+      .textContent =
+      formatNumber(
+        data.price
       );
 
+    /* -----------------------------------------
+       CHANGE
+    ----------------------------------------- */
+
+    const change =
+      data.changePercent;
+
+    $("priceChange")
+      .textContent =
+      change === null ||
+      change === undefined
+        ? "—"
+        : `${formatNumber(change)}%`;
+
+    applyDirection(
+      $("priceChange"),
+      change > 0
+        ? "Bullish"
+        : change < 0
+          ? "Bearish"
+          : "Neutral"
+    );
+
+    /* -----------------------------------------
+       MODE
+    ----------------------------------------- */
+
+    if (
+      data.mode ===
+      "nse-cm-market-mcp"
+    ) {
+
+      $("dataMode")
+        .textContent =
+        "NSE CM Market data";
+
+    } else if (
+      data.mode ===
+      "bhavcopy"
+    ) {
+
+      $("dataMode")
+        .textContent =
+        "NSE BhavCopy data";
+
+    } else {
+
+      $("dataMode")
+        .textContent =
+        data.status ||
+        "NSE data";
     }
 
-
-    const candles =
-      intraday.candles;
-
-
-    const last =
-      candles[candles.length - 1];
-
-
-    /*
-      CURRENT PRICE
-    */
-
-    $("price").textContent =
-      number(last.close);
-
-    $("mode").textContent =
-      "Educational demo • " +
-      currentInterval +
-      " • " +
-      intraday.baseDate;
-
-
-    /*
-      STRUCTURE
-    */
+    /* -----------------------------------------
+       STRUCTURE
+    ----------------------------------------- */
 
     const structure =
-      intraday.analysis?.structure ||
+      data.priceAction?.structure ||
       "Neutral";
 
-    $("structure").textContent =
+    $("structure")
+      .textContent =
       structure;
 
-    setColor(
+    applyDirection(
       $("structure"),
       structure
     );
 
+    /* -----------------------------------------
+       SETUP
+    ----------------------------------------- */
 
-    /*
-      INTRADAY RANGE
-    */
-
-    const intradayHigh =
-      Math.max(
-        ...candles.map(
-          c => Number(c.high)
-        )
-      );
-
-    const intradayLow =
-      Math.min(
-        ...candles.map(
-          c => Number(c.low)
-        )
-      );
-
-    const candleRange =
-      Number(last.high) -
-      Number(last.low);
-
-    $("range").textContent =
-      number(candleRange);
-
-    $("volume").textContent =
-      number(last.volume);
-
-    $("timeframe").textContent =
-      currentInterval;
-
-
-    /*
-      PRICE ACTION
-    */
-
-    const breakout =
-      intraday.analysis?.breakout ||
-      "No confirmed breakout";
-
-    const retest =
-      intraday.analysis?.retest ||
-      "No confirmed retest";
-
-    const falseBreakout =
-      intraday.analysis?.falseBreakout ||
-      "No confirmed false breakout";
-
-    const setup =
-      intraday.analysis?.setup ||
+    $("setup")
+      .textContent =
+      data.priceAction?.setup ||
       "No confirmed setup";
 
+    $("setupStatus")
+      .textContent =
+      data.priceAction?.setup ||
+      "No confirmed setup";
 
-    $("breakout").textContent =
-      breakout;
+    /* -----------------------------------------
+       LEVELS
+    ----------------------------------------- */
 
-    $("retest").textContent =
-      retest;
+    $("resistance")
+      .textContent =
+      formatNumber(
+        data.levels?.resistance
+      );
 
-    $("falseBreakout").textContent =
-      falseBreakout;
+    $("support")
+      .textContent =
+      formatNumber(
+        data.levels?.support
+      );
 
-    $("setupStatus").textContent =
-      setup;
+    /* -----------------------------------------
+       DAILY DATA
+    ----------------------------------------- */
 
+    $("open")
+      .textContent =
+      formatNumber(
+        data.open
+      );
 
-    setColor(
-      $("breakout"),
-      breakout
+    $("high")
+      .textContent =
+      formatNumber(
+        data.high
+      );
+
+    $("low")
+      .textContent =
+      formatNumber(
+        data.low
+      );
+
+    $("close")
+      .textContent =
+      formatNumber(
+        data.price ??
+        data.close
+      );
+
+    $("previousClose")
+      .textContent =
+      formatNumber(
+        data.previousClose
+      );
+
+    $("tradeDate")
+      .textContent =
+      data.latestTimestamp ||
+      data.date ||
+      "—";
+
+    /* -----------------------------------------
+       VOLUME
+    ----------------------------------------- */
+
+    $("volume")
+      .textContent =
+      formatVolume(
+        data.volume
+      );
+
+    /* -----------------------------------------
+       RANGE
+    ----------------------------------------- */
+
+    const range =
+      data.levels?.range;
+
+    $("candleRange")
+      .textContent =
+      formatNumber(range);
+
+    /* -----------------------------------------
+       TIMEFRAME
+    ----------------------------------------- */
+
+    $("timeframe")
+      .textContent =
+      timeframe;
+
+    /* -----------------------------------------
+       PRICE ACTION
+    ----------------------------------------- */
+
+    $("priceAction")
+      .textContent =
+      structure;
+
+    applyDirection(
+      $("priceAction"),
+      structure
     );
 
-    setColor(
-      $("retest"),
-      retest
+    /* -----------------------------------------
+       INTRADAY ANALYSIS
+    ----------------------------------------- */
+
+    $("breakout")
+      .textContent =
+      data.priceAction?.breakout ||
+      data.intraday?.breakout ||
+      "Not calculated";
+
+    $("retest")
+      .textContent =
+      data.priceAction?.retest ||
+      data.intraday?.retest ||
+      "Not calculated";
+
+    $("falseBreakout")
+      .textContent =
+      data.priceAction?.falseBreakout ||
+      data.intraday?.falseBreakout ||
+      "Not calculated";
+
+    /* -----------------------------------------
+       BACKEND MESSAGE
+    ----------------------------------------- */
+
+    $("backendMessage")
+      .textContent =
+      data.source ||
+      "NSE data connected";
+
+  } catch (error) {
+
+    $("dataMode")
+      .textContent =
+      "Data loading error";
+
+    $("backendMessage")
+      .textContent =
+      error.message;
+
+    console.error(
+      "Scanner error:",
+      error
     );
-
-    setColor(
-      $("falseBreakout"),
-      falseBreakout
-    );
-
-    setColor(
-      $("setupStatus"),
-      setup
-    );
-
-
-    /*
-      CHART
-    */
-
-    drawIntradayChart(
-      candles,
-      daily.levels?.resistance,
-      daily.levels?.support
-    );
-
-
-    /*
-      CONNECTION
-    */
-
-    $("connection").textContent =
-      "● Backend connected";
-
-    $("connection").className =
-      "boxValue green";
-
-    $("lastUpdate").textContent =
-      "Demo " +
-      currentInterval +
-      " • " +
-      intraday.baseDate +
-      " • " +
-      candles.length +
-      " candles";
-
-
   }
-
-  catch(error){
-
-    clearData(
-      error.name === "AbortError"
-        ? "Backend request timed out"
-        : error.message ||
-          "Backend connection failed"
-    );
-
-    $("connection").textContent =
-      "● Connection failed";
-
-    $("connection").className =
-      "boxValue red";
-
-    $("lastUpdate").textContent =
-      error.message ||
-      "Unknown error";
-
-  }
-
 }
 
+/* =========================================================
+   LOAD EVERYTHING
+========================================================= */
 
-/* INTRADAY CHART */
+async function refreshAll() {
 
-function drawIntradayChart(
-  candles,
-  resistance,
-  support
-){
+  await checkBackend();
 
-  const values = [];
-
-  candles.forEach(
-    candle => {
-
-      values.push(
-        Number(candle.high)
-      );
-
-      values.push(
-        Number(candle.low)
-      );
-
-    }
-  );
-
-
-  if(
-    Number.isFinite(
-      Number(resistance)
-    )
-  ){
-
-    values.push(
-      Number(resistance)
-    );
-
-  }
-
-
-  if(
-    Number.isFinite(
-      Number(support)
-    )
-  ){
-
-    values.push(
-      Number(support)
-    );
-
-  }
-
-
-  if(values.length < 2){
-
-    $("chart").innerHTML = "";
-
-    return;
-
-  }
-
-
-  const max =
-    Math.max(...values);
-
-  const min =
-    Math.min(...values);
-
-  const padding =
-    Math.max(
-      (max - min) * 0.08,
-      0.01
-    );
-
-  const topValue =
-    max + padding;
-
-  const bottomValue =
-    min - padding;
-
-  const range =
-    topValue - bottomValue;
-
-
-  const chart =
-    $("chart");
-
-  chart.innerHTML = "";
-
-
-  function y(value){
-
-    return (
-      (topValue - Number(value))
-      /
-      range
-    ) * 100;
-
-  }
-
-
-  /*
-    DRAW CANDLES
-  */
-
-  const count =
-    candles.length;
-
-
-  candles.forEach(
-    (candle,index) => {
-
-      const open =
-        Number(candle.open);
-
-      const high =
-        Number(candle.high);
-
-      const low =
-        Number(candle.low);
-
-      const close =
-        Number(candle.close);
-
-
-      if(
-        ![
-          open,
-          high,
-          low,
-          close
-        ].every(Number.isFinite)
-      ){
-
-        return;
-
-      }
-
-
-      const candleEl =
-        document.createElement("div");
-
-      candleEl.className =
-        "candle " +
-        (
-          close >= open
-            ? "candleUp"
-            : "candleDown"
-        );
-
-
-      const leftPercent =
-        count === 1
-          ? 50
-          : (
-              index /
-              (count - 1)
-            ) * 100;
-
-
-      candleEl.style.left =
-        "calc(" +
-        leftPercent +
-        "% - 7px)";
-
-
-      /*
-        WICK
-      */
-
-      const wick =
-        document.createElement("div");
-
-      wick.className =
-        "wick";
-
-      wick.style.top =
-        y(high) + "%";
-
-      wick.style.height =
-        Math.max(
-          y(low) - y(high),
-          0.4
-        ) + "%";
-
-
-      /*
-        BODY
-      */
-
-      const body =
-        document.createElement("div");
-
-      body.className =
-        "body";
-
-
-      const bodyTop =
-        y(
-          Math.max(
-            open,
-            close
-          )
-        );
-
-
-      const bodyBottom =
-        y(
-          Math.min(
-            open,
-            close
-          )
-        );
-
-
-      body.style.top =
-        bodyTop + "%";
-
-      body.style.height =
-        Math.max(
-          bodyBottom - bodyTop,
-          1
-        ) + "%";
-
-
-      candleEl.appendChild(wick);
-      candleEl.appendChild(body);
-
-      chart.appendChild(candleEl);
-
-    }
-  );
-
-
-  /*
-    LEVELS
-  */
-
-  placeLevel(
-    "resLine",
-    resistance
-  );
-
-  placeLevel(
-    "supLine",
-    support
-  );
-
-
-  function placeLevel(
-    id,
-    value
-  ){
-
-    const element =
-      $(id);
-
-
-    if(
-      !Number.isFinite(
-        Number(value)
-      )
-    ){
-
-      element.style.display =
-        "none";
-
-      return;
-
-    }
-
-
-    let position =
-      y(value);
-
-
-    position =
-      Math.max(
-        2,
-        Math.min(
-          98,
-          position
-        )
-      );
-
-
-    element.style.display =
-      "block";
-
-    element.style.top =
-      position + "%";
-
-  }
-
+  await loadScanner();
 }
 
+/* =========================================================
+   EVENTS
+========================================================= */
 
-/* 5 MIN */
+$("symbol")
+  .addEventListener(
+    "change",
+    loadScanner
+  );
 
-$("b5").addEventListener(
-  "click",
-  function(){
+$("tf5")
+  .addEventListener(
+    "click",
+    () => {
 
-    currentInterval = "5m";
+      timeframe = "5m";
 
-    $("b5").classList.add(
-      "active"
-    );
+      $("tf5")
+        .classList.add(
+          "active"
+        );
 
-    $("b15").classList.remove(
-      "active"
-    );
+      $("tf15")
+        .classList.remove(
+          "active"
+        );
 
-    loadScanner();
+      $("timeframe")
+        .textContent =
+        "5m";
 
-  }
-);
+      loadScanner();
+    }
+  );
 
+$("tf15")
+  .addEventListener(
+    "click",
+    () => {
 
-/* 15 MIN */
+      timeframe = "15m";
 
-$("b15").addEventListener(
-  "click",
-  function(){
+      $("tf15")
+        .classList.add(
+          "active"
+        );
 
-    currentInterval = "15m";
+      $("tf5")
+        .classList.remove(
+          "active"
+        );
 
-    $("b15").classList.add(
-      "active"
-    );
+      $("timeframe")
+        .textContent =
+        "15m";
 
-    $("b5").classList.remove(
-      "active"
-    );
+      loadScanner();
+    }
+  );
 
-    loadScanner();
+$("refresh")
+  .addEventListener(
+    "click",
+    refreshAll
+  );
 
-  }
-);
+/* =========================================================
+   START
+========================================================= */
 
-
-/* SYMBOL */
-
-$("symbol").addEventListener(
-  "change",
-  loadScanner
-);
-
-
-/* REFRESH */
-
-$("refreshBtn").addEventListener(
-  "click",
-  loadScanner
-);
-
-
-/* START */
-
-loadScanner();
+refreshAll();
 
 </script>
 
