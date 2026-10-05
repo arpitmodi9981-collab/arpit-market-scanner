@@ -3,174 +3,129 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Arpit Market Scanner</title>
 
   <style>
-    * {
-      box-sizing: border-box;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,sans-serif;
+      background:#0b0f14;
+      color:#f2f5f7
     }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b0f14;
-      color: #f2f5f7;
+    .app{
+      max-width:900px;
+      margin:auto;
+      padding:18px
     }
-
-    .app {
-      max-width: 900px;
-      margin: auto;
-      padding: 18px;
+    h1{margin:0;font-size:28px}
+    .subtitle{color:#9ba6b2;margin:6px 0 20px}
+    .card{
+      background:#131922;
+      border:1px solid #27313d;
+      border-radius:14px;
+      padding:16px;
+      margin-bottom:14px
     }
-
-    h1 {
-      margin: 0;
-      font-size: 28px;
+    .title{
+      font-size:18px;
+      font-weight:700;
+      margin-bottom:12px
     }
-
-    .subtitle {
-      color: #9ba6b2;
-      margin: 6px 0 20px;
+    .controls{
+      display:grid;
+      grid-template-columns:1fr 120px 120px;
+      gap:10px
     }
-
-    .card {
-      background: #131922;
-      border: 1px solid #27313d;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 14px;
+    input,select,button{
+      width:100%;
+      min-height:44px;
+      border-radius:9px;
+      border:1px solid #303b48;
+      background:#0d131b;
+      color:#fff;
+      padding:10px;
+      font-size:15px
     }
-
-    .title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 12px;
+    button{
+      cursor:pointer;
+      background:#1c2733;
+      font-weight:700
     }
-
-    .controls {
-      display: grid;
-      grid-template-columns: 1fr 120px 120px;
-      gap: 10px;
+    button:disabled{opacity:.55}
+    .price{
+      font-size:34px;
+      font-weight:800
     }
-
-    input,
-    select,
-    button {
-      width: 100%;
-      min-height: 44px;
-      border-radius: 9px;
-      border: 1px solid #303b48;
-      background: #0d131b;
-      color: #fff;
-      padding: 10px;
-      font-size: 15px;
+    .change{
+      margin-top:5px;
+      font-size:16px
     }
-
-    button {
-      cursor: pointer;
-      background: #1c2733;
-      font-weight: 700;
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px
     }
-
-    button:hover {
-      background: #263442;
+    .metric{
+      background:#0d131b;
+      border-radius:10px;
+      padding:12px
     }
-
-    .price {
-      font-size: 34px;
-      font-weight: 800;
+    .metric-label{
+      color:#8f9ba8;
+      font-size:13px
     }
-
-    .change {
-      margin-top: 5px;
-      font-size: 16px;
-      color: #ff6b6b;
+    .metric-value{
+      font-size:20px;
+      font-weight:700;
+      margin-top:5px
     }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+    .structure{
+      font-size:24px;
+      font-weight:800
     }
-
-    .metric {
-      background: #0d131b;
-      border-radius: 10px;
-      padding: 12px;
+    .status{
+      color:#aeb8c3;
+      font-size:14px;
+      line-height:1.5
     }
-
-    .metric-label {
-      color: #8f9ba8;
-      font-size: 13px;
+    .chart{
+      min-height:180px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      border:1px dashed #35404c;
+      border-radius:10px;
+      color:#8995a2;
+      padding:20px
     }
-
-    .metric-value {
-      font-size: 20px;
-      font-weight: 700;
-      margin-top: 5px;
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap:15px;
+      padding:8px 0;
+      border-bottom:1px solid #202934
     }
-
-    .structure {
-      font-size: 24px;
-      font-weight: 800;
+    .row:last-child{border-bottom:0}
+    .error{color:#ff7373}
+    .ok{color:#78d99b}
+    .upload{
+      display:grid;
+      gap:10px
     }
-
-    .status {
-      color: #aeb8c3;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .chart {
-      min-height: 180px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      border: 1px dashed #35404c;
-      border-radius: 10px;
-      color: #8995a2;
-      padding: 20px;
-    }
-
-    .row {
-      display: flex;
-      justify-content: space-between;
-      gap: 15px;
-      padding: 8px 0;
-      border-bottom: 1px solid #202934;
-    }
-
-    .row:last-child {
-      border-bottom: 0;
-    }
-
-    .error {
-      color: #ff7373;
-    }
-
-    .ok {
-      color: #78d99b;
-    }
-
-    @media (max-width: 650px) {
-      .controls {
-        grid-template-columns: 1fr 1fr;
+    @media(max-width:650px){
+      .controls{
+        grid-template-columns:1fr 1fr
       }
-
-      .controls input {
-        grid-column: 1 / -1;
-      }
-
-      .grid {
-        grid-template-columns: 1fr 1fr;
+      .controls input{
+        grid-column:1/-1
       }
     }
   </style>
 
-  <!-- Browser candle engine -->
   <script src="./candle-engine-browser.js"></script>
+  <script src="./candle-data.js"></script>
 </head>
 
 <body>
@@ -186,27 +141,19 @@
     <div class="title">Instrument & Timeframe</div>
 
     <div class="controls">
-      <input
-        id="symbolInput"
-        value="20MICRONS"
-        placeholder="NSE symbol"
-        autocomplete="off"
-      >
+      <input id="symbolInput" value="20MICRONS" placeholder="NSE symbol">
 
       <select id="timeframe">
         <option value="5m">5m</option>
         <option value="15m">15m</option>
       </select>
 
-      <button id="refreshBtn">
-        Refresh
-      </button>
+      <button id="refreshBtn">Refresh</button>
     </div>
   </div>
 
   <div class="card">
     <div class="title">Current NSE Price</div>
-
     <div id="price" class="price">—</div>
     <div id="symbolLabel">—</div>
     <div id="change" class="change">—</div>
@@ -215,11 +162,9 @@
   <div class="card">
     <div class="title">Market Structure</div>
 
-    <div id="structure" class="structure">
-      —
-    </div>
+    <div id="structure" class="structure">—</div>
 
-    <div class="grid" style="margin-top:12px;">
+    <div class="grid" style="margin-top:12px">
       <div class="metric">
         <div class="metric-label">Resistance</div>
         <div id="resistance" class="metric-value">—</div>
@@ -233,12 +178,31 @@
   </div>
 
   <div class="card">
+    <div class="title">5m / 15m Candle Data</div>
+
+    <div class="upload">
+      <input
+        id="candleFile"
+        type="file"
+        accept=".csv,.json"
+      >
+
+      <button id="analyzeFileBtn">
+        Analyze Candle File
+      </button>
+    </div>
+
+    <div id="fileStatus" class="status" style="margin-top:10px">
+      Select an OHLC CSV or JSON candle file.
+    </div>
+  </div>
+
+  <div class="card">
     <div class="title">Intraday Chart</div>
 
     <div id="chart" class="chart">
-      Actual 5m / 15m NSE candles are not connected yet.
-      <br><br>
-      No artificial candles are displayed.
+      Actual 5m / 15m candles will appear here after
+      valid candle data is loaded.
     </div>
   </div>
 
@@ -280,17 +244,17 @@
 
     <div class="row">
       <span>Breakout</span>
-      <strong id="breakout">Intraday candles unavailable</strong>
+      <strong id="breakout">—</strong>
     </div>
 
     <div class="row">
       <span>Retest</span>
-      <strong id="retest">Intraday candles unavailable</strong>
+      <strong id="retest">—</strong>
     </div>
 
     <div class="row">
       <span>False Breakout</span>
-      <strong id="falseBreakout">Intraday candles unavailable</strong>
+      <strong id="falseBreakout">—</strong>
     </div>
 
     <div class="row">
@@ -336,7 +300,7 @@
 
     </div>
 
-    <div id="timestamp" class="status" style="margin-top:12px;">
+    <div id="timestamp" class="status" style="margin-top:12px">
       Trade Timestamp: —
     </div>
   </div>
@@ -362,254 +326,400 @@
 </div>
 
 <script>
-  const BACKEND =
-    "https://arpit-market-scanner-backend.onrender.com";
 
-  const $ = (id) => document.getElementById(id);
+const BACKEND =
+  "https://arpit-market-scanner-backend.onrender.com";
 
-  function number(value, digits = 2) {
-    const n = Number(value);
+const $ = (id) => document.getElementById(id);
 
-    if (!Number.isFinite(n)) {
-      return "—";
+function number(value, digits = 2) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n.toFixed(digits) : "—";
+}
+
+function integer(value) {
+  const n = Number(value);
+  return Number.isFinite(n)
+    ? n.toLocaleString("en-IN")
+    : "—";
+}
+
+function setText(id, value) {
+  $(id).textContent =
+    value === undefined ||
+    value === null ||
+    value === ""
+      ? "—"
+      : value;
+}
+
+
+/* -----------------------------
+   NSE LIVE DATA
+----------------------------- */
+
+async function loadScanner() {
+
+  const symbol =
+    $("symbolInput")
+      .value
+      .trim()
+      .toUpperCase();
+
+  const timeframe =
+    $("timeframe").value;
+
+  if (!symbol) {
+    $("backendStatus").textContent =
+      "Enter an NSE symbol.";
+    return;
+  }
+
+  $("refreshBtn").disabled = true;
+  $("refreshBtn").textContent = "Loading...";
+
+  setText("tfLabel", timeframe);
+
+  try {
+
+    const response = await fetch(
+      `${BACKEND}/scanner/${encodeURIComponent(symbol)}`,
+      {
+        cache: "no-store"
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Backend HTTP ${response.status}`
+      );
     }
 
-    return n.toFixed(digits);
+    const data = await response.json();
+
+    setText("price", number(data.price));
+    setText("symbolLabel", data.symbol);
+
+    setText(
+      "change",
+      data.changePercent !== undefined
+        ? `${number(data.changePercent)}%`
+        : "—"
+    );
+
+    setText(
+      "structure",
+      data.priceAction?.structure ||
+      "Neutral"
+    );
+
+    setText(
+      "resistance",
+      number(data.levels?.resistance)
+    );
+
+    setText(
+      "support",
+      number(data.levels?.support)
+    );
+
+    setText("open", number(data.open));
+    setText("high", number(data.high));
+    setText("low", number(data.low));
+    setText("close", number(data.price));
+    setText(
+      "previousClose",
+      number(data.previousClose)
+    );
+
+    setText(
+      "dailyVolume",
+      integer(data.volume)
+    );
+
+    setText(
+      "timestamp",
+      `Trade Timestamp: ${
+        data.latestTimestamp || "—"
+      }`
+    );
+
+    setText(
+      "paStructure",
+      data.priceAction?.structure ||
+      "Neutral"
+    );
+
+    $("backendStatus").textContent =
+      "Backend online";
+
+    $("backendStatus").className =
+      "status ok";
+
+    $("nseStatus").textContent =
+      "NSE CM Market MCP: connected";
+
+    $("nseStatus").className =
+      "status ok";
+
+  } catch (error) {
+
+    console.error(error);
+
+    $("backendStatus").textContent =
+      `Backend error: ${error.message}`;
+
+    $("backendStatus").className =
+      "status error";
+
+    $("nseStatus").textContent =
+      "NSE CM Market MCP: unavailable";
+
+    $("nseStatus").className =
+      "status error";
+
+  } finally {
+
+    $("refreshBtn").disabled = false;
+    $("refreshBtn").textContent = "Refresh";
+  }
+}
+
+
+/* -----------------------------
+   CANDLE FILE ANALYSIS
+----------------------------- */
+
+async function analyzeCandleFile() {
+
+  const file =
+    $("candleFile").files[0];
+
+  if (!file) {
+    $("fileStatus").textContent =
+      "Please select a CSV or JSON candle file.";
+
+    $("fileStatus").className =
+      "status error";
+
+    return;
   }
 
-  function integer(value) {
-    const n = Number(value);
+  if (
+    !window.CandleData ||
+    !window.CandleEngine
+  ) {
+    $("fileStatus").textContent =
+      "Candle modules are not loaded.";
 
-    if (!Number.isFinite(n)) {
-      return "—";
+    $("fileStatus").className =
+      "status error";
+
+    return;
+  }
+
+  $("analyzeFileBtn").disabled = true;
+  $("analyzeFileBtn").textContent =
+    "Analyzing...";
+
+  try {
+
+    const result =
+      await window.CandleData.readFile(file);
+
+    if (
+      result.status !== "ok" ||
+      result.count < 5
+    ) {
+      throw new Error(
+        "At least 5 valid OHLC candles are required."
+      );
     }
-
-    return n.toLocaleString("en-IN");
-  }
-
-  function setText(id, value) {
-    $(id).textContent =
-      value === undefined || value === null || value === ""
-        ? "—"
-        : value;
-  }
-
-  async function loadScanner() {
-    const symbol =
-      $("symbolInput").value.trim().toUpperCase();
 
     const timeframe =
       $("timeframe").value;
 
-    if (!symbol) {
-      setText("backendStatus", "Enter an NSE symbol.");
-      return;
+    const analysis =
+      window.CandleEngine
+        .calculateCandleEngine(
+          result.candles,
+          timeframe
+        );
+
+    if (analysis.status !== "ok") {
+      throw new Error(
+        analysis.message ||
+        "Candle analysis failed."
+      );
     }
 
-    $("refreshBtn").disabled = true;
-    $("refreshBtn").textContent = "Loading...";
+    const latest =
+      analysis.latest;
 
-    setText("tfLabel", timeframe);
+    setText(
+      "candleRange",
+      number(latest.range)
+    );
 
-    try {
-      const response = await fetch(
-        `${BACKEND}/scanner/${encodeURIComponent(symbol)}`
-      );
+    setText(
+      "volume",
+      integer(latest.volume)
+    );
 
-      if (!response.ok) {
-        throw new Error(
-          `Backend HTTP ${response.status}`
-        );
-      }
+    setText(
+      "tfLabel",
+      analysis.timeframe
+    );
 
-      const data = await response.json();
+    setText(
+      "candleDirection",
+      latest.direction
+    );
 
-      if (!data || !data.price) {
-        throw new Error(
-          "NSE data was not returned."
-        );
-      }
+    setText(
+      "paStructure",
+      analysis.structure.market
+    );
 
-      setText("price", number(data.price));
-      setText("symbolLabel", data.symbol);
+    setText(
+      "breakout",
+      analysis.priceAction.breakout
+    );
 
-      setText(
-        "change",
-        `${number(data.changePercent)}%`
-      );
+    setText(
+      "retest",
+      analysis.priceAction.retest
+    );
 
-      setText(
-        "structure",
-        data.priceAction?.structure ||
-        data.levels?.strength ||
-        "Neutral"
-      );
+    setText(
+      "falseBreakout",
+      analysis.priceAction.falseBreakout
+    );
 
-      setText(
-        "resistance",
-        number(data.levels?.resistance)
-      );
+    let setup =
+      "No confirmed setup";
 
-      setText(
-        "support",
-        number(data.levels?.support)
-      );
-
-      setText(
-        "open",
-        number(data.open)
-      );
-
-      setText(
-        "high",
-        number(data.high)
-      );
-
-      setText(
-        "low",
-        number(data.low)
-      );
-
-      setText(
-        "close",
-        number(data.price)
-      );
-
-      setText(
-        "previousClose",
-        number(data.previousClose)
-      );
-
-      setText(
-        "dailyVolume",
-        integer(data.volume)
-      );
-
-      setText(
-        "timestamp",
-        `Trade Timestamp: ${
-          data.latestTimestamp || "—"
-        }`
-      );
-
-      setText(
-        "paStructure",
-        data.priceAction?.structure || "Neutral"
-      );
-
-      setText(
-        "breakout",
-        data.priceAction?.breakout ||
-        "Intraday candles unavailable"
-      );
-
-      setText(
-        "retest",
-        data.priceAction?.retest ||
-        "Intraday candles unavailable"
-      );
-
-      setText(
-        "falseBreakout",
-        data.priceAction?.falseBreakout ||
-        "Intraday candles unavailable"
-      );
-
-      setText(
-        "setup",
-        data.priceAction?.setup ||
-        data.priceAction?.structure ||
-        "No confirmed setup"
-      );
-
-      setText(
-        "candleRange",
-        number(data.levels?.range)
-      );
-
-      setText(
-        "volume",
-        integer(data.volume)
-      );
-
-      setText(
-        "candleDirection",
-        "Intraday candles unavailable"
-      );
-
-      $("backendStatus").textContent =
-        "Backend online";
-
-      $("backendStatus").className =
-        "status ok";
-
-      $("nseStatus").textContent =
-        "NSE CM Market MCP: connected";
-
-      $("nseStatus").className =
-        "status ok";
-
-      $("chart").innerHTML =
-        "Actual 5m / 15m NSE candles are not connected yet." +
-        "<br><br>" +
-        "No artificial candles are displayed.";
-
-    } catch (error) {
-
-      console.error(error);
-
-      $("backendStatus").textContent =
-        `Backend error: ${error.message}`;
-
-      $("backendStatus").className =
-        "status error";
-
-      $("nseStatus").textContent =
-        "NSE CM Market MCP: unavailable";
-
-      $("nseStatus").className =
-        "status error";
-
-    } finally {
-
-      $("refreshBtn").disabled = false;
-      $("refreshBtn").textContent = "Refresh";
+    if (
+      analysis.priceAction.retest !==
+      "No confirmed retest"
+    ) {
+      setup =
+        analysis.priceAction.retest;
+    } else if (
+      analysis.priceAction.breakout !==
+      "No confirmed breakout"
+    ) {
+      setup =
+        analysis.priceAction.breakout;
+    } else {
+      setup =
+        `${analysis.structure.market} structure`;
     }
+
+    setText("setup", setup);
+
+    setText(
+      "resistance",
+      number(analysis.levels.resistance)
+    );
+
+    setText(
+      "support",
+      number(analysis.levels.support)
+    );
+
+    $("chart").innerHTML =
+      `Loaded ${result.count} candles<br><br>` +
+      `Source: ${result.fileName}`;
+
+    $("fileStatus").textContent =
+      `Successfully loaded ${result.count} candles from ${result.fileName}.`;
+
+    $("fileStatus").className =
+      "status ok";
+
+  } catch (error) {
+
+    console.error(error);
+
+    $("fileStatus").textContent =
+      `Candle analysis error: ${error.message}`;
+
+    $("fileStatus").className =
+      "status error";
+
+  } finally {
+
+    $("analyzeFileBtn").disabled = false;
+    $("analyzeFileBtn").textContent =
+      "Analyze Candle File";
   }
+}
 
-  $("refreshBtn")
-    .addEventListener("click", loadScanner);
 
-  $("symbolInput")
-    .addEventListener("keydown", (event) => {
+/* -----------------------------
+   EVENTS
+----------------------------- */
+
+$("refreshBtn")
+  .addEventListener(
+    "click",
+    loadScanner
+  );
+
+$("analyzeFileBtn")
+  .addEventListener(
+    "click",
+    analyzeCandleFile
+  );
+
+$("symbolInput")
+  .addEventListener(
+    "keydown",
+    (event) => {
       if (event.key === "Enter") {
         loadScanner();
       }
-    });
+    }
+  );
 
-  $("timeframe")
-    .addEventListener("change", () => {
+$("timeframe")
+  .addEventListener(
+    "change",
+    () => {
       setText(
         "tfLabel",
         $("timeframe").value
       );
-    });
+    }
+  );
 
-  // Verify browser candle engine loaded.
-  if (
-    window.CandleEngine &&
-    typeof window.CandleEngine.calculateCandleEngine === "function"
-  ) {
-    console.log(
-      "Candle Engine loaded successfully."
-    );
-  } else {
-    console.warn(
-      "Candle Engine browser module not loaded."
-    );
-  }
 
-  loadScanner();
+/* -----------------------------
+   MODULE CHECK
+----------------------------- */
+
+console.log(
+  "Candle Engine:",
+  window.CandleEngine
+    ? "loaded"
+    : "missing"
+);
+
+console.log(
+  "Candle Data:",
+  window.CandleData
+    ? "loaded"
+    : "missing"
+);
+
+
+/* -----------------------------
+   START
+----------------------------- */
+
+loadScanner();
+
 </script>
 
 </body>
