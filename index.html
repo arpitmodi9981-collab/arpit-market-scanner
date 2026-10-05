@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Arpit Market Scanner</title>
 
@@ -16,1230 +13,603 @@
 
     body {
       margin: 0;
-      background: #080b12;
-      color: #f4f7fb;
-      font-family:
-        Inter,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-    }
-
-    button,
-    input,
-    select {
-      font: inherit;
+      font-family: Arial, sans-serif;
+      background: #0b0f14;
+      color: #f2f5f7;
     }
 
     .app {
-      width: 100%;
-      max-width: 1100px;
+      max-width: 900px;
       margin: auto;
       padding: 18px;
     }
 
-    header {
-      margin-bottom: 18px;
-    }
-
-    .title {
+    h1 {
+      margin: 0;
       font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
     }
 
     .subtitle {
-      color: #8d98aa;
-      margin-top: 5px;
-      font-size: 14px;
+      color: #9ba6b2;
+      margin: 6px 0 20px;
     }
 
-    .notice {
-      margin-top: 12px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: #111722;
-      border: 1px solid #242c3a;
-      color: #aeb8c8;
-      font-size: 12px;
+    .card {
+      background: #131922;
+      border: 1px solid #27313d;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
     }
 
     .controls {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr 120px 120px;
       gap: 10px;
-      margin-bottom: 14px;
     }
 
-    .control-box {
-      background: #10151f;
-      border: 1px solid #252d3a;
-      border-radius: 12px;
-      padding: 12px;
-    }
-
-    label {
-      display: block;
-      color: #8995a8;
-      font-size: 12px;
-      margin-bottom: 7px;
-    }
-
+    input,
     select,
-    input {
+    button {
       width: 100%;
       min-height: 44px;
-      background: #080c13;
-      color: #fff;
-      border: 1px solid #303948;
       border-radius: 9px;
-      padding: 0 12px;
-      outline: none;
+      border: 1px solid #303b48;
+      background: #0d131b;
+      color: #fff;
+      padding: 10px;
+      font-size: 15px;
     }
 
     button {
-      min-height: 44px;
-      border: 0;
-      border-radius: 9px;
-      padding: 0 18px;
-      background: #e8edf5;
-      color: #080b12;
-      font-weight: 700;
       cursor: pointer;
+      background: #1c2733;
+      font-weight: 700;
     }
 
-    button:disabled {
-      opacity: .5;
-      cursor: not-allowed;
+    button:hover {
+      background: #263442;
     }
 
-    .symbol-row {
-      display: flex;
-      gap: 8px;
+    .price {
+      font-size: 34px;
+      font-weight: 800;
     }
 
-    .symbol-row input {
-      flex: 1;
-    }
-
-    .timeframes {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .tf {
-      flex: 1;
-      background: #0a0f17;
-      color: #9aa6b8;
-      border: 1px solid #2a3342;
-    }
-
-    .tf.active {
-      background: #e8edf5;
-      color: #080b12;
+    .change {
+      margin-top: 5px;
+      font-size: 16px;
+      color: #ff6b6b;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .card {
-      background: #10151f;
-      border: 1px solid #252d3a;
-      border-radius: 12px;
-      padding: 14px;
-      min-width: 0;
-    }
-
-    .label {
-      color: #8792a5;
-      font-size: 12px;
-      margin-bottom: 7px;
-    }
-
-    .value {
-      font-size: 22px;
-      font-weight: 800;
-      word-break: break-word;
-    }
-
-    .small {
-      font-size: 13px;
-      color: #9da8b8;
-    }
-
-    .positive {
-      color: #5ee39a;
-    }
-
-    .negative {
-      color: #ff7272;
-    }
-
-    .neutral {
-      color: #c8d0dc;
-    }
-
-    .section {
-      background: #10151f;
-      border: 1px solid #252d3a;
-      border-radius: 12px;
-      padding: 15px;
-      margin-top: 10px;
-    }
-
-    .section-title {
-      font-size: 15px;
-      font-weight: 750;
-      margin-bottom: 13px;
-    }
-
-    .levels {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
     }
 
-    .level {
-      border: 1px solid #2b3442;
+    .metric {
+      background: #0d131b;
       border-radius: 10px;
-      padding: 13px;
+      padding: 12px;
     }
 
-    .level .value {
+    .metric-label {
+      color: #8f9ba8;
+      font-size: 13px;
+    }
+
+    .metric-value {
       font-size: 20px;
+      font-weight: 700;
+      margin-top: 5px;
+    }
+
+    .structure {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .status {
+      color: #aeb8c3;
+      font-size: 14px;
+      line-height: 1.5;
     }
 
     .chart {
-      position: relative;
-      height: 250px;
-      border-radius: 10px;
-      border: 1px solid #242d3b;
-      background:
-        linear-gradient(
-          rgba(255,255,255,.035) 1px,
-          transparent 1px
-        ),
-        linear-gradient(
-          90deg,
-          rgba(255,255,255,.035) 1px,
-          transparent 1px
-        );
-      background-size: 50px 50px;
-      overflow: hidden;
-    }
-
-    .chart-message {
-      position: absolute;
-      inset: 0;
+      min-height: 180px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 20px;
-      color: #8995a8;
-      font-size: 13px;
-    }
-
-    .line {
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 1px;
-    }
-
-    .resistance-line {
-      background: #ff6f6f;
-      top: 28%;
-    }
-
-    .support-line {
-      background: #58d997;
-      top: 72%;
-    }
-
-    .line-label {
-      position: absolute;
-      right: 8px;
-      transform: translateY(-50%);
-      font-size: 11px;
-      padding: 3px 6px;
-      border-radius: 5px;
-      background: #0b1018;
-    }
-
-    .resistance-label {
-      top: 28%;
-      color: #ff7d7d;
-    }
-
-    .support-label {
-      top: 72%;
-      color: #62df9d;
-    }
-
-    .analysis-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    .analysis-card {
-      border: 1px solid #2a3340;
+      border: 1px dashed #35404c;
       border-radius: 10px;
-      padding: 12px;
-      background: #0d121a;
+      color: #8995a2;
+      padding: 20px;
     }
 
-    .analysis-card .heading {
-      font-size: 11px;
-      color: #7f8b9d;
-      margin-bottom: 7px;
-    }
-
-    .analysis-card .text {
-      font-size: 13px;
-      font-weight: 650;
-    }
-
-    .status-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      color: #aab4c3;
-      font-size: 13px;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #6d7788;
-    }
-
-    .dot.online {
-      background: #55df96;
-    }
-
-    .dot.error {
-      background: #ff6969;
-    }
-
-    .data-table {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1px 20px;
-    }
-
-    .data-row {
+    .row {
       display: flex;
       justify-content: space-between;
-      gap: 10px;
-      padding: 9px 0;
-      border-bottom: 1px solid #1d2530;
-      font-size: 13px;
+      gap: 15px;
+      padding: 8px 0;
+      border-bottom: 1px solid #202934;
     }
 
-    .data-row span:first-child {
-      color: #8792a4;
+    .row:last-child {
+      border-bottom: 0;
     }
 
-    .data-row span:last-child {
-      font-weight: 650;
-      text-align: right;
+    .error {
+      color: #ff7373;
     }
 
-    footer {
-      padding: 18px 0 5px;
-      text-align: center;
-      color: #677285;
-      font-size: 11px;
+    .ok {
+      color: #78d99b;
     }
 
-    .loading {
-      opacity: .6;
-    }
-
-    @media (max-width: 800px) {
-      .grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .analysis-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .data-table {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 560px) {
-      .app {
-        padding: 12px;
-      }
-
-      .title {
-        font-size: 23px;
-      }
-
+    @media (max-width: 650px) {
       .controls {
-        grid-template-columns: 1fr;
-      }
-
-      .grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .value {
-        font-size: 19px;
-      }
-
-      .analysis-grid {
         grid-template-columns: 1fr 1fr;
       }
 
-      .chart {
-        height: 220px;
+      .controls input {
+        grid-column: 1 / -1;
+      }
+
+      .grid {
+        grid-template-columns: 1fr 1fr;
       }
     }
   </style>
+
+  <!-- Browser candle engine -->
+  <script src="./candle-engine-browser.js"></script>
 </head>
 
 <body>
 
 <div class="app">
 
-  <header>
-    <div class="title">Arpit Market Scanner</div>
+  <h1>Arpit Market Scanner</h1>
+  <div class="subtitle">
+    Price-action learning & market-structure scanner
+  </div>
 
-    <div class="subtitle">
-      Price-action learning & market-structure scanner
-    </div>
+  <div class="card">
+    <div class="title">Instrument & Timeframe</div>
 
-    <div class="notice">
-      EDUCATIONAL / INFORMATIONAL • NSE CM MARKET DATA •
-      Actual 5m / 15m candle feed is not connected yet.
-    </div>
-  </header>
-
-
-  <div class="controls">
-
-    <div class="control-box">
-
-      <label>Instrument</label>
-
-      <div class="symbol-row">
-        <input
-          id="symbol"
-          value="20MICRONS"
-          placeholder="Enter NSE symbol"
-          autocomplete="off"
-        />
-
-        <button id="scanBtn">
-          Scan
-        </button>
-      </div>
-
-      <div class="timeframes">
-
-        <button
-          class="tf active"
-          data-timeframe="5m"
-          type="button"
-        >
-          5m
-        </button>
-
-        <button
-          class="tf"
-          data-timeframe="15m"
-          type="button"
-        >
-          15m
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <div class="control-box">
-
-      <label>Auto Refresh</label>
-
-      <button
-        id="refreshBtn"
-        type="button"
+    <div class="controls">
+      <input
+        id="symbolInput"
+        value="20MICRONS"
+        placeholder="NSE symbol"
+        autocomplete="off"
       >
+
+      <select id="timeframe">
+        <option value="5m">5m</option>
+        <option value="15m">15m</option>
+      </select>
+
+      <button id="refreshBtn">
         Refresh
       </button>
-
     </div>
-
   </div>
 
+  <div class="card">
+    <div class="title">Current NSE Price</div>
 
-  <div class="grid">
-
-    <div class="card">
-      <div class="label">Current NSE Price</div>
-      <div
-        id="price"
-        class="value"
-      >
-        —
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="label">Change</div>
-      <div
-        id="change"
-        class="value"
-      >
-        —
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="label">Market Structure</div>
-      <div
-        id="structure"
-        class="value"
-      >
-        —
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="label">Volume</div>
-      <div
-        id="volume"
-        class="value"
-      >
-        —
-      </div>
-    </div>
-
+    <div id="price" class="price">—</div>
+    <div id="symbolLabel">—</div>
+    <div id="change" class="change">—</div>
   </div>
 
+  <div class="card">
+    <div class="title">Market Structure</div>
 
-  <div class="section">
-
-    <div class="section-title">
-      Support & Resistance
+    <div id="structure" class="structure">
+      —
     </div>
 
-    <div class="levels">
-
-      <div class="level">
-        <div class="label">
-          Resistance
-        </div>
-
-        <div
-          id="resistance"
-          class="value"
-        >
-          —
-        </div>
+    <div class="grid" style="margin-top:12px;">
+      <div class="metric">
+        <div class="metric-label">Resistance</div>
+        <div id="resistance" class="metric-value">—</div>
       </div>
 
-      <div class="level">
-        <div class="label">
-          Support
-        </div>
-
-        <div
-          id="support"
-          class="value"
-        >
-          —
-        </div>
+      <div class="metric">
+        <div class="metric-label">Support</div>
+        <div id="support" class="metric-value">—</div>
       </div>
-
     </div>
-
   </div>
 
+  <div class="card">
+    <div class="title">Intraday Chart</div>
 
-  <div class="section">
-
-    <div class="section-title">
-      Intraday Chart
+    <div id="chart" class="chart">
+      Actual 5m / 15m NSE candles are not connected yet.
+      <br><br>
+      No artificial candles are displayed.
     </div>
-
-    <div class="chart">
-
-      <div class="line resistance-line"></div>
-
-      <div class="line support-line"></div>
-
-      <div
-        id="resistanceLabel"
-        class="line-label resistance-label"
-      >
-        Resistance
-      </div>
-
-      <div
-        id="supportLabel"
-        class="line-label support-label"
-      >
-        Support
-      </div>
-
-      <div class="chart-message">
-        Actual 5m / 15m NSE candles are not connected yet.<br>
-        No artificial candles are displayed.
-      </div>
-
-    </div>
-
   </div>
 
+  <div class="card">
+    <div class="title">Intraday Analysis</div>
 
-  <div class="section">
+    <div class="grid">
 
-    <div class="section-title">
-      Intraday Analysis
-    </div>
-
-    <div class="analysis-grid">
-
-      <div class="analysis-card">
-        <div class="heading">
-          Candle Range
-        </div>
-
-        <div
-          id="range"
-          class="text"
-        >
-          —
-        </div>
+      <div class="metric">
+        <div class="metric-label">Candle Range</div>
+        <div id="candleRange" class="metric-value">—</div>
       </div>
 
-      <div class="analysis-card">
-        <div class="heading">
-          Timeframe
-        </div>
-
-        <div
-          id="timeframe"
-          class="text"
-        >
-          5m
-        </div>
+      <div class="metric">
+        <div class="metric-label">Last Volume</div>
+        <div id="volume" class="metric-value">—</div>
       </div>
 
-      <div class="analysis-card">
-        <div class="heading">
-          Breakout
-        </div>
-
-        <div
-          id="breakout"
-          class="text"
-        >
-          —
-        </div>
+      <div class="metric">
+        <div class="metric-label">Timeframe</div>
+        <div id="tfLabel" class="metric-value">5m</div>
       </div>
 
-      <div class="analysis-card">
-        <div class="heading">
-          Retest
-        </div>
-
-        <div
-          id="retest"
-          class="text"
-        >
-          —
-        </div>
-      </div>
-
-      <div class="analysis-card">
-        <div class="heading">
-          False Breakout
-        </div>
-
-        <div
-          id="falseBreakout"
-          class="text"
-        >
-          —
-        </div>
-      </div>
-
-      <div class="analysis-card">
-        <div class="heading">
-          Setup Status
-        </div>
-
-        <div
-          id="setup"
-          class="text"
-        >
-          —
-        </div>
+      <div class="metric">
+        <div class="metric-label">Candle Direction</div>
+        <div id="candleDirection" class="metric-value">—</div>
       </div>
 
     </div>
-
   </div>
 
+  <div class="card">
+    <div class="title">Price Action Classification</div>
 
-  <div class="section">
-
-    <div class="section-title">
-      NSE Market Data
+    <div class="row">
+      <span>Structure</span>
+      <strong id="paStructure">—</strong>
     </div>
 
-    <div class="data-table">
-
-      <div class="data-row">
-        <span>Symbol</span>
-        <span id="dataSymbol">—</span>
-      </div>
-
-      <div class="data-row">
-        <span>Open</span>
-        <span id="open">—</span>
-      </div>
-
-      <div class="data-row">
-        <span>High</span>
-        <span id="high">—</span>
-      </div>
-
-      <div class="data-row">
-        <span>Low</span>
-        <span id="low">—</span>
-      </div>
-
-      <div class="data-row">
-        <span>Previous Close</span>
-        <span id="previousClose">—</span>
-      </div>
-
-      <div class="data-row">
-        <span>52W High</span>
-        <span id="weekHigh">—</span>
-      </div>
-
-      <div class="data-row">
-        <span>52W Low</span>
-        <span id="weekLow">—</span>
-      </div>
-
-      <div class="data-row">
-        <span>Trade Timestamp</span>
-        <span id="timestamp">—</span>
-      </div>
-
+    <div class="row">
+      <span>Breakout</span>
+      <strong id="breakout">Intraday candles unavailable</strong>
     </div>
 
+    <div class="row">
+      <span>Retest</span>
+      <strong id="retest">Intraday candles unavailable</strong>
+    </div>
+
+    <div class="row">
+      <span>False Breakout</span>
+      <strong id="falseBreakout">Intraday candles unavailable</strong>
+    </div>
+
+    <div class="row">
+      <span>Setup Status</span>
+      <strong id="setup">—</strong>
+    </div>
   </div>
 
+  <div class="card">
+    <div class="title">Daily NSE Data</div>
 
-  <div class="section">
+    <div class="grid">
 
-    <div class="status-row">
-
-      <div class="status">
-        <span
-          id="backendDot"
-          class="dot"
-        ></span>
-
-        <span id="backendStatus">
-          Backend checking...
-        </span>
+      <div class="metric">
+        <div class="metric-label">Open</div>
+        <div id="open" class="metric-value">—</div>
       </div>
 
-      <div class="small">
-        Source: NSE CM Market MCP
+      <div class="metric">
+        <div class="metric-label">High</div>
+        <div id="high" class="metric-value">—</div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-label">Low</div>
+        <div id="low" class="metric-value">—</div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-label">Close / Last Price</div>
+        <div id="close" class="metric-value">—</div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-label">Previous Close</div>
+        <div id="previousClose" class="metric-value">—</div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-label">Volume</div>
+        <div id="dailyVolume" class="metric-value">—</div>
       </div>
 
     </div>
 
+    <div id="timestamp" class="status" style="margin-top:12px;">
+      Trade Timestamp: —
+    </div>
   </div>
 
+  <div class="card">
+    <div class="title">Backend Connection</div>
 
-  <footer>
-    Arpit Market Scanner • Educational / informational use
-  </footer>
+    <div id="backendStatus" class="status">
+      Checking backend...
+    </div>
+
+    <div id="nseStatus" class="status">
+      NSE CM Market MCP: —
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="status">
+      Arpit Market Scanner • Educational / informational use
+    </div>
+  </div>
 
 </div>
 
-
 <script>
+  const BACKEND =
+    "https://arpit-market-scanner-backend.onrender.com";
 
-const BACKEND =
-  "https://arpit-market-scanner-backend.onrender.com";
+  const $ = (id) => document.getElementById(id);
 
+  function number(value, digits = 2) {
+    const n = Number(value);
 
-let selectedTimeframe = "5m";
+    if (!Number.isFinite(n)) {
+      return "—";
+    }
 
-
-const $ = id =>
-  document.getElementById(id);
-
-
-function money(value) {
-
-  if (
-    value === null ||
-    value === undefined ||
-    !Number.isFinite(Number(value))
-  ) {
-    return "—";
+    return n.toFixed(digits);
   }
 
-  return Number(value).toFixed(2);
-}
+  function integer(value) {
+    const n = Number(value);
 
+    if (!Number.isFinite(n)) {
+      return "—";
+    }
 
-function integer(value) {
-
-  if (
-    value === null ||
-    value === undefined ||
-    !Number.isFinite(Number(value))
-  ) {
-    return "—";
+    return n.toLocaleString("en-IN");
   }
 
-  return Number(value).toLocaleString("en-IN");
-}
-
-
-function percent(value) {
-
-  if (
-    value === null ||
-    value === undefined ||
-    !Number.isFinite(Number(value))
-  ) {
-    return "—";
-  }
-
-  const n = Number(value);
-
-  return `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
-}
-
-
-function setClass(element, type) {
-
-  element.classList.remove(
-    "positive",
-    "negative",
-    "neutral"
-  );
-
-  element.classList.add(type);
-}
-
-
-function setText(id, value) {
-
-  const element = $(id);
-
-  if (element) {
-    element.textContent =
-      value === null ||
-      value === undefined ||
-      value === ""
+  function setText(id, value) {
+    $(id).textContent =
+      value === undefined || value === null || value === ""
         ? "—"
         : value;
   }
-}
 
+  async function loadScanner() {
+    const symbol =
+      $("symbolInput").value.trim().toUpperCase();
 
-async function loadScanner() {
+    const timeframe =
+      $("timeframe").value;
 
-  const symbol =
-    $("symbol").value.trim().toUpperCase();
-
-  if (!symbol) {
-    return;
-  }
-
-  $("scanBtn").disabled = true;
-  $("scanBtn").textContent = "Loading...";
-
-  try {
-
-    const response =
-      await fetch(
-        `${BACKEND}/scanner/${encodeURIComponent(symbol)}`,
-        {
-          cache: "no-store"
-        }
-      );
-
-    const data =
-      await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.message || "Scanner request failed"
-      );
+    if (!symbol) {
+      setText("backendStatus", "Enter an NSE symbol.");
+      return;
     }
 
-    renderScanner(data);
+    $("refreshBtn").disabled = true;
+    $("refreshBtn").textContent = "Loading...";
 
-    setBackend(
-      true,
-      "Backend online"
-    );
+    setText("tfLabel", timeframe);
 
-  } catch (error) {
-
-    console.error(error);
-
-    setBackend(
-      false,
-      "Backend connection error"
-    );
-
-    setText(
-      "structure",
-      "Unavailable"
-    );
-
-  } finally {
-
-    $("scanBtn").disabled = false;
-    $("scanBtn").textContent = "Scan";
-  }
-}
-
-
-function renderScanner(data) {
-
-  const price =
-    Number(data.price);
-
-  const change =
-    Number(data.changePercent);
-
-  setText(
-    "price",
-    Number.isFinite(price)
-      ? money(price)
-      : "—"
-  );
-
-  setText(
-    "change",
-    Number.isFinite(change)
-      ? percent(change)
-      : "—"
-  );
-
-
-  if (Number.isFinite(change)) {
-
-    setClass(
-      $("change"),
-      change > 0
-        ? "positive"
-        : change < 0
-          ? "negative"
-          : "neutral"
-    );
-  }
-
-
-  const structure =
-    data.priceAction?.structure ||
-    "Unavailable";
-
-  setText(
-    "structure",
-    structure
-  );
-
-
-  if (structure === "Bullish") {
-
-    setClass(
-      $("structure"),
-      "positive"
-    );
-
-  } else if (structure === "Bearish") {
-
-    setClass(
-      $("structure"),
-      "negative"
-    );
-
-  } else {
-
-    setClass(
-      $("structure"),
-      "neutral"
-    );
-  }
-
-
-  setText(
-    "volume",
-    integer(data.volume)
-  );
-
-
-  const resistance =
-    data.levels?.resistance;
-
-  const support =
-    data.levels?.support;
-
-  setText(
-    "resistance",
-    money(resistance)
-  );
-
-  setText(
-    "support",
-    money(support)
-  );
-
-
-  setText(
-    "resistanceLabel",
-    `R ${money(resistance)}`
-  );
-
-  setText(
-    "supportLabel",
-    `S ${money(support)}`
-  );
-
-
-  const range =
-    data.levels?.range;
-
-  setText(
-    "range",
-    range !== null &&
-    range !== undefined
-      ? money(range)
-      : "—"
-  );
-
-
-  setText(
-    "timeframe",
-    selectedTimeframe
-  );
-
-
-  setText(
-    "breakout",
-    data.intraday?.breakout ||
-    data.priceAction?.breakout ||
-    "Unavailable"
-  );
-
-  setText(
-    "retest",
-    data.intraday?.retest ||
-    data.priceAction?.retest ||
-    "Unavailable"
-  );
-
-  setText(
-    "falseBreakout",
-    data.intraday?.falseBreakout ||
-    data.priceAction?.falseBreakout ||
-    "Unavailable"
-  );
-
-  setText(
-    "setup",
-    data.priceAction?.setup ||
-    "No confirmed setup"
-  );
-
-
-  setText(
-    "dataSymbol",
-    data.symbol
-  );
-
-  setText(
-    "open",
-    money(data.open)
-  );
-
-  setText(
-    "high",
-    money(data.high)
-  );
-
-  setText(
-    "low",
-    money(data.low)
-  );
-
-  setText(
-    "previousClose",
-    money(data.previousClose)
-  );
-
-  setText(
-    "weekHigh",
-    money(data.fiftyTwoWeekHigh)
-  );
-
-  setText(
-    "weekLow",
-    money(data.fiftyTwoWeekLow)
-  );
-
-  setText(
-    "timestamp",
-    data.latestTimestamp
-  );
-}
-
-
-function setBackend(online, text) {
-
-  $("backendStatus").textContent =
-    text;
-
-  $("backendDot").classList.remove(
-    "online",
-    "error"
-  );
-
-  $("backendDot").classList.add(
-    online
-      ? "online"
-      : "error"
-  );
-}
-
-
-async function checkBackend() {
-
-  try {
-
-    const response =
-      await fetch(
-        `${BACKEND}/health`,
-        {
-          cache: "no-store"
-        }
+    try {
+      const response = await fetch(
+        `${BACKEND}/scanner/${encodeURIComponent(symbol)}`
       );
 
-    if (!response.ok) {
-      throw new Error("Backend offline");
-    }
-
-    setBackend(
-      true,
-      "Backend online"
-    );
-
-  } catch {
-
-    setBackend(
-      false,
-      "Backend offline"
-    );
-  }
-}
-
-
-document
-  .querySelectorAll(".tf")
-  .forEach(button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        document
-          .querySelectorAll(".tf")
-          .forEach(x =>
-            x.classList.remove("active")
-          );
-
-        button.classList.add("active");
-
-        selectedTimeframe =
-          button.dataset.timeframe;
-
-        setText(
-          "timeframe",
-          selectedTimeframe
+      if (!response.ok) {
+        throw new Error(
+          `Backend HTTP ${response.status}`
         );
       }
-    );
-  });
 
+      const data = await response.json();
 
-$("scanBtn")
-  .addEventListener(
-    "click",
-    loadScanner
-  );
+      if (!data || !data.price) {
+        throw new Error(
+          "NSE data was not returned."
+        );
+      }
 
+      setText("price", number(data.price));
+      setText("symbolLabel", data.symbol);
 
-$("refreshBtn")
-  .addEventListener(
-    "click",
-    loadScanner
-  );
+      setText(
+        "change",
+        `${number(data.changePercent)}%`
+      );
 
+      setText(
+        "structure",
+        data.priceAction?.structure ||
+        data.levels?.strength ||
+        "Neutral"
+      );
 
-$("symbol")
-  .addEventListener(
-    "keydown",
-    event => {
+      setText(
+        "resistance",
+        number(data.levels?.resistance)
+      );
 
+      setText(
+        "support",
+        number(data.levels?.support)
+      );
+
+      setText(
+        "open",
+        number(data.open)
+      );
+
+      setText(
+        "high",
+        number(data.high)
+      );
+
+      setText(
+        "low",
+        number(data.low)
+      );
+
+      setText(
+        "close",
+        number(data.price)
+      );
+
+      setText(
+        "previousClose",
+        number(data.previousClose)
+      );
+
+      setText(
+        "dailyVolume",
+        integer(data.volume)
+      );
+
+      setText(
+        "timestamp",
+        `Trade Timestamp: ${
+          data.latestTimestamp || "—"
+        }`
+      );
+
+      setText(
+        "paStructure",
+        data.priceAction?.structure || "Neutral"
+      );
+
+      setText(
+        "breakout",
+        data.priceAction?.breakout ||
+        "Intraday candles unavailable"
+      );
+
+      setText(
+        "retest",
+        data.priceAction?.retest ||
+        "Intraday candles unavailable"
+      );
+
+      setText(
+        "falseBreakout",
+        data.priceAction?.falseBreakout ||
+        "Intraday candles unavailable"
+      );
+
+      setText(
+        "setup",
+        data.priceAction?.setup ||
+        data.priceAction?.structure ||
+        "No confirmed setup"
+      );
+
+      setText(
+        "candleRange",
+        number(data.levels?.range)
+      );
+
+      setText(
+        "volume",
+        integer(data.volume)
+      );
+
+      setText(
+        "candleDirection",
+        "Intraday candles unavailable"
+      );
+
+      $("backendStatus").textContent =
+        "Backend online";
+
+      $("backendStatus").className =
+        "status ok";
+
+      $("nseStatus").textContent =
+        "NSE CM Market MCP: connected";
+
+      $("nseStatus").className =
+        "status ok";
+
+      $("chart").innerHTML =
+        "Actual 5m / 15m NSE candles are not connected yet." +
+        "<br><br>" +
+        "No artificial candles are displayed.";
+
+    } catch (error) {
+
+      console.error(error);
+
+      $("backendStatus").textContent =
+        `Backend error: ${error.message}`;
+
+      $("backendStatus").className =
+        "status error";
+
+      $("nseStatus").textContent =
+        "NSE CM Market MCP: unavailable";
+
+      $("nseStatus").className =
+        "status error";
+
+    } finally {
+
+      $("refreshBtn").disabled = false;
+      $("refreshBtn").textContent = "Refresh";
+    }
+  }
+
+  $("refreshBtn")
+    .addEventListener("click", loadScanner);
+
+  $("symbolInput")
+    .addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         loadScanner();
       }
-    }
-  );
+    });
 
+  $("timeframe")
+    .addEventListener("change", () => {
+      setText(
+        "tfLabel",
+        $("timeframe").value
+      );
+    });
 
-checkBackend();
-loadScanner();
+  // Verify browser candle engine loaded.
+  if (
+    window.CandleEngine &&
+    typeof window.CandleEngine.calculateCandleEngine === "function"
+  ) {
+    console.log(
+      "Candle Engine loaded successfully."
+    );
+  } else {
+    console.warn(
+      "Candle Engine browser module not loaded."
+    );
+  }
 
-
-setInterval(
-  () => {
-    loadScanner();
-  },
-  60000
-);
-
+  loadScanner();
 </script>
 
 </body>
