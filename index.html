@@ -1303,9 +1303,8 @@ console.log(
    START
 ============================= */
 
-loadScanner();
+$("backendStatus").textContent =
+  "Ready. Tap Refresh to load NSE data.";
 
-</script>
-
-</body>
-</html>
+$("nseStatus").textContent =
+  "NSE CM Market MCP: not checked";
