@@ -98,7 +98,14 @@
       border:1px dashed #35404c;
       border-radius:10px;
       color:#8995a2;
-      padding:20px
+      padding:20px;
+      overflow:hidden
+    }
+    .chart svg{
+      display:block;
+      width:100%;
+      height:auto;
+      max-width:100%
     }
     .row{
       display:flex;
@@ -126,6 +133,7 @@
 
   <script src="./candle-engine-browser.js"></script>
   <script src="./candle-data.js"></script>
+  <script src="./intraday-chart.js"></script>
 </head>
 
 <body>
@@ -427,6 +435,7 @@ async function loadScanner() {
     setText("high", number(data.high));
     setText("low", number(data.low));
     setText("close", number(data.price));
+
     setText(
       "previousClose",
       number(data.previousClose)
@@ -628,9 +637,23 @@ async function analyzeCandleFile() {
       number(analysis.levels.support)
     );
 
-    $("chart").innerHTML =
-      `Loaded ${result.count} candles<br><br>` +
-      `Source: ${result.fileName}`;
+    /* -----------------------------
+       INTRADAY CANDLE CHART
+    ----------------------------- */
+
+    if (window.IntradayChart) {
+
+      window.IntradayChart.renderIntradayChart(
+        result.candles
+      );
+
+    } else {
+
+      $("chart").innerHTML =
+        `Loaded ${result.count} candles<br><br>` +
+        `Source: ${result.fileName}`;
+
+    }
 
     $("fileStatus").textContent =
       `Successfully loaded ${result.count} candles from ${result.fileName}.`;
@@ -709,6 +732,13 @@ console.log(
 console.log(
   "Candle Data:",
   window.CandleData
+    ? "loaded"
+    : "missing"
+);
+
+console.log(
+  "Intraday Chart:",
+  window.IntradayChart
     ? "loaded"
     : "missing"
 );
