@@ -7,19 +7,30 @@
 
   <style>
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family:Arial,sans-serif;
       background:#0b0f14;
       color:#f2f5f7
     }
+
     .app{
       max-width:900px;
       margin:auto;
       padding:18px
     }
-    h1{margin:0;font-size:28px}
-    .subtitle{color:#9ba6b2;margin:6px 0 20px}
+
+    h1{
+      margin:0;
+      font-size:28px
+    }
+
+    .subtitle{
+      color:#9ba6b2;
+      margin:6px 0 20px
+    }
+
     .card{
       background:#131922;
       border:1px solid #27313d;
@@ -27,16 +38,19 @@
       padding:16px;
       margin-bottom:14px
     }
+
     .title{
       font-size:18px;
       font-weight:700;
       margin-bottom:12px
     }
+
     .controls{
       display:grid;
       grid-template-columns:1fr 120px 120px;
       gap:10px
     }
+
     input,select,button{
       width:100%;
       min-height:44px;
@@ -47,48 +61,61 @@
       padding:10px;
       font-size:15px
     }
+
     button{
       cursor:pointer;
       background:#1c2733;
       font-weight:700
     }
-    button:disabled{opacity:.55}
+
+    button:disabled{
+      opacity:.55
+    }
+
     .price{
       font-size:34px;
       font-weight:800
     }
+
     .change{
       margin-top:5px;
       font-size:16px
     }
+
     .grid{
       display:grid;
       grid-template-columns:repeat(2,1fr);
       gap:10px
     }
+
     .metric{
       background:#0d131b;
       border-radius:10px;
       padding:12px
     }
+
     .metric-label{
       color:#8f9ba8;
       font-size:13px
     }
+
     .metric-value{
       font-size:20px;
       font-weight:700;
       margin-top:5px
     }
+
     .structure{
       font-size:24px;
       font-weight:800
     }
+
     .status{
       color:#aeb8c3;
       font-size:14px;
       line-height:1.5
     }
+
     .chart{
       min-height:180px;
       display:flex;
@@ -101,12 +128,14 @@
       padding:20px;
       overflow:hidden
     }
+
     .chart svg{
       display:block;
       width:100%;
       height:auto;
       max-width:100%
     }
+
     .row{
       display:flex;
       justify-content:space-between;
@@ -114,17 +143,30 @@
       padding:8px 0;
       border-bottom:1px solid #202934
     }
-    .row:last-child{border-bottom:0}
-    .error{color:#ff7373}
-    .ok{color:#78d99b}
+
+    .row:last-child{
+      border-bottom:0
+    }
+
+    .error{
+      color:#ff7373
+    }
+
+    .ok{
+      color:#78d99b
+    }
+
     .upload{
       display:grid;
       gap:10px
     }
+
     @media(max-width:650px){
+
       .controls{
         grid-template-columns:1fr 1fr
       }
+
       .controls input{
         grid-column:1/-1
       }
@@ -141,54 +183,134 @@
 <div class="app">
 
   <h1>Arpit Market Scanner</h1>
+
   <div class="subtitle">
     Price-action learning & market-structure scanner
   </div>
 
+
+  <!-- INSTRUMENT -->
+
   <div class="card">
-    <div class="title">Instrument & Timeframe</div>
+
+    <div class="title">
+      Instrument & Timeframe
+    </div>
 
     <div class="controls">
-      <input id="symbolInput" value="20MICRONS" placeholder="NSE symbol">
+
+      <input
+        id="symbolInput"
+        value="20MICRONS"
+        placeholder="NSE symbol"
+      >
 
       <select id="timeframe">
-        <option value="5m">5m</option>
-        <option value="15m">15m</option>
+
+        <option value="5m">
+          5m
+        </option>
+
+        <option value="15m">
+          15m
+        </option>
+
       </select>
 
-      <button id="refreshBtn">Refresh</button>
+      <button id="refreshBtn">
+        Refresh
+      </button>
+
     </div>
+
   </div>
 
+
+  <!-- CURRENT PRICE -->
+
   <div class="card">
-    <div class="title">Current NSE Price</div>
-    <div id="price" class="price">—</div>
-    <div id="symbolLabel">—</div>
-    <div id="change" class="change">—</div>
+
+    <div class="title">
+      Current NSE Price
+    </div>
+
+    <div id="price" class="price">
+      —
+    </div>
+
+    <div id="symbolLabel">
+      —
+    </div>
+
+    <div id="change" class="change">
+      —
+    </div>
+
   </div>
 
+
+  <!-- MARKET STRUCTURE -->
+
   <div class="card">
-    <div class="title">Market Structure</div>
 
-    <div id="structure" class="structure">—</div>
+    <div class="title">
+      Market Structure
+    </div>
 
-    <div class="grid" style="margin-top:12px">
+    <div id="structure" class="structure">
+      —
+    </div>
+
+    <div
+      class="grid"
+      style="margin-top:12px"
+    >
+
       <div class="metric">
-        <div class="metric-label">Resistance</div>
-        <div id="resistance" class="metric-value">—</div>
+
+        <div class="metric-label">
+          Resistance
+        </div>
+
+        <div
+          id="resistance"
+          class="metric-value"
+        >
+          —
+        </div>
+
       </div>
 
       <div class="metric">
-        <div class="metric-label">Support</div>
-        <div id="support" class="metric-value">—</div>
+
+        <div class="metric-label">
+          Support
+        </div>
+
+        <div
+          id="support"
+          class="metric-value"
+        >
+          —
+        </div>
+
       </div>
+
     </div>
+
   </div>
 
+
+  <!-- CANDLE DATA -->
+
   <div class="card">
-    <div class="title">5m / 15m Candle Data</div>
+
+    <div class="title">
+      5m / 15m Candle Data
+    </div>
 
     <div class="upload">
+
       <input
         id="candleFile"
         type="file"
@@ -198,162 +320,397 @@
       <button id="analyzeFileBtn">
         Analyze Candle File
       </button>
+
     </div>
 
-    <div id="fileStatus" class="status" style="margin-top:10px">
+    <div
+      id="fileStatus"
+      class="status"
+      style="margin-top:10px"
+    >
       Select an OHLC CSV or JSON candle file.
     </div>
+
   </div>
 
-  <div class="card">
-    <div class="title">Intraday Chart</div>
 
-    <div id="chart" class="chart">
+  <!-- CHART -->
+
+  <div class="card">
+
+    <div class="title">
+      Intraday Chart
+    </div>
+
+    <div
+      id="chart"
+      class="chart"
+    >
       Actual 5m / 15m candles will appear here after
       valid candle data is loaded.
     </div>
+
   </div>
 
+
+  <!-- INTRADAY ANALYSIS -->
+
   <div class="card">
-    <div class="title">Intraday Analysis</div>
+
+    <div class="title">
+      Intraday Analysis
+    </div>
 
     <div class="grid">
 
       <div class="metric">
-        <div class="metric-label">Candle Range</div>
-        <div id="candleRange" class="metric-value">—</div>
+
+        <div class="metric-label">
+          Candle Range
+        </div>
+
+        <div
+          id="candleRange"
+          class="metric-value"
+        >
+          —
+        </div>
+
       </div>
 
-      <div class="metric">
-        <div class="metric-label">Last Volume</div>
-        <div id="volume" class="metric-value">—</div>
-      </div>
 
       <div class="metric">
-        <div class="metric-label">Timeframe</div>
-        <div id="tfLabel" class="metric-value">5m</div>
+
+        <div class="metric-label">
+          Last Volume
+        </div>
+
+        <div
+          id="volume"
+          class="metric-value"
+        >
+          —
+        </div>
+
       </div>
 
+
       <div class="metric">
-        <div class="metric-label">Candle Direction</div>
-        <div id="candleDirection" class="metric-value">—</div>
+
+        <div class="metric-label">
+          Timeframe
+        </div>
+
+        <div
+          id="tfLabel"
+          class="metric-value"
+        >
+          5m
+        </div>
+
+      </div>
+
+
+      <div class="metric">
+
+        <div class="metric-label">
+          Candle Direction
+        </div>
+
+        <div
+          id="candleDirection"
+          class="metric-value"
+        >
+          —
+        </div>
+
       </div>
 
     </div>
+
   </div>
 
+
+  <!-- PRICE ACTION -->
+
   <div class="card">
-    <div class="title">Price Action Classification</div>
 
-    <div class="row">
-      <span>Structure</span>
-      <strong id="paStructure">—</strong>
+    <div class="title">
+      Price Action Classification
     </div>
 
     <div class="row">
-      <span>Breakout</span>
-      <strong id="breakout">—</strong>
+
+      <span>
+        Structure
+      </span>
+
+      <strong id="paStructure">
+        —
+      </strong>
+
     </div>
 
-    <div class="row">
-      <span>Retest</span>
-      <strong id="retest">—</strong>
-    </div>
 
     <div class="row">
-      <span>False Breakout</span>
-      <strong id="falseBreakout">—</strong>
+
+      <span>
+        Breakout
+      </span>
+
+      <strong id="breakout">
+        —
+      </strong>
+
     </div>
 
+
     <div class="row">
-      <span>Setup Status</span>
-      <strong id="setup">—</strong>
+
+      <span>
+        Retest
+      </span>
+
+      <strong id="retest">
+        —
+      </strong>
+
     </div>
+
+
+    <div class="row">
+
+      <span>
+        False Breakout
+      </span>
+
+      <strong id="falseBreakout">
+        —
+      </strong>
+
+    </div>
+
+
+    <div class="row">
+
+      <span>
+        Setup Status
+      </span>
+
+      <strong id="setup">
+        —
+      </strong>
+
+    </div>
+
   </div>
 
+
+  <!-- DAILY DATA -->
+
   <div class="card">
-    <div class="title">Daily NSE Data</div>
+
+    <div class="title">
+      Daily NSE Data
+    </div>
 
     <div class="grid">
 
-      <div class="metric">
-        <div class="metric-label">Open</div>
-        <div id="open" class="metric-value">—</div>
-      </div>
 
       <div class="metric">
-        <div class="metric-label">High</div>
-        <div id="high" class="metric-value">—</div>
+
+        <div class="metric-label">
+          Open
+        </div>
+
+        <div
+          id="open"
+          class="metric-value"
+        >
+          —
+        </div>
+
       </div>
 
-      <div class="metric">
-        <div class="metric-label">Low</div>
-        <div id="low" class="metric-value">—</div>
-      </div>
 
       <div class="metric">
-        <div class="metric-label">Close / Last Price</div>
-        <div id="close" class="metric-value">—</div>
+
+        <div class="metric-label">
+          High
+        </div>
+
+        <div
+          id="high"
+          class="metric-value"
+        >
+          —
+        </div>
+
       </div>
 
-      <div class="metric">
-        <div class="metric-label">Previous Close</div>
-        <div id="previousClose" class="metric-value">—</div>
-      </div>
 
       <div class="metric">
-        <div class="metric-label">Volume</div>
-        <div id="dailyVolume" class="metric-value">—</div>
+
+        <div class="metric-label">
+          Low
+        </div>
+
+        <div
+          id="low"
+          class="metric-value"
+        >
+          —
+        </div>
+
+      </div>
+
+
+      <div class="metric">
+
+        <div class="metric-label">
+          Close / Last Price
+        </div>
+
+        <div
+          id="close"
+          class="metric-value"
+        >
+          —
+        </div>
+
+      </div>
+
+
+      <div class="metric">
+
+        <div class="metric-label">
+          Previous Close
+        </div>
+
+        <div
+          id="previousClose"
+          class="metric-value"
+        >
+          —
+        </div>
+
+      </div>
+
+
+      <div class="metric">
+
+        <div class="metric-label">
+          Volume
+        </div>
+
+        <div
+          id="dailyVolume"
+          class="metric-value"
+        >
+          —
+        </div>
+
       </div>
 
     </div>
 
-    <div id="timestamp" class="status" style="margin-top:12px">
+
+    <div
+      id="timestamp"
+      class="status"
+      style="margin-top:12px"
+    >
       Trade Timestamp: —
     </div>
+
   </div>
 
-  <div class="card">
-    <div class="title">Backend Connection</div>
 
-    <div id="backendStatus" class="status">
+  <!-- BACKEND -->
+
+  <div class="card">
+
+    <div class="title">
+      Backend Connection
+    </div>
+
+    <div
+      id="backendStatus"
+      class="status"
+    >
       Checking backend...
     </div>
 
-    <div id="nseStatus" class="status">
+    <div
+      id="nseStatus"
+      class="status"
+    >
       NSE CM Market MCP: —
     </div>
+
   </div>
 
+
   <div class="card">
+
     <div class="status">
       Arpit Market Scanner • Educational / informational use
     </div>
+
   </div>
 
 </div>
+
 
 <script>
 
 const BACKEND =
   "https://arpit-market-scanner-backend.onrender.com";
 
-const $ = (id) => document.getElementById(id);
 
-function number(value, digits = 2) {
-  const n = Number(value);
-  return Number.isFinite(n) ? n.toFixed(digits) : "—";
+const $ =
+  (id) =>
+    document.getElementById(id);
+
+
+function number(
+  value,
+  digits = 2
+) {
+
+  const n =
+    Number(value);
+
+  return Number.isFinite(n)
+    ? n.toFixed(digits)
+    : "—";
 }
 
+
 function integer(value) {
-  const n = Number(value);
+
+  const n =
+    Number(value);
+
   return Number.isFinite(n)
     ? n.toLocaleString("en-IN")
     : "—";
 }
 
-function setText(id, value) {
-  $(id).textContent =
+
+function setText(
+  id,
+  value
+) {
+
+  const element =
+    $(id);
+
+  if (!element) {
+    return;
+  }
+
+  element.textContent =
     value === undefined ||
     value === null ||
     value === ""
@@ -362,9 +719,9 @@ function setText(id, value) {
 }
 
 
-/* -----------------------------
+/* =============================
    NSE LIVE DATA
------------------------------ */
+============================= */
 
 async function loadScanner() {
 
@@ -375,38 +732,84 @@ async function loadScanner() {
       .toUpperCase();
 
   const timeframe =
-    $("timeframe").value;
+    $("timeframe")
+      .value;
+
 
   if (!symbol) {
+
     $("backendStatus").textContent =
       "Enter an NSE symbol.";
+
+    $("backendStatus").className =
+      "status error";
+
     return;
   }
 
-  $("refreshBtn").disabled = true;
-  $("refreshBtn").textContent = "Loading...";
 
-  setText("tfLabel", timeframe);
+  $("refreshBtn").disabled =
+    true;
+
+  $("refreshBtn").textContent =
+    "Loading...";
+
+
+  setText(
+    "tfLabel",
+    timeframe
+  );
+
+
+  const controller =
+    new AbortController();
+
+
+  const timeoutId =
+    setTimeout(
+      () => {
+        controller.abort();
+      },
+      15000
+    );
+
 
   try {
 
-    const response = await fetch(
-      `${BACKEND}/scanner/${encodeURIComponent(symbol)}`,
-      {
-        cache: "no-store"
-      }
-    );
+    const response =
+      await fetch(
+        `${BACKEND}/scanner/${encodeURIComponent(symbol)}`,
+        {
+          cache: "no-store",
+          signal: controller.signal
+        }
+      );
+
 
     if (!response.ok) {
+
       throw new Error(
         `Backend HTTP ${response.status}`
       );
+
     }
 
-    const data = await response.json();
 
-    setText("price", number(data.price));
-    setText("symbolLabel", data.symbol);
+    const data =
+      await response.json();
+
+
+    setText(
+      "price",
+      number(data.price)
+    );
+
+
+    setText(
+      "symbolLabel",
+      data.symbol
+    );
+
 
     setText(
       "change",
@@ -415,36 +818,67 @@ async function loadScanner() {
         : "—"
     );
 
+
     setText(
       "structure",
       data.priceAction?.structure ||
       "Neutral"
     );
 
+
     setText(
       "resistance",
-      number(data.levels?.resistance)
+      number(
+        data.levels?.resistance
+      )
     );
+
 
     setText(
       "support",
-      number(data.levels?.support)
+      number(
+        data.levels?.support
+      )
     );
 
-    setText("open", number(data.open));
-    setText("high", number(data.high));
-    setText("low", number(data.low));
-    setText("close", number(data.price));
+
+    setText(
+      "open",
+      number(data.open)
+    );
+
+
+    setText(
+      "high",
+      number(data.high)
+    );
+
+
+    setText(
+      "low",
+      number(data.low)
+    );
+
+
+    setText(
+      "close",
+      number(data.price)
+    );
+
 
     setText(
       "previousClose",
-      number(data.previousClose)
+      number(
+        data.previousClose
+      )
     );
+
 
     setText(
       "dailyVolume",
       integer(data.volume)
     );
+
 
     setText(
       "timestamp",
@@ -453,58 +887,101 @@ async function loadScanner() {
       }`
     );
 
+
     setText(
       "paStructure",
       data.priceAction?.structure ||
       "Neutral"
     );
 
+
     $("backendStatus").textContent =
       "Backend online";
 
+
     $("backendStatus").className =
       "status ok";
+
 
     $("nseStatus").textContent =
       "NSE CM Market MCP: connected";
 
+
     $("nseStatus").className =
       "status ok";
 
+
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "Scanner error:",
+      error
+    );
 
-    $("backendStatus").textContent =
-      `Backend error: ${error.message}`;
+
+    if (
+      error &&
+      error.name === "AbortError"
+    ) {
+
+      $("backendStatus").textContent =
+        "NSE request timed out. Tap Refresh to try again.";
+
+    } else {
+
+      $("backendStatus").textContent =
+        `Backend error: ${
+          error?.message ||
+          "Unknown error"
+        }`;
+
+    }
+
 
     $("backendStatus").className =
       "status error";
 
+
     $("nseStatus").textContent =
-      "NSE CM Market MCP: unavailable";
+      "NSE CM Market MCP: request failed";
+
 
     $("nseStatus").className =
       "status error";
 
+
   } finally {
 
-    $("refreshBtn").disabled = false;
-    $("refreshBtn").textContent = "Refresh";
+    clearTimeout(
+      timeoutId
+    );
+
+
+    $("refreshBtn").disabled =
+      false;
+
+
+    $("refreshBtn").textContent =
+      "Refresh";
+
   }
+
 }
 
 
-/* -----------------------------
+/* =============================
    CANDLE FILE ANALYSIS
------------------------------ */
+============================= */
 
 async function analyzeCandleFile() {
 
   const file =
-    $("candleFile").files[0];
+    $("candleFile")
+      .files[0];
+
 
   if (!file) {
+
     $("fileStatus").textContent =
       "Please select a CSV or JSON candle file.";
 
@@ -514,10 +991,12 @@ async function analyzeCandleFile() {
     return;
   }
 
+
   if (
     !window.CandleData ||
     !window.CandleEngine
   ) {
+
     $("fileStatus").textContent =
       "Candle modules are not loaded.";
 
@@ -527,26 +1006,37 @@ async function analyzeCandleFile() {
     return;
   }
 
-  $("analyzeFileBtn").disabled = true;
+
+  $("analyzeFileBtn").disabled =
+    true;
+
   $("analyzeFileBtn").textContent =
     "Analyzing...";
+
 
   try {
 
     const result =
-      await window.CandleData.readFile(file);
+      await window.CandleData
+        .readFile(file);
+
 
     if (
       result.status !== "ok" ||
       result.count < 5
     ) {
+
       throw new Error(
         "At least 5 valid OHLC candles are required."
       );
+
     }
 
+
     const timeframe =
-      $("timeframe").value;
+      $("timeframe")
+        .value;
+
 
     const analysis =
       window.CandleEngine
@@ -555,97 +1045,131 @@ async function analyzeCandleFile() {
           timeframe
         );
 
-    if (analysis.status !== "ok") {
+
+    if (
+      analysis.status !== "ok"
+    ) {
+
       throw new Error(
         analysis.message ||
         "Candle analysis failed."
       );
+
     }
+
 
     const latest =
       analysis.latest;
+
 
     setText(
       "candleRange",
       number(latest.range)
     );
 
+
     setText(
       "volume",
       integer(latest.volume)
     );
+
 
     setText(
       "tfLabel",
       analysis.timeframe
     );
 
+
     setText(
       "candleDirection",
       latest.direction
     );
+
 
     setText(
       "paStructure",
       analysis.structure.market
     );
 
+
     setText(
       "breakout",
       analysis.priceAction.breakout
     );
+
 
     setText(
       "retest",
       analysis.priceAction.retest
     );
 
+
     setText(
       "falseBreakout",
       analysis.priceAction.falseBreakout
     );
 
+
     let setup =
       "No confirmed setup";
+
 
     if (
       analysis.priceAction.retest !==
       "No confirmed retest"
     ) {
+
       setup =
         analysis.priceAction.retest;
+
     } else if (
       analysis.priceAction.breakout !==
       "No confirmed breakout"
     ) {
+
       setup =
         analysis.priceAction.breakout;
+
     } else {
+
       setup =
         `${analysis.structure.market} structure`;
+
     }
 
-    setText("setup", setup);
+
+    setText(
+      "setup",
+      setup
+    );
+
 
     setText(
       "resistance",
-      number(analysis.levels.resistance)
+      number(
+        analysis.levels.resistance
+      )
     );
+
 
     setText(
       "support",
-      number(analysis.levels.support)
+      number(
+        analysis.levels.support
+      )
     );
 
-    /* -----------------------------
-       INTRADAY CANDLE CHART
-    ----------------------------- */
 
-    if (window.IntradayChart) {
+    /* INTRADAY CHART */
 
-      window.IntradayChart.renderIntradayChart(
-        result.candles
-      );
+    if (
+      window.IntradayChart
+    ) {
+
+      window.IntradayChart
+        .renderIntradayChart(
+          result.candles
+        );
 
     } else {
 
@@ -655,34 +1179,52 @@ async function analyzeCandleFile() {
 
     }
 
+
     $("fileStatus").textContent =
-      `Successfully loaded ${result.count} candles from ${result.fileName}.`;
+      `Successfully loaded ${
+        result.count
+      } candles from ${
+        result.fileName
+      }.`;
 
     $("fileStatus").className =
       "status ok";
 
+
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "Candle error:",
+      error
+    );
+
 
     $("fileStatus").textContent =
-      `Candle analysis error: ${error.message}`;
+      `Candle analysis error: ${
+        error?.message ||
+        "Unknown error"
+      }`;
 
     $("fileStatus").className =
       "status error";
 
+
   } finally {
 
-    $("analyzeFileBtn").disabled = false;
+    $("analyzeFileBtn").disabled =
+      false;
+
     $("analyzeFileBtn").textContent =
       "Analyze Candle File";
+
   }
+
 }
 
 
-/* -----------------------------
+/* =============================
    EVENTS
------------------------------ */
+============================= */
 
 $("refreshBtn")
   .addEventListener(
@@ -690,37 +1232,48 @@ $("refreshBtn")
     loadScanner
   );
 
+
 $("analyzeFileBtn")
   .addEventListener(
     "click",
     analyzeCandleFile
   );
 
+
 $("symbolInput")
   .addEventListener(
     "keydown",
     (event) => {
-      if (event.key === "Enter") {
+
+      if (
+        event.key === "Enter"
+      ) {
+
         loadScanner();
+
       }
+
     }
   );
+
 
 $("timeframe")
   .addEventListener(
     "change",
     () => {
+
       setText(
         "tfLabel",
         $("timeframe").value
       );
+
     }
   );
 
 
-/* -----------------------------
+/* =============================
    MODULE CHECK
------------------------------ */
+============================= */
 
 console.log(
   "Candle Engine:",
@@ -729,12 +1282,14 @@ console.log(
     : "missing"
 );
 
+
 console.log(
   "Candle Data:",
   window.CandleData
     ? "loaded"
     : "missing"
 );
+
 
 console.log(
   "Intraday Chart:",
@@ -744,9 +1299,9 @@ console.log(
 );
 
 
-/* -----------------------------
+/* =============================
    START
------------------------------ */
+============================= */
 
 loadScanner();
 
